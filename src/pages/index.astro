@@ -10,7 +10,7 @@ import Footer from '../components/Footer.astro';
 >
   <Header />
 
-  <main class="max-w-[1440px] mx-auto">
+  <main class="w-full">
 
     <!-- ─── Section header ─────────────────────────────────── -->
     <div class="px-6 md:px-12 py-3 border-b-2 border-[#1A1A1A] flex items-baseline justify-between">
@@ -20,12 +20,28 @@ import Footer from '../components/Footer.astro';
         </h2>
         <div class="w-px h-4 bg-[#D0CEC8] hidden sm:block"></div>
         <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#CC0000] hidden sm:block">
-          Today's Listings
+          Remote · AI-Native
         </span>
       </div>
       <span id="job-count" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#bbb]">
         Loading…
       </span>
+    </div>
+
+    <!-- ─── Loading skeleton ─────────────────────────────────── -->
+    <div id="loading-state" class="divide-y divide-[#D0CEC8]">
+      {[...Array(6)].map(() => (
+        <div class="flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] animate-pulse">
+          <div class="w-7 h-2.5 bg-[#EFEFEC] rounded hidden sm:block shrink-0"></div>
+          <div class="flex-1 min-w-0 space-y-2">
+            <div class="h-4 bg-[#EFEFEC] rounded w-2/5"></div>
+            <div class="h-3 bg-[#EFEFEC] rounded w-3/4"></div>
+          </div>
+          <div class="h-2.5 w-20 bg-[#EFEFEC] rounded hidden md:block shrink-0"></div>
+          <div class="h-2.5 w-14 bg-[#EFEFEC] rounded hidden sm:block shrink-0"></div>
+          <div class="w-[96px] h-[64px] bg-[#EFEFEC] shrink-0"></div>
+        </div>
+      ))}
     </div>
 
     <!-- ─── Empty state ─────────────────────────────────────── -->
@@ -44,117 +60,47 @@ import Footer from '../components/Footer.astro';
       </p>
     </div>
 
-    <!-- ─── Loading skeleton ─────────────────────────────────── -->
-    <div id="loading-state" class="border-b border-[#D0CEC8]">
-      <!-- Primary skeleton: 2 col + sidebar -->
-      <div class="grid lg:grid-cols-3">
-        <!-- Featured -->
-        <div class="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-[#D0CEC8] animate-pulse">
-          <div class="aspect-[16/9] bg-[#EFEFEC] mb-6"></div>
-          <div class="h-2.5 bg-[#EFEFEC] w-28 mb-4"></div>
-          <div class="h-9 bg-[#EFEFEC] w-4/5 mb-2"></div>
-          <div class="h-9 bg-[#EFEFEC] w-2/3 mb-5"></div>
-          <div class="space-y-2">
-            <div class="h-3 bg-[#EFEFEC] w-full"></div>
-            <div class="h-3 bg-[#EFEFEC] w-full"></div>
-            <div class="h-3 bg-[#EFEFEC] w-3/4"></div>
-          </div>
-        </div>
-        <!-- Sidebar -->
-        <div class="divide-y divide-[#D0CEC8]">
-          {[0,1].map(() => (
-            <div class="p-6 animate-pulse">
-              <div class="aspect-[16/9] bg-[#EFEFEC] mb-4"></div>
-              <div class="h-2.5 bg-[#EFEFEC] w-20 mb-3"></div>
-              <div class="h-5 bg-[#EFEFEC] w-4/5 mb-2"></div>
-              <div class="h-3 bg-[#EFEFEC] w-full mb-1"></div>
-              <div class="h-3 bg-[#EFEFEC] w-3/5"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── Live content ─────────────────────────────────────── -->
-
-    <!-- Primary zone: featured (2fr) + sidebar (1fr) -->
-    <div id="primary-zone" class="hidden border-b-2 border-[#1A1A1A]">
-      <div class="grid lg:grid-cols-3">
-        <div id="featured-zone" class="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-[#D0CEC8]"></div>
-        <div id="sidebar-zone" class="divide-y divide-[#D0CEC8]"></div>
-      </div>
-    </div>
-
-    <!-- Secondary zone: 3 equal columns with column rules -->
-    <div id="secondary-zone" class="hidden">
-      <div id="secondary-grid"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#D0CEC8]">
-      </div>
-    </div>
+    <!-- ─── Job list ─────────────────────────────────────────── -->
+    <div id="job-list" class="hidden divide-y divide-[#D0CEC8]"></div>
 
   </main>
 
   <Footer />
 </Layout>
 
-<!-- ═══════ TEMPLATES ═══════════════════════════════════════════ -->
+<!-- ═══════ ROW TEMPLATE ══════════════════════════════════════ -->
+<template id="tpl-row">
+  <article class="group relative flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] cursor-pointer
+                  hover:bg-[#F2F0EC] transition-colors duration-150">
 
-<!-- Featured article template -->
-<template id="tpl-featured">
-  <article class="group relative cursor-pointer h-full">
-    <!-- Label row -->
-    <div class="flex items-center justify-between mb-5">
-      <span class="font-mono text-[8px] tracking-[0.35em] uppercase text-[#CC0000]">Featured Position</span>
-      <span class="font-mono text-[8px] tracking-[0.2em] text-[#bbb] job-num"></span>
-    </div>
-    <!-- Image -->
-    <div class="overflow-hidden mb-6 job-image-wrap aspect-[16/9] bg-[#EFEFEC]"></div>
-    <!-- Headline -->
-    <h2 class="font-serif font-black leading-[1.05] mb-4 group-hover:text-[#CC0000] transition-colors duration-200 job-title"
-      style="font-size: clamp(1.7rem, 3.5vw, 2.8rem);"></h2>
-    <!-- Thin rule -->
-    <div class="w-full h-px bg-[#D0CEC8] mb-4"></div>
-    <!-- Description -->
-    <p class="font-sans text-[0.875rem] text-[#555] leading-relaxed line-clamp-5 mb-6 job-description"></p>
-    <!-- Meta + apply -->
-    <div class="flex items-center justify-between">
-      <span class="font-mono text-[8px] tracking-[0.15em] text-[#bbb] uppercase job-date"></span>
-      <a class="job-link relative z-10 font-mono text-[9px] tracking-[0.25em] uppercase border-b border-[#1A1A1A] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
-        target="_blank" rel="noopener noreferrer">Apply ↗</a>
-    </div>
-    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
-  </article>
-</template>
+    <!-- Index number -->
+    <span class="job-num font-mono text-[9px] tracking-[0.1em] text-[#ccc] w-7 shrink-0 hidden sm:block"></span>
 
-<!-- Sidebar article template -->
-<template id="tpl-sidebar">
-  <article class="group relative cursor-pointer p-6">
-    <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#CC0000] block mb-3">Open Position</span>
-    <div class="overflow-hidden mb-4 job-image-wrap aspect-[16/9] bg-[#EFEFEC]"></div>
-    <h2 class="font-serif text-[1.2rem] font-black leading-tight mb-2 group-hover:text-[#CC0000] transition-colors duration-200 job-title"></h2>
-    <p class="font-sans text-[0.8rem] text-[#666] leading-relaxed line-clamp-2 mb-4 job-description"></p>
-    <div class="flex items-center justify-between">
-      <span class="font-mono text-[8px] text-[#bbb] uppercase job-date"></span>
-      <a class="job-link relative z-10 font-mono text-[8px] tracking-[0.2em] uppercase border-b border-[#D0CEC8] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
-        target="_blank" rel="noopener noreferrer">Apply ↗</a>
+    <!-- Title + description -->
+    <div class="flex-1 min-w-0">
+      <h2 class="job-title font-serif font-black text-[1.05rem] leading-tight truncate
+                 group-hover:text-[#CC0000] transition-colors duration-150"></h2>
+      <p class="job-description font-sans text-[0.72rem] text-[#999] truncate mt-0.5 leading-snug"></p>
     </div>
-    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
-  </article>
-</template>
 
-<!-- Secondary article template -->
-<template id="tpl-secondary">
-  <article class="group relative cursor-pointer p-6 md:p-8">
-    <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#CC0000] block mb-3">Open Position</span>
-    <div class="overflow-hidden mb-4 job-image-wrap aspect-[3/2] bg-[#EFEFEC]"></div>
-    <h2 class="font-serif text-[1.15rem] font-black leading-tight mb-2 group-hover:text-[#CC0000] transition-colors duration-200 job-title"></h2>
-    <p class="font-sans text-[0.8rem] text-[#666] leading-relaxed line-clamp-3 mb-4 job-description"></p>
-    <div class="flex items-center justify-between pt-3 border-t border-[#EFEFEC]">
-      <span class="font-mono text-[8px] text-[#bbb] uppercase job-date"></span>
-      <a class="job-link relative z-10 font-mono text-[8px] tracking-[0.2em] uppercase border-b border-[#D0CEC8] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
-        target="_blank" rel="noopener noreferrer">Apply ↗</a>
-    </div>
-    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
+    <!-- Date -->
+    <span class="job-date font-mono text-[8px] tracking-[0.15em] text-[#bbb] uppercase
+                 shrink-0 hidden md:block whitespace-nowrap"></span>
+
+    <!-- Apply link -->
+    <a class="job-link relative z-10 font-mono text-[9px] tracking-[0.25em] uppercase
+              border-b border-[#1A1A1A] pb-px shrink-0 whitespace-nowrap
+              hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-150
+              hidden sm:block"
+       target="_blank" rel="noopener noreferrer">Apply ↗</a>
+
+    <!-- Thumbnail — fixed 96 × 64 -->
+    <div class="job-image-wrap w-[96px] h-[64px] shrink-0 overflow-hidden bg-[#EFEFEC]"></div>
+
+    <!-- Full-row tap target -->
+    <a class="job-card-link absolute inset-0 z-0"
+       target="_blank" rel="noopener noreferrer"
+       aria-hidden="true" tabindex="-1"></a>
   </article>
 </template>
 
@@ -174,43 +120,37 @@ import Footer from '../components/Footer.astro';
       img.src = job.image_url;
       img.alt = job.title;
       img.loading = 'lazy';
-      img.className = 'w-full h-full object-cover grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.04] transition-all duration-500 ease-out';
+      img.className = 'w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300';
       wrap.appendChild(img);
     } else {
       wrap.innerHTML = `
-        <div class="w-full h-full flex items-center justify-center relative overflow-hidden bg-[#EFEFEC]">
-          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #1A1A1A 0, #1A1A1A 1px, transparent 0, transparent 50%); background-size: 8px 8px;"></div>
-          <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#ccc]">No Image</span>
+        <div class="w-full h-full flex items-center justify-center bg-[#EFEFEC] relative overflow-hidden">
+          <div class="absolute inset-0 opacity-[0.06]"
+               style="background-image:repeating-linear-gradient(45deg,#1A1A1A 0,#1A1A1A 1px,transparent 0,transparent 50%);background-size:6px 6px;"></div>
+          <span class="font-mono text-[7px] tracking-[0.2em] uppercase text-[#ccc]">—</span>
         </div>`;
     }
   }
 
-  function populateArticle(article: Element, job: Job, index: number) {
-    const num = String(index + 1).padStart(2, '0');
-    const numEl = article.querySelector('.job-num') as HTMLElement | null;
-    if (numEl) numEl.textContent = `No. ${num}`;
-    injectImage(article.querySelector('.job-image-wrap')!, job);
+  function buildRow(job: Job, index: number): DocumentFragment {
+    const frag = (document.getElementById('tpl-row') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
+    const article = frag.querySelector('article')!;
+    (article.querySelector('.job-num') as HTMLElement).textContent = String(index + 1).padStart(2, '0');
     (article.querySelector('.job-title') as HTMLElement).textContent = job.title;
     (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
     (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
     (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
     (article.querySelector('.job-card-link') as HTMLAnchorElement).href = job.link;
-  }
-
-  function cloneTemplate(id: string): DocumentFragment {
-    return (document.getElementById(id) as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
+    injectImage(article.querySelector('.job-image-wrap')!, job);
+    return frag;
   }
 
   async function loadJobs() {
-    const loadingEl = document.getElementById('loading-state')!;
-    const emptyEl = document.getElementById('empty-state')!;
-    const errorEl = document.getElementById('error-state')!;
-    const countEl = document.getElementById('job-count')!;
-    const primaryZone = document.getElementById('primary-zone')!;
-    const featuredZone = document.getElementById('featured-zone')!;
-    const sidebarZone = document.getElementById('sidebar-zone')!;
-    const secondaryZone = document.getElementById('secondary-zone')!;
-    const secondaryGrid = document.getElementById('secondary-grid')!;
+    const loadingEl  = document.getElementById('loading-state')!;
+    const emptyEl    = document.getElementById('empty-state')!;
+    const errorEl    = document.getElementById('error-state')!;
+    const countEl    = document.getElementById('job-count')!;
+    const listEl     = document.getElementById('job-list')!;
 
     try {
       const res = await fetch(
@@ -229,33 +169,9 @@ import Footer from '../components/Footer.astro';
       }
 
       countEl.textContent = `${jobs.length} position${jobs.length !== 1 ? 's' : ''}`;
+      jobs.forEach((job, i) => listEl.appendChild(buildRow(job, i)));
+      listEl.classList.remove('hidden');
 
-      // ── Featured (first job) ──
-      const featFrag = cloneTemplate('tpl-featured');
-      const featArticle = featFrag.querySelector('article')!;
-      populateArticle(featArticle, jobs[0], 0);
-      featuredZone.appendChild(featFrag);
-
-      // ── Sidebar (jobs 1 & 2) ──
-      jobs.slice(1, 3).forEach((job, i) => {
-        const frag = cloneTemplate('tpl-sidebar');
-        populateArticle(frag.querySelector('article')!, job, i + 1);
-        sidebarZone.appendChild(frag);
-      });
-
-      primaryZone.classList.remove('hidden');
-
-      // ── Secondary (jobs 3+) ──
-      if (jobs.length > 3) {
-        jobs.slice(3).forEach((job, i) => {
-          const frag = cloneTemplate('tpl-secondary');
-          populateArticle(frag.querySelector('article')!, job, i + 3);
-          secondaryGrid.appendChild(frag);
-        });
-        secondaryZone.classList.remove('hidden');
-      }
-
-      // ── Google for Jobs: JobPosting structured data ───────
       injectJobPostingSchema(jobs);
 
     } catch {
@@ -265,15 +181,8 @@ import Footer from '../components/Footer.astro';
     }
   }
 
-  /**
-   * Injects JobPosting + ItemList JSON-LD so Google can surface
-   * individual listings in the "Jobs" rich result carousel.
-   * See: https://developers.google.com/search/docs/appearance/structured-data/job-posting
-   */
   function injectJobPostingSchema(jobs: Job[]) {
-    // Remove any previously injected schema (e.g. on SPA nav)
     document.getElementById('ld-jobs')?.remove();
-
     const itemList = {
       '@context': 'https://schema.org',
       '@type': 'ItemList',
@@ -292,14 +201,9 @@ import Footer from '../components/Footer.astro';
           datePosted: job.created_at.split('T')[0],
           url: job.link,
           directApply: true,
-          // All vibecoding jobs are remote
           jobLocationType: 'TELECOMMUTE',
-          applicantLocationRequirements: {
-            '@type': 'Country',
-            name: 'Worldwide',
-          },
+          applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
           employmentType: ['FULL_TIME', 'CONTRACTOR'],
-          // Occupational category: Software Developers (SOC 15-1252)
           occupationalCategory: '15-1252',
           hiringOrganization: {
             '@type': 'Organization',
@@ -311,7 +215,6 @@ import Footer from '../components/Footer.astro';
         },
       })),
     };
-
     const script = document.createElement('script');
     script.id = 'ld-jobs';
     script.type = 'application/ld+json';
