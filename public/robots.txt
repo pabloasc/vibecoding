@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block crawling of static build artifacts
+Disallow: /_astro/
+
+Sitemap: https://vibecoding.work/sitemap-index.xml

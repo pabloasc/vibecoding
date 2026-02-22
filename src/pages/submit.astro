@@ -1,0 +1,297 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const webPage = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Post an AI Developer Job — vibecoding.work',
+  url: 'https://vibecoding.work/submit',
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home',               item: 'https://vibecoding.work/'       },
+      { '@type': 'ListItem', position: 2, name: 'Submit a Position',  item: 'https://vibecoding.work/submit' },
+    ],
+  },
+});
+---
+
+<Layout
+  title="Post an AI Developer Job — vibecoding.work"
+  description="Post a remote job opening on vibecoding.work. Reach the best vibecoders and AI-native software engineers who build fast and ship faster."
+>
+  <script slot="head" type="application/ld+json" set:html={webPage} />
+  <Header />
+
+  <main class="px-5 md:px-12 py-12 max-w-2xl">
+
+    <!-- Section header -->
+    <div class="border-b-2 border-[#1A1A1A] pb-5 mb-10">
+      <p class="font-mono text-[9px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Contribute</p>
+      <h2 class="font-serif text-[2rem] md:text-[2.5rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">Submit a Position</h2>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-state" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-10 mb-8">
+      <p class="font-mono text-[9px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Position Submitted</p>
+      <p class="font-serif text-[2rem] font-black mb-6 leading-none">Your listing is live.</p>
+      <a href="/" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888] hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
+        ← Back to listings
+      </a>
+    </div>
+
+    <!-- Error banner -->
+    <div id="error-banner" class="hidden bg-[#CC0000] text-white px-5 py-3.5 mb-6">
+      <p class="font-mono text-[9px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
+    </div>
+
+    <!-- Form -->
+    <form id="submit-form" class="space-y-8" novalidate>
+
+      <!-- Title -->
+      <div class="space-y-2.5">
+        <label for="title" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+          Job Title <span class="text-[#CC0000]">*</span>
+        </label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          required
+          placeholder="e.g. Senior AI Engineer"
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-serif text-lg text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2.5">
+        <label for="description" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+          Description <span class="text-[#CC0000]">*</span>
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          required
+          rows="5"
+          placeholder="Describe the role, requirements, and what makes it special for a vibecoder…"
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-sans text-sm leading-relaxed text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200 resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Link -->
+      <div class="space-y-2.5">
+        <label for="link" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+          Application URL <span class="text-[#CC0000]">*</span>
+        </label>
+        <input
+          type="url"
+          id="link"
+          name="link"
+          required
+          placeholder="https://jobs.example.com/position"
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200"
+        />
+      </div>
+
+      <!-- Image upload -->
+      <div class="space-y-2.5">
+        <label for="image" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+          Cover Image <span class="text-[#ccc]">(optional)</span>
+        </label>
+        <div
+          id="drop-zone"
+          class="border border-dashed border-[#ccc] bg-white p-12 text-center cursor-pointer
+                 hover:border-[#1A1A1A] transition-colors duration-200 relative"
+        >
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/jpeg,image/png,image/webp"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          <div id="drop-prompt">
+            <p class="font-serif text-[1.4rem] font-black mb-2 text-[#1A1A1A]">Drop image here</p>
+            <p class="font-mono text-[9px] tracking-[0.2em] text-[#bbb] uppercase">
+              or click to browse &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
+            </p>
+          </div>
+          <div id="image-preview-wrap" class="hidden">
+            <img id="image-preview" src="" alt="Preview"
+              class="max-h-52 mx-auto border border-[#1A1A1A] grayscale" />
+            <p class="font-mono text-[9px] tracking-[0.2em] text-[#bbb] uppercase mt-3" id="image-name"></p>
+            <button
+              type="button"
+              id="remove-image"
+              class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#CC0000]
+                     border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity"
+            >Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit row -->
+      <div class="flex items-center gap-6 pt-6 border-t border-[#1A1A1A]">
+        <button
+          type="submit"
+          id="submit-btn"
+          class="font-mono text-[9px] tracking-[0.3em] uppercase
+                 bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
+                 hover:bg-[#CC0000] transition-colors duration-200
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Publish Position →
+        </button>
+        <a href="/"
+          class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#bbb] hover:text-[#1A1A1A] transition-colors duration-200">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  // ── Image preview ─────────────────────────────────────────
+  const imageInput = document.getElementById('image') as HTMLInputElement;
+  const dropPrompt = document.getElementById('drop-prompt')!;
+  const previewWrap = document.getElementById('image-preview-wrap')!;
+  const previewImg = document.getElementById('image-preview') as HTMLImageElement;
+  const imageName = document.getElementById('image-name')!;
+  const removeBtn = document.getElementById('remove-image')!;
+
+  imageInput.addEventListener('change', () => {
+    const file = imageInput.files?.[0];
+    if (!file) return;
+    showPreview(file);
+  });
+
+  removeBtn.addEventListener('click', () => {
+    imageInput.value = '';
+    previewWrap.classList.add('hidden');
+    dropPrompt.classList.remove('hidden');
+  });
+
+  function showPreview(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target?.result as string;
+      imageName.textContent = file.name;
+      dropPrompt.classList.add('hidden');
+      previewWrap.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Form submission ───────────────────────────────────────
+  const form = document.getElementById('submit-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const successEl = document.getElementById('success-state')!;
+  const errorBanner = document.getElementById('error-banner')!;
+  const errorMessage = document.getElementById('error-message')!;
+
+  function showError(msg: string) {
+    errorMessage.textContent = msg;
+    errorBanner.classList.remove('hidden');
+    errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideError() {
+    errorBanner.classList.add('hidden');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const title = (document.getElementById('title') as HTMLInputElement).value.trim();
+    const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
+    const link = (document.getElementById('link') as HTMLInputElement).value.trim();
+    const imageFile = imageInput.files?.[0] ?? null;
+
+    if (!title) { showError('Job title is required.'); return; }
+    if (!description) { showError('Description is required.'); return; }
+    if (!link) { showError('Application URL is required.'); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Publishing…';
+
+    try {
+      let image_url: string | null = null;
+
+      if (imageFile) {
+        if (imageFile.size > 5 * 1024 * 1024) {
+          showError('Image must be smaller than 5 MB.');
+          return;
+        }
+
+        const ext = imageFile.name.split('.').pop();
+        const filename = `${crypto.randomUUID()}.${ext}`;
+
+        const uploadRes = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/job-images/${filename}`,
+          {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              'Content-Type': imageFile.type,
+              'x-upsert': 'false',
+            },
+            body: imageFile,
+          }
+        );
+
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(err?.message || 'Image upload failed.');
+        }
+
+        image_url = `${SUPABASE_URL}/storage/v1/object/public/job-images/${filename}`;
+      }
+
+      const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/jobs`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({ title, description, link, image_url }),
+      });
+
+      if (!insertRes.ok) {
+        const err = await insertRes.json().catch(() => ({}));
+        throw new Error(err?.message || 'Failed to save the position.');
+      }
+
+      form.classList.add('hidden');
+      successEl.classList.remove('hidden');
+      successEl.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publish Position →';
+    }
+  });
+</script>

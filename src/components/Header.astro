@@ -1,0 +1,100 @@
+---
+const today = new Date();
+const issue = 1;
+const vol = 1;
+const dateStr = today.toLocaleDateString('en-US', {
+  month: 'long',
+  year: 'numeric',
+}).toUpperCase();
+---
+
+<header class="bg-[#F8F7F4]">
+
+  <!-- ① 3px top accent rule -->
+  <div class="h-[3px] bg-[#1A1A1A]"></div>
+
+  <!-- ② Meta + masthead row -->
+  <div class="px-6 md:px-12 pt-5 pb-5 border-b border-[#D0CEC8]">
+    <div class="flex items-center justify-between gap-4">
+
+      <!-- Left meta (hidden on mobile) -->
+      <div class="hidden md:flex flex-col gap-0.5 min-w-[130px]">
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">
+          Vol.&nbsp;{vol}&nbsp;/&nbsp;Issue&nbsp;#{String(issue).padStart(3,'0')}
+        </span>
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">Jobs&nbsp;&amp;&nbsp;Opportunities</span>
+      </div>
+
+      <!-- Center: Logo + wordmark -->
+      <a href="/" class="flex-1 md:flex-none flex items-center justify-start md:justify-center gap-3 group" aria-label="vibecoding.work home">
+        <img
+          src="/images/logo.png"
+          alt="vibecoding.work"
+          class="h-12 md:h-14 w-auto object-contain transition-opacity duration-200 group-hover:opacity-60"
+        />
+        <div class="leading-none">
+          <div class="leading-none">
+            <span class="font-serif font-black tracking-tight text-[#1A1A1A]"
+              style="font-size: clamp(1.6rem, 4vw, 2.4rem);">vibecoding</span><span
+              class="font-mono font-medium text-[#CC0000]"
+              style="font-size: clamp(1.1rem, 2.8vw, 1.65rem);">.work</span>
+          </div>
+          <p class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#aaa] mt-1 hidden sm:block">
+            For AI-native builders
+          </p>
+        </div>
+      </a>
+
+      <!-- Right meta (hidden on mobile) -->
+      <div class="hidden md:flex flex-col items-end gap-0.5 min-w-[130px]">
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">{dateStr}</span>
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">Est.&nbsp;2024</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ③ Pull quote strip -->
+  <div class="px-6 md:px-12 py-2.5 border-b-[3px] border-[#1A1A1A] text-center">
+    <p class="font-serif italic text-[0.9rem] text-[#888] leading-snug">
+      "Build fast. Ship faster. Let the AI do the heavy lifting."
+    </p>
+  </div>
+
+  <!-- ④ Nav bar -->
+  <nav class="px-6 md:px-12 flex items-center gap-8 border-b border-[#D0CEC8]">
+    <a href="/" class="nav-link font-mono text-[9px] tracking-[0.25em] uppercase py-3 whitespace-nowrap relative text-[#1A1A1A]">
+      Open Positions
+    </a>
+    <a href="/submit" class="nav-link font-mono text-[9px] tracking-[0.25em] uppercase py-3 whitespace-nowrap relative text-[#888] hover:text-[#CC0000] transition-colors duration-200">
+      Submit a Job ↗
+    </a>
+  </nav>
+
+</header>
+
+<style>
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #CC0000;
+    transition: width 0.25s ease;
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current="page"]::after {
+    width: 100%;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
+    if (new URL(link.href).pathname === window.location.pathname) {
+      link.style.color = '#1A1A1A';
+      link.setAttribute('aria-current', 'page');
+    }
+  });
+</script>

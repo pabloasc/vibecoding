@@ -1,0 +1,96 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  link: string;
+  created_at: string;
+  variant?: 'featured' | 'sidebar' | 'secondary';
+  index?: number;
+}
+
+const { title, description, image_url, link, created_at, variant = 'secondary', index = 0 } = Astro.props;
+
+const date = new Date(created_at).toLocaleDateString('en-US', {
+  day: '2-digit', month: 'short', year: 'numeric',
+}).toUpperCase();
+
+const num = `No. ${String(index + 1).padStart(2, '0')}`;
+---
+
+<article class="group relative cursor-pointer">
+  {variant === 'featured' && (
+    <div class="flex items-center justify-between mb-5">
+      <span class="font-mono text-[8px] tracking-[0.35em] uppercase text-[#CC0000]">Featured Position</span>
+      <span class="font-mono text-[8px] tracking-[0.2em] text-[#bbb]">{num}</span>
+    </div>
+  )}
+
+  {variant !== 'featured' && (
+    <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#CC0000] block mb-3">Open Position</span>
+  )}
+
+  <!-- Image -->
+  <div class:list={[
+    'overflow-hidden mb-5 bg-[#EFEFEC]',
+    variant === 'featured' ? 'aspect-[16/9] mb-6' : 'aspect-[3/2] mb-4',
+  ]}>
+    {image_url ? (
+      <img
+        src={image_url}
+        alt={title}
+        loading="lazy"
+        class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.04] transition-all duration-500 ease-out"
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center relative bg-[#EFEFEC] overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.04]"
+          style="background-image: repeating-linear-gradient(45deg,#1A1A1A 0,#1A1A1A 1px,transparent 0,transparent 50%);background-size:8px 8px;"></div>
+        <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#ccc]">No Image</span>
+      </div>
+    )}
+  </div>
+
+  <!-- Headline -->
+  <h2 class:list={[
+    'font-serif font-black leading-[1.05] mb-4 group-hover:text-[#CC0000] transition-colors duration-200',
+    variant === 'featured' ? 'text-[clamp(1.7rem,3.5vw,2.8rem)] mb-4' : 'text-[1.15rem] mb-2',
+  ]}>
+    {title}
+  </h2>
+
+  {variant === 'featured' && <div class="w-full h-px bg-[#D0CEC8] mb-4"></div>}
+
+  <!-- Description -->
+  <p class:list={[
+    'font-sans text-[#666] leading-relaxed mb-4',
+    variant === 'featured' ? 'text-[0.875rem] line-clamp-5 mb-6' : 'text-[0.8rem] line-clamp-3',
+  ]}>
+    {description}
+  </p>
+
+  <!-- Meta + Apply -->
+  <div class:list={[
+    'flex items-center justify-between',
+    variant !== 'featured' && 'pt-3 border-t border-[#EFEFEC]',
+  ]}>
+    <span class="font-mono text-[8px] tracking-[0.15em] text-[#bbb] uppercase">{date}</span>
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      class:list={[
+        'relative z-10 font-mono text-[8px] tracking-[0.25em] uppercase pb-px border-b',
+        'hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200',
+        variant === 'featured' ? 'border-[#1A1A1A]' : 'border-[#D0CEC8]',
+      ]}
+    >
+      Apply ↗
+    </a>
+  </div>
+
+  <!-- Full-card tap target -->
+  <a href={link} target="_blank" rel="noopener noreferrer"
+    class="absolute inset-0 z-0" aria-hidden="true" tabindex="-1"></a>
+</article>

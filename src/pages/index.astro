@@ -1,0 +1,323 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="vibecoding.work — AI Developer Jobs & Remote Opportunities"
+  description="Browse open remote positions for vibecoders and AI-native developers. Find jobs that embrace AI-assisted development and ship at the speed of thought."
+>
+  <Header />
+
+  <main class="max-w-[1440px] mx-auto">
+
+    <!-- ─── Section header ─────────────────────────────────── -->
+    <div class="px-6 md:px-12 py-3 border-b-2 border-[#1A1A1A] flex items-baseline justify-between">
+      <div class="flex items-baseline gap-3">
+        <h2 class="font-serif text-[1.5rem] md:text-[1.9rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">
+          Open Positions
+        </h2>
+        <div class="w-px h-4 bg-[#D0CEC8] hidden sm:block"></div>
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#CC0000] hidden sm:block">
+          Today's Listings
+        </span>
+      </div>
+      <span id="job-count" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#bbb]">
+        Loading…
+      </span>
+    </div>
+
+    <!-- ─── Empty state ─────────────────────────────────────── -->
+    <div id="empty-state" class="hidden px-6 md:px-12 py-24 text-center border-b border-[#D0CEC8]">
+      <p class="font-serif text-[2rem] font-black text-[#ccc] mb-3 leading-none">No positions yet.</p>
+      <a href="/submit"
+        class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#aaa] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
+        Be the first to submit one ↗
+      </a>
+    </div>
+
+    <!-- ─── Error state ──────────────────────────────────────── -->
+    <div id="error-state" class="hidden px-6 md:px-12 py-12 text-center">
+      <p class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#CC0000]">
+        Failed to load positions — check your Supabase configuration.
+      </p>
+    </div>
+
+    <!-- ─── Loading skeleton ─────────────────────────────────── -->
+    <div id="loading-state" class="border-b border-[#D0CEC8]">
+      <!-- Primary skeleton: 2 col + sidebar -->
+      <div class="grid lg:grid-cols-3">
+        <!-- Featured -->
+        <div class="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-[#D0CEC8] animate-pulse">
+          <div class="aspect-[16/9] bg-[#EFEFEC] mb-6"></div>
+          <div class="h-2.5 bg-[#EFEFEC] w-28 mb-4"></div>
+          <div class="h-9 bg-[#EFEFEC] w-4/5 mb-2"></div>
+          <div class="h-9 bg-[#EFEFEC] w-2/3 mb-5"></div>
+          <div class="space-y-2">
+            <div class="h-3 bg-[#EFEFEC] w-full"></div>
+            <div class="h-3 bg-[#EFEFEC] w-full"></div>
+            <div class="h-3 bg-[#EFEFEC] w-3/4"></div>
+          </div>
+        </div>
+        <!-- Sidebar -->
+        <div class="divide-y divide-[#D0CEC8]">
+          {[0,1].map(() => (
+            <div class="p-6 animate-pulse">
+              <div class="aspect-[16/9] bg-[#EFEFEC] mb-4"></div>
+              <div class="h-2.5 bg-[#EFEFEC] w-20 mb-3"></div>
+              <div class="h-5 bg-[#EFEFEC] w-4/5 mb-2"></div>
+              <div class="h-3 bg-[#EFEFEC] w-full mb-1"></div>
+              <div class="h-3 bg-[#EFEFEC] w-3/5"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Live content ─────────────────────────────────────── -->
+
+    <!-- Primary zone: featured (2fr) + sidebar (1fr) -->
+    <div id="primary-zone" class="hidden border-b-2 border-[#1A1A1A]">
+      <div class="grid lg:grid-cols-3">
+        <div id="featured-zone" class="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-[#D0CEC8]"></div>
+        <div id="sidebar-zone" class="divide-y divide-[#D0CEC8]"></div>
+      </div>
+    </div>
+
+    <!-- Secondary zone: 3 equal columns with column rules -->
+    <div id="secondary-zone" class="hidden">
+      <div id="secondary-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#D0CEC8]">
+      </div>
+    </div>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<!-- ═══════ TEMPLATES ═══════════════════════════════════════════ -->
+
+<!-- Featured article template -->
+<template id="tpl-featured">
+  <article class="group relative cursor-pointer h-full">
+    <!-- Label row -->
+    <div class="flex items-center justify-between mb-5">
+      <span class="font-mono text-[8px] tracking-[0.35em] uppercase text-[#CC0000]">Featured Position</span>
+      <span class="font-mono text-[8px] tracking-[0.2em] text-[#bbb] job-num"></span>
+    </div>
+    <!-- Image -->
+    <div class="overflow-hidden mb-6 job-image-wrap aspect-[16/9] bg-[#EFEFEC]"></div>
+    <!-- Headline -->
+    <h2 class="font-serif font-black leading-[1.05] mb-4 group-hover:text-[#CC0000] transition-colors duration-200 job-title"
+      style="font-size: clamp(1.7rem, 3.5vw, 2.8rem);"></h2>
+    <!-- Thin rule -->
+    <div class="w-full h-px bg-[#D0CEC8] mb-4"></div>
+    <!-- Description -->
+    <p class="font-sans text-[0.875rem] text-[#555] leading-relaxed line-clamp-5 mb-6 job-description"></p>
+    <!-- Meta + apply -->
+    <div class="flex items-center justify-between">
+      <span class="font-mono text-[8px] tracking-[0.15em] text-[#bbb] uppercase job-date"></span>
+      <a class="job-link relative z-10 font-mono text-[9px] tracking-[0.25em] uppercase border-b border-[#1A1A1A] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
+        target="_blank" rel="noopener noreferrer">Apply ↗</a>
+    </div>
+    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
+  </article>
+</template>
+
+<!-- Sidebar article template -->
+<template id="tpl-sidebar">
+  <article class="group relative cursor-pointer p-6">
+    <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#CC0000] block mb-3">Open Position</span>
+    <div class="overflow-hidden mb-4 job-image-wrap aspect-[16/9] bg-[#EFEFEC]"></div>
+    <h2 class="font-serif text-[1.2rem] font-black leading-tight mb-2 group-hover:text-[#CC0000] transition-colors duration-200 job-title"></h2>
+    <p class="font-sans text-[0.8rem] text-[#666] leading-relaxed line-clamp-2 mb-4 job-description"></p>
+    <div class="flex items-center justify-between">
+      <span class="font-mono text-[8px] text-[#bbb] uppercase job-date"></span>
+      <a class="job-link relative z-10 font-mono text-[8px] tracking-[0.2em] uppercase border-b border-[#D0CEC8] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
+        target="_blank" rel="noopener noreferrer">Apply ↗</a>
+    </div>
+    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
+  </article>
+</template>
+
+<!-- Secondary article template -->
+<template id="tpl-secondary">
+  <article class="group relative cursor-pointer p-6 md:p-8">
+    <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#CC0000] block mb-3">Open Position</span>
+    <div class="overflow-hidden mb-4 job-image-wrap aspect-[3/2] bg-[#EFEFEC]"></div>
+    <h2 class="font-serif text-[1.15rem] font-black leading-tight mb-2 group-hover:text-[#CC0000] transition-colors duration-200 job-title"></h2>
+    <p class="font-sans text-[0.8rem] text-[#666] leading-relaxed line-clamp-3 mb-4 job-description"></p>
+    <div class="flex items-center justify-between pt-3 border-t border-[#EFEFEC]">
+      <span class="font-mono text-[8px] text-[#bbb] uppercase job-date"></span>
+      <a class="job-link relative z-10 font-mono text-[8px] tracking-[0.2em] uppercase border-b border-[#D0CEC8] pb-px hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-200"
+        target="_blank" rel="noopener noreferrer">Apply ↗</a>
+    </div>
+    <a class="job-card-link absolute inset-0 z-0" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"></a>
+  </article>
+</template>
+
+<script>
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; };
+
+  function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  }
+
+  function injectImage(wrap: Element, job: Job) {
+    if (job.image_url) {
+      const img = document.createElement('img');
+      img.src = job.image_url;
+      img.alt = job.title;
+      img.loading = 'lazy';
+      img.className = 'w-full h-full object-cover grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.04] transition-all duration-500 ease-out';
+      wrap.appendChild(img);
+    } else {
+      wrap.innerHTML = `
+        <div class="w-full h-full flex items-center justify-center relative overflow-hidden bg-[#EFEFEC]">
+          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #1A1A1A 0, #1A1A1A 1px, transparent 0, transparent 50%); background-size: 8px 8px;"></div>
+          <span class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#ccc]">No Image</span>
+        </div>`;
+    }
+  }
+
+  function populateArticle(article: Element, job: Job, index: number) {
+    const num = String(index + 1).padStart(2, '0');
+    const numEl = article.querySelector('.job-num') as HTMLElement | null;
+    if (numEl) numEl.textContent = `No. ${num}`;
+    injectImage(article.querySelector('.job-image-wrap')!, job);
+    (article.querySelector('.job-title') as HTMLElement).textContent = job.title;
+    (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
+    (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
+    (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
+    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = job.link;
+  }
+
+  function cloneTemplate(id: string): DocumentFragment {
+    return (document.getElementById(id) as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
+  }
+
+  async function loadJobs() {
+    const loadingEl = document.getElementById('loading-state')!;
+    const emptyEl = document.getElementById('empty-state')!;
+    const errorEl = document.getElementById('error-state')!;
+    const countEl = document.getElementById('job-count')!;
+    const primaryZone = document.getElementById('primary-zone')!;
+    const featuredZone = document.getElementById('featured-zone')!;
+    const sidebarZone = document.getElementById('sidebar-zone')!;
+    const secondaryZone = document.getElementById('secondary-zone')!;
+    const secondaryGrid = document.getElementById('secondary-grid')!;
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const jobs: Job[] = await res.json();
+
+      loadingEl.classList.add('hidden');
+
+      if (jobs.length === 0) {
+        emptyEl.classList.remove('hidden');
+        countEl.textContent = '0 positions';
+        return;
+      }
+
+      countEl.textContent = `${jobs.length} position${jobs.length !== 1 ? 's' : ''}`;
+
+      // ── Featured (first job) ──
+      const featFrag = cloneTemplate('tpl-featured');
+      const featArticle = featFrag.querySelector('article')!;
+      populateArticle(featArticle, jobs[0], 0);
+      featuredZone.appendChild(featFrag);
+
+      // ── Sidebar (jobs 1 & 2) ──
+      jobs.slice(1, 3).forEach((job, i) => {
+        const frag = cloneTemplate('tpl-sidebar');
+        populateArticle(frag.querySelector('article')!, job, i + 1);
+        sidebarZone.appendChild(frag);
+      });
+
+      primaryZone.classList.remove('hidden');
+
+      // ── Secondary (jobs 3+) ──
+      if (jobs.length > 3) {
+        jobs.slice(3).forEach((job, i) => {
+          const frag = cloneTemplate('tpl-secondary');
+          populateArticle(frag.querySelector('article')!, job, i + 3);
+          secondaryGrid.appendChild(frag);
+        });
+        secondaryZone.classList.remove('hidden');
+      }
+
+      // ── Google for Jobs: JobPosting structured data ───────
+      injectJobPostingSchema(jobs);
+
+    } catch {
+      loadingEl.classList.add('hidden');
+      errorEl.classList.remove('hidden');
+      countEl.textContent = 'Error';
+    }
+  }
+
+  /**
+   * Injects JobPosting + ItemList JSON-LD so Google can surface
+   * individual listings in the "Jobs" rich result carousel.
+   * See: https://developers.google.com/search/docs/appearance/structured-data/job-posting
+   */
+  function injectJobPostingSchema(jobs: Job[]) {
+    // Remove any previously injected schema (e.g. on SPA nav)
+    document.getElementById('ld-jobs')?.remove();
+
+    const itemList = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Open AI Developer Positions — vibecoding.work',
+      description: 'Remote jobs for vibecoders and AI-native software engineers.',
+      url: 'https://vibecoding.work/',
+      numberOfItems: jobs.length,
+      itemListElement: jobs.map((job, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'JobPosting',
+          '@id': job.link,
+          title: job.title,
+          description: job.description,
+          datePosted: job.created_at.split('T')[0],
+          url: job.link,
+          directApply: true,
+          // All vibecoding jobs are remote
+          jobLocationType: 'TELECOMMUTE',
+          applicantLocationRequirements: {
+            '@type': 'Country',
+            name: 'Worldwide',
+          },
+          employmentType: ['FULL_TIME', 'CONTRACTOR'],
+          // Occupational category: Software Developers (SOC 15-1252)
+          occupationalCategory: '15-1252',
+          hiringOrganization: {
+            '@type': 'Organization',
+            name: 'vibecoding.work',
+            sameAs: 'https://vibecoding.work',
+            logo: 'https://vibecoding.work/images/logo.png',
+          },
+          ...(job.image_url ? { image: job.image_url } : {}),
+        },
+      })),
+    };
+
+    const script = document.createElement('script');
+    script.id = 'ld-jobs';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(itemList);
+    document.head.appendChild(script);
+  }
+
+  loadJobs();
+</script>
