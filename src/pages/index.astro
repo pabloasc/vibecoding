@@ -115,7 +115,7 @@ import Footer from '../components/Footer.astro';
       img.src = job.image_url;
       img.alt = job.title;
       img.loading = 'lazy';
-      img.className = 'w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300';
+      img.className = 'w-full h-full object-contain';
       wrap.appendChild(img);
     } else {
       wrap.innerHTML = `

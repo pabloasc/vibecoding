@@ -69,6 +69,17 @@ const dateStr = today.toLocaleDateString('en-US', {
     <a href="/submit" class="nav-link font-mono text-[9px] tracking-[0.25em] uppercase py-3 whitespace-nowrap relative text-[#888] hover:text-[#CC0000] transition-colors duration-200">
       Submit a Job ↗
     </a>
+
+    <!-- Auth status (hidden until session confirmed) -->
+    <div id="auth-nav" class="hidden ml-auto flex items-center gap-3">
+      <span class="w-px h-3 bg-[#D0CEC8]"></span>
+      <span id="auth-username" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888]"></span>
+      <button id="auth-signout"
+        class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888]
+               hover:text-[#CC0000] transition-colors duration-150 whitespace-nowrap">
+        Sign out
+      </button>
+    </div>
   </nav>
 
 </header>
@@ -91,10 +102,38 @@ const dateStr = today.toLocaleDateString('en-US', {
 </style>
 
 <script>
+  // Active nav link
   document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
     if (new URL(link.href).pathname === window.location.pathname) {
       link.style.color = '#1A1A1A';
       link.setAttribute('aria-current', 'page');
+    }
+  });
+</script>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  const authNav      = document.getElementById('auth-nav')!;
+  const authUsername = document.getElementById('auth-username')!;
+  const signoutBtn   = document.getElementById('auth-signout')!;
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+      const email = session.user.email ?? '';
+      authUsername.textContent = email.split('@')[0];
+      authNav.classList.remove('hidden');
+    } else {
+      authNav.classList.add('hidden');
+    }
+  });
+
+  signoutBtn.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    // If on a gated page, redirect home
+    const gated = ['/submit', '/edit'];
+    if (gated.some(p => window.location.pathname.startsWith(p))) {
+      window.location.href = '/';
     }
   });
 </script>

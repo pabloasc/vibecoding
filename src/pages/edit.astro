@@ -143,35 +143,66 @@ import Footer from '../components/Footer.astro';
           <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">No image set</p>
         </div>
 
-        <!-- New image upload zone -->
-        <div
-          id="drop-zone"
-          class="border border-dashed border-[#ccc] bg-white p-10 text-center cursor-pointer
-                 hover:border-[#1A1A1A] transition-colors duration-200 relative"
-        >
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/jpeg,image/png,image/webp"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          <div id="drop-prompt">
-            <p class="font-serif text-[1.2rem] font-black mb-1 text-[#1A1A1A]">Upload new image</p>
-            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
-              JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
-            </p>
+        <!-- New image source tabs -->
+        <div class="flex border border-[#D0CEC8]">
+          <button type="button" id="img-tab-upload"
+            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
+                   bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150">
+            Upload file
+          </button>
+          <button type="button" id="img-tab-url"
+            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
+                   bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
+            External URL
+          </button>
+        </div>
+
+        <!-- Upload pane -->
+        <div id="img-pane-upload">
+          <div id="drop-zone"
+            class="border border-dashed border-[#ccc] bg-white p-10 text-center cursor-pointer
+                   hover:border-[#1A1A1A] transition-colors duration-200 relative"
+          >
+            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <div id="drop-prompt">
+              <p class="font-serif text-[1.2rem] font-black mb-1 text-[#1A1A1A]">Upload new image</p>
+              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
+                JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
+              </p>
+            </div>
+            <div id="image-preview-wrap" class="hidden">
+              <img id="image-preview" src="" alt="New preview"
+                class="max-h-40 mx-auto border border-[#1A1A1A] grayscale mb-3" />
+              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase" id="image-name"></p>
+              <button type="button" id="remove-new-image"
+                class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
+                       border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity">
+                Cancel new image
+              </button>
+            </div>
           </div>
-          <div id="image-preview-wrap" class="hidden">
-            <img id="image-preview" src="" alt="New preview"
-              class="max-h-40 mx-auto border border-[#1A1A1A] grayscale mb-3" />
-            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase" id="image-name"></p>
-            <button
-              type="button"
-              id="remove-new-image"
+        </div>
+
+        <!-- URL pane (hidden by default) -->
+        <div id="img-pane-url" class="hidden space-y-3">
+          <input
+            type="url"
+            id="image-url"
+            placeholder="https://example.com/image.jpg"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A]
+                   transition-colors duration-200"
+          />
+          <div id="url-preview-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
+            <img id="url-preview" src="" alt="URL preview"
+              class="max-h-40 border border-[#1A1A1A] grayscale" />
+            <button type="button" id="clear-url"
               class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                     border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity"
-            >Cancel new image</button>
+                     border-b border-[#CC0000] pb-px mt-3 block hover:opacity-70 transition-opacity">
+              Clear
+            </button>
           </div>
         </div>
       </div>
@@ -316,6 +347,29 @@ import Footer from '../components/Footer.astro';
     editFormEl.classList.remove('hidden');
   }
 
+  // ── Image source tabs ─────────────────────────────────────
+  let imageSource: 'file' | 'url' = 'file';
+  const imgTabUpload  = document.getElementById('img-tab-upload') as HTMLButtonElement;
+  const imgTabUrl     = document.getElementById('img-tab-url') as HTMLButtonElement;
+  const imgPaneUpload = document.getElementById('img-pane-upload')!;
+  const imgPaneUrl    = document.getElementById('img-pane-url')!;
+
+  imgTabUpload.addEventListener('click', () => {
+    imageSource = 'file';
+    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
+    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
+    imgPaneUpload.classList.remove('hidden');
+    imgPaneUrl.classList.add('hidden');
+  });
+
+  imgTabUrl.addEventListener('click', () => {
+    imageSource = 'url';
+    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
+    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
+    imgPaneUrl.classList.remove('hidden');
+    imgPaneUpload.classList.add('hidden');
+  });
+
   // ── Image handling ────────────────────────────────────────
   const imageInput      = document.getElementById('image') as HTMLInputElement;
   const dropPromptEl    = document.getElementById('drop-prompt')!;
@@ -339,6 +393,29 @@ import Footer from '../components/Footer.astro';
       document.getElementById('current-image-wrap')!.classList.remove('hidden');
       document.getElementById('no-image-notice')!.classList.add('hidden');
     }
+  });
+
+  // ── URL preview ───────────────────────────────────────────
+  const imageUrlInput  = document.getElementById('image-url') as HTMLInputElement;
+  const urlPreviewWrap = document.getElementById('url-preview-wrap')!;
+  const urlPreviewImg  = document.getElementById('url-preview') as HTMLImageElement;
+  let urlDebounce: ReturnType<typeof setTimeout> | null = null;
+
+  imageUrlInput.addEventListener('input', () => {
+    if (urlDebounce) clearTimeout(urlDebounce);
+    urlDebounce = setTimeout(() => {
+      const url = imageUrlInput.value.trim();
+      if (!url) { urlPreviewWrap.classList.add('hidden'); return; }
+      urlPreviewImg.onload  = () => urlPreviewWrap.classList.remove('hidden');
+      urlPreviewImg.onerror = () => urlPreviewWrap.classList.add('hidden');
+      urlPreviewImg.src = url;
+    }, 500);
+  });
+
+  document.getElementById('clear-url')!.addEventListener('click', () => {
+    imageUrlInput.value = '';
+    urlPreviewImg.src = '';
+    urlPreviewWrap.classList.add('hidden');
   });
 
   imageInput.addEventListener('change', () => {
@@ -378,6 +455,9 @@ import Footer from '../components/Footer.astro';
 
       if (imageAction === 'remove') {
         image_url = null;
+      } else if (imageSource === 'url') {
+        const extUrl = imageUrlInput.value.trim();
+        image_url = extUrl || null;
       } else if (imageAction instanceof File) {
         const file = imageAction;
         if (file.size > 5 * 1024 * 1024) {

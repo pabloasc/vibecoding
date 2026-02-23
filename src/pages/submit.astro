@@ -40,45 +40,120 @@ const webPage = JSON.stringify({
 
     <!-- Auth wall -->
     <div id="auth-wall" class="hidden">
-      <div class="border border-[#D0CEC8] bg-[#F2F0EC] p-8 mb-10">
-        <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#888] mb-1">Sign in required</p>
-        <h3 class="font-serif text-[1.6rem] font-black leading-tight mb-1">Enter your email</h3>
-        <p class="font-sans text-sm text-[#666] mb-6">We'll send you a magic link — no password needed.</p>
+      <div class="border border-[#D0CEC8] bg-[#F2F0EC] mb-10">
 
-        <!-- Email sent confirmation -->
-        <div id="email-sent" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-6 mb-4">
-          <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] mb-2">Check your inbox</p>
-          <p class="font-serif text-[1.2rem] font-black leading-tight">Magic link sent.</p>
-          <p class="font-sans text-sm text-[#888] mt-2">Click the link in your email to sign in and continue.</p>
-        </div>
-
-        <!-- Auth error -->
-        <div id="auth-error" class="hidden bg-[#CC0000] text-white px-5 py-3 mb-4">
-          <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="auth-error-msg">An error occurred.</p>
-        </div>
-
-        <form id="login-form" class="flex gap-3">
-          <input
-            type="email"
-            id="login-email"
-            required
-            placeholder="you@example.com"
-            class="flex-1 border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A]
-                   transition-colors duration-200"
-          />
-          <button
-            type="submit"
-            id="login-btn"
-            class="font-mono text-[11px] tracking-[0.25em] uppercase
-                   bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3
-                   hover:bg-[#CC0000] transition-colors duration-200
-                   disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
-          >
-            Send link →
+        <!-- Tabs -->
+        <div class="flex border-b border-[#D0CEC8]">
+          <button id="tab-signin"
+            class="flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5
+                   border-b-2 border-[#1A1A1A] text-[#1A1A1A] transition-colors duration-150">
+            Sign in
           </button>
-        </form>
+          <button id="tab-signup"
+            class="flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5
+                   border-b-2 border-transparent text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
+            Sign up
+          </button>
+        </div>
+
+        <div class="p-8">
+
+          <!-- Auth error -->
+          <div id="auth-error" class="hidden bg-[#CC0000] text-white px-5 py-3 mb-4">
+            <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="auth-error-msg">An error occurred.</p>
+          </div>
+
+          <!-- Sign-up success -->
+          <div id="signup-success" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-6 mb-4">
+            <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] mb-2">Almost there</p>
+            <p class="font-serif text-[1.2rem] font-black leading-tight">Check your email.</p>
+            <p class="font-sans text-sm text-[#888] mt-2">Click the confirmation link to activate your account, then sign in.</p>
+          </div>
+
+          <!-- Sign in form -->
+          <form id="login-form" class="space-y-3">
+            <input
+              type="email"
+              id="login-email"
+              required
+              placeholder="Email"
+              autocomplete="email"
+              class="w-full border border-[#ccc] bg-white px-4 py-3
+                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                     focus:outline-none focus:border-[#1A1A1A]
+                     transition-colors duration-200"
+            />
+            <input
+              type="password"
+              id="login-password"
+              required
+              placeholder="Password"
+              autocomplete="current-password"
+              class="w-full border border-[#ccc] bg-white px-4 py-3
+                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                     focus:outline-none focus:border-[#1A1A1A]
+                     transition-colors duration-200"
+            />
+            <button
+              type="submit"
+              id="login-btn"
+              class="font-mono text-[11px] tracking-[0.25em] uppercase
+                     bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3 w-full
+                     hover:bg-[#CC0000] transition-colors duration-200
+                     disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Sign in →
+            </button>
+          </form>
+
+          <!-- Sign up form (hidden by default) -->
+          <form id="signup-form" class="hidden space-y-3">
+            <input
+              type="email"
+              id="signup-email"
+              required
+              placeholder="Email"
+              autocomplete="email"
+              class="w-full border border-[#ccc] bg-white px-4 py-3
+                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                     focus:outline-none focus:border-[#1A1A1A]
+                     transition-colors duration-200"
+            />
+            <input
+              type="password"
+              id="signup-password"
+              required
+              placeholder="Password"
+              autocomplete="new-password"
+              class="w-full border border-[#ccc] bg-white px-4 py-3
+                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                     focus:outline-none focus:border-[#1A1A1A]
+                     transition-colors duration-200"
+            />
+            <input
+              type="password"
+              id="signup-confirm"
+              required
+              placeholder="Confirm password"
+              autocomplete="new-password"
+              class="w-full border border-[#ccc] bg-white px-4 py-3
+                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                     focus:outline-none focus:border-[#1A1A1A]
+                     transition-colors duration-200"
+            />
+            <button
+              type="submit"
+              id="signup-btn"
+              class="font-mono text-[11px] tracking-[0.25em] uppercase
+                     bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3 w-full
+                     hover:bg-[#CC0000] transition-colors duration-200
+                     disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Create account →
+            </button>
+          </form>
+
+        </div>
       </div>
     </div>
 
@@ -153,39 +228,72 @@ const webPage = JSON.stringify({
         />
       </div>
 
-      <!-- Image upload -->
+      <!-- Image -->
       <div class="space-y-2.5">
-        <label for="image" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
           Cover Image <span class="text-[#999]">(optional)</span>
         </label>
-        <div
-          id="drop-zone"
-          class="border border-dashed border-[#ccc] bg-white p-12 text-center cursor-pointer
-                 hover:border-[#1A1A1A] transition-colors duration-200 relative"
-        >
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/jpeg,image/png,image/webp"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          <div id="drop-prompt">
-            <p class="font-serif text-[1.4rem] font-black mb-2 text-[#1A1A1A]">Drop image here</p>
-            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
-              or click to browse &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
-            </p>
+
+        <!-- Source tabs -->
+        <div class="flex border border-[#D0CEC8]">
+          <button type="button" id="img-tab-upload"
+            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
+                   bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150">
+            Upload file
+          </button>
+          <button type="button" id="img-tab-url"
+            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
+                   bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
+            External URL
+          </button>
+        </div>
+
+        <!-- Upload pane -->
+        <div id="img-pane-upload">
+          <div id="drop-zone"
+            class="border border-dashed border-[#ccc] bg-white p-12 text-center cursor-pointer
+                   hover:border-[#1A1A1A] transition-colors duration-200 relative"
+          >
+            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <div id="drop-prompt">
+              <p class="font-serif text-[1.4rem] font-black mb-2 text-[#1A1A1A]">Drop image here</p>
+              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
+                or click to browse &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
+              </p>
+            </div>
+            <div id="image-preview-wrap" class="hidden">
+              <img id="image-preview" src="" alt="Preview"
+                class="max-h-52 mx-auto border border-[#1A1A1A] grayscale" />
+              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase mt-3" id="image-name"></p>
+              <button type="button" id="remove-image"
+                class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
+                       border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity">
+                Remove
+              </button>
+            </div>
           </div>
-          <div id="image-preview-wrap" class="hidden">
-            <img id="image-preview" src="" alt="Preview"
-              class="max-h-52 mx-auto border border-[#1A1A1A] grayscale" />
-            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase mt-3" id="image-name"></p>
-            <button
-              type="button"
-              id="remove-image"
+        </div>
+
+        <!-- URL pane (hidden by default) -->
+        <div id="img-pane-url" class="hidden space-y-3">
+          <input
+            type="url"
+            id="image-url"
+            placeholder="https://example.com/image.jpg"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A]
+                   transition-colors duration-200"
+          />
+          <div id="url-preview-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
+            <img id="url-preview" src="" alt="URL preview"
+              class="max-h-40 border border-[#1A1A1A] grayscale" />
+            <button type="button" id="clear-url"
               class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                     border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity"
-            >Remove</button>
+                     border-b border-[#CC0000] pb-px mt-3 block hover:opacity-70 transition-opacity">
+              Clear
+            </button>
           </div>
         </div>
       </div>
@@ -247,38 +355,123 @@ const webPage = JSON.stringify({
     }
   });
 
-  // ── Login form ────────────────────────────────────────────
-  const loginFormEl   = document.getElementById('login-form') as HTMLFormElement;
-  const loginBtn      = document.getElementById('login-btn') as HTMLButtonElement;
-  const emailSentEl   = document.getElementById('email-sent')!;
-  const authErrorEl   = document.getElementById('auth-error')!;
-  const authErrorMsg  = document.getElementById('auth-error-msg')!;
+  // ── Tab switching ─────────────────────────────────────────
+  const tabSignin  = document.getElementById('tab-signin')!;
+  const tabSignup  = document.getElementById('tab-signup')!;
+  const loginFormEl  = document.getElementById('login-form') as HTMLFormElement;
+  const signupFormEl = document.getElementById('signup-form') as HTMLFormElement;
+  const authErrorEl  = document.getElementById('auth-error')!;
+  const authErrorMsg = document.getElementById('auth-error-msg')!;
+  const signupSuccessEl = document.getElementById('signup-success')!;
+
+  const activeTab   = 'border-b-2 border-[#1A1A1A] text-[#1A1A1A]';
+  const inactiveTab = 'border-b-2 border-transparent text-[#888] hover:text-[#1A1A1A]';
+
+  function switchToSignin() {
+    tabSignin.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${activeTab}`;
+    tabSignup.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${inactiveTab}`;
+    loginFormEl.classList.remove('hidden');
+    signupFormEl.classList.add('hidden');
+    authErrorEl.classList.add('hidden');
+    signupSuccessEl.classList.add('hidden');
+  }
+
+  function switchToSignup() {
+    tabSignup.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${activeTab}`;
+    tabSignin.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${inactiveTab}`;
+    signupFormEl.classList.remove('hidden');
+    loginFormEl.classList.add('hidden');
+    authErrorEl.classList.add('hidden');
+    signupSuccessEl.classList.add('hidden');
+  }
+
+  tabSignin.addEventListener('click', switchToSignin);
+  tabSignup.addEventListener('click', switchToSignup);
+
+  // ── Sign in ───────────────────────────────────────────────
+  const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
 
   loginFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = (document.getElementById('login-email') as HTMLInputElement).value.trim();
-    if (!email) return;
+    const email    = (document.getElementById('login-email') as HTMLInputElement).value.trim();
+    const password = (document.getElementById('login-password') as HTMLInputElement).value;
+    if (!email || !password) return;
 
     loginBtn.disabled = true;
-    loginBtn.textContent = 'Sending…';
+    loginBtn.textContent = 'Signing in…';
     authErrorEl.classList.add('hidden');
 
-    const redirectTo = window.location.origin + '/submit';
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     loginBtn.disabled = false;
-    loginBtn.textContent = 'Send link →';
+    loginBtn.textContent = 'Sign in →';
+
+    if (error) {
+      authErrorMsg.textContent = error.message;
+      authErrorEl.classList.remove('hidden');
+    }
+    // On success, onAuthStateChange fires and calls showForm()
+  });
+
+  // ── Sign up ───────────────────────────────────────────────
+  const signupBtn = document.getElementById('signup-btn') as HTMLButtonElement;
+
+  signupFormEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email    = (document.getElementById('signup-email') as HTMLInputElement).value.trim();
+    const password = (document.getElementById('signup-password') as HTMLInputElement).value;
+    const confirm  = (document.getElementById('signup-confirm') as HTMLInputElement).value;
+
+    if (!email || !password) return;
+    if (password !== confirm) {
+      authErrorMsg.textContent = 'Passwords do not match.';
+      authErrorEl.classList.remove('hidden');
+      return;
+    }
+
+    signupBtn.disabled = true;
+    signupBtn.textContent = 'Creating account…';
+    authErrorEl.classList.add('hidden');
+
+    const { error } = await supabase.auth.signUp({ email, password });
+
+    signupBtn.disabled = false;
+    signupBtn.textContent = 'Create account →';
 
     if (error) {
       authErrorMsg.textContent = error.message;
       authErrorEl.classList.remove('hidden');
     } else {
-      loginFormEl.classList.add('hidden');
-      emailSentEl.classList.remove('hidden');
+      signupFormEl.classList.add('hidden');
+      signupSuccessEl.classList.remove('hidden');
     }
+    // If email confirmation is disabled in Supabase, onAuthStateChange fires immediately
   });
 
-  // ── Image preview ─────────────────────────────────────────
+  // ── Image source tabs ─────────────────────────────────────
+  let imageSource: 'file' | 'url' = 'file';
+  const imgTabUpload  = document.getElementById('img-tab-upload') as HTMLButtonElement;
+  const imgTabUrl     = document.getElementById('img-tab-url') as HTMLButtonElement;
+  const imgPaneUpload = document.getElementById('img-pane-upload')!;
+  const imgPaneUrl    = document.getElementById('img-pane-url')!;
+
+  imgTabUpload.addEventListener('click', () => {
+    imageSource = 'file';
+    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
+    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
+    imgPaneUpload.classList.remove('hidden');
+    imgPaneUrl.classList.add('hidden');
+  });
+
+  imgTabUrl.addEventListener('click', () => {
+    imageSource = 'url';
+    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
+    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
+    imgPaneUrl.classList.remove('hidden');
+    imgPaneUpload.classList.add('hidden');
+  });
+
+  // ── File upload preview ────────────────────────────────────
   const imageInput = document.getElementById('image') as HTMLInputElement;
   const dropPrompt = document.getElementById('drop-prompt')!;
   const previewWrap = document.getElementById('image-preview-wrap')!;
@@ -309,6 +502,29 @@ const webPage = JSON.stringify({
     reader.readAsDataURL(file);
   }
 
+  // ── URL preview ───────────────────────────────────────────
+  const imageUrlInput  = document.getElementById('image-url') as HTMLInputElement;
+  const urlPreviewWrap = document.getElementById('url-preview-wrap')!;
+  const urlPreviewImg  = document.getElementById('url-preview') as HTMLImageElement;
+  let urlDebounce: ReturnType<typeof setTimeout> | null = null;
+
+  imageUrlInput.addEventListener('input', () => {
+    if (urlDebounce) clearTimeout(urlDebounce);
+    urlDebounce = setTimeout(() => {
+      const url = imageUrlInput.value.trim();
+      if (!url) { urlPreviewWrap.classList.add('hidden'); return; }
+      urlPreviewImg.onload  = () => urlPreviewWrap.classList.remove('hidden');
+      urlPreviewImg.onerror = () => urlPreviewWrap.classList.add('hidden');
+      urlPreviewImg.src = url;
+    }, 500);
+  });
+
+  document.getElementById('clear-url')!.addEventListener('click', () => {
+    imageUrlInput.value = '';
+    urlPreviewImg.src = '';
+    urlPreviewWrap.classList.add('hidden');
+  });
+
   // ── Form submission ───────────────────────────────────────
   const submitBtn  = document.getElementById('submit-btn') as HTMLButtonElement;
   const successEl  = document.getElementById('success-state')!;
@@ -332,7 +548,8 @@ const webPage = JSON.stringify({
     const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
     const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
     const link        = (document.getElementById('link') as HTMLInputElement).value.trim();
-    const imageFile   = imageInput.files?.[0] ?? null;
+    const imageFile    = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
+    const imageExtUrl  = imageSource === 'url'  ? imageUrlInput.value.trim() : null;
 
     if (!title)       { showError('Job title is required.'); return; }
     if (!description) { showError('Description is required.'); return; }
@@ -342,7 +559,7 @@ const webPage = JSON.stringify({
     submitBtn.textContent = 'Publishing…';
 
     try {
-      let image_url: string | null = null;
+      let image_url: string | null = imageExtUrl || null;
 
       if (imageFile) {
         if (imageFile.size > 5 * 1024 * 1024) {

@@ -51,9 +51,7 @@ import Footer from '../components/Footer.astro';
       </div>
 
       <!-- Hero image -->
-      <div id="job-image-wrap" class="hidden w-full h-[260px] md:h-[360px] overflow-hidden bg-[#EFEFEC] relative">
-        <div class="absolute inset-0 opacity-[0.06]"
-             style="background-image:repeating-linear-gradient(45deg,#1A1A1A 0,#1A1A1A 1px,transparent 0,transparent 50%);background-size:6px 6px;"></div>
+      <div id="job-image-wrap" class="hidden w-full bg-[#EFEFEC]">
       </div>
 
       <!-- Content -->
@@ -151,7 +149,7 @@ import Footer from '../components/Footer.astro';
       const img = document.createElement('img');
       img.src = job.image_url;
       img.alt = job.title;
-      img.className = 'w-full h-full object-cover';
+      img.className = 'w-full h-auto block';
       wrap.appendChild(img);
       wrap.classList.remove('hidden');
     }
@@ -164,8 +162,8 @@ import Footer from '../components/Footer.astro';
   }
 
   async function checkAdmin(jobId: string) {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (!error && user?.email === ADMIN_EMAIL) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.email === ADMIN_EMAIL) {
       const bar = document.getElementById('admin-bar')!;
       const link = document.getElementById('admin-edit-link') as HTMLAnchorElement;
       link.href = `/edit?id=${jobId}`;
