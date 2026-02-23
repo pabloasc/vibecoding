@@ -29,30 +29,79 @@ const webPage = JSON.stringify({
 
     <!-- Section header -->
     <div class="border-b-2 border-[#1A1A1A] pb-5 mb-10">
-      <p class="font-mono text-[9px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Contribute</p>
+      <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Contribute</p>
       <h2 class="font-serif text-[2rem] md:text-[2.5rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">Submit a Position</h2>
+    </div>
+
+    <!-- Auth checking state -->
+    <div id="auth-checking" class="py-12 text-center">
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">Checking session…</p>
+    </div>
+
+    <!-- Auth wall -->
+    <div id="auth-wall" class="hidden">
+      <div class="border border-[#D0CEC8] bg-[#F2F0EC] p-8 mb-10">
+        <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#888] mb-1">Sign in required</p>
+        <h3 class="font-serif text-[1.6rem] font-black leading-tight mb-1">Enter your email</h3>
+        <p class="font-sans text-sm text-[#666] mb-6">We'll send you a magic link — no password needed.</p>
+
+        <!-- Email sent confirmation -->
+        <div id="email-sent" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-6 mb-4">
+          <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] mb-2">Check your inbox</p>
+          <p class="font-serif text-[1.2rem] font-black leading-tight">Magic link sent.</p>
+          <p class="font-sans text-sm text-[#888] mt-2">Click the link in your email to sign in and continue.</p>
+        </div>
+
+        <!-- Auth error -->
+        <div id="auth-error" class="hidden bg-[#CC0000] text-white px-5 py-3 mb-4">
+          <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="auth-error-msg">An error occurred.</p>
+        </div>
+
+        <form id="login-form" class="flex gap-3">
+          <input
+            type="email"
+            id="login-email"
+            required
+            placeholder="you@example.com"
+            class="flex-1 border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A]
+                   transition-colors duration-200"
+          />
+          <button
+            type="submit"
+            id="login-btn"
+            class="font-mono text-[11px] tracking-[0.25em] uppercase
+                   bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3
+                   hover:bg-[#CC0000] transition-colors duration-200
+                   disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            Send link →
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- Success state -->
     <div id="success-state" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-10 mb-8">
-      <p class="font-mono text-[9px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Position Submitted</p>
+      <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Position Submitted</p>
       <p class="font-serif text-[2rem] font-black mb-6 leading-none">Your listing is live.</p>
-      <a href="/" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888] hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
+      <a href="/" class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888] hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
         ← Back to listings
       </a>
     </div>
 
     <!-- Error banner -->
     <div id="error-banner" class="hidden bg-[#CC0000] text-white px-5 py-3.5 mb-6">
-      <p class="font-mono text-[9px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
     </div>
 
-    <!-- Form -->
-    <form id="submit-form" class="space-y-8" novalidate>
+    <!-- Form (hidden until authenticated) -->
+    <form id="submit-form" class="hidden space-y-8" novalidate>
 
       <!-- Title -->
       <div class="space-y-2.5">
-        <label for="title" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+        <label for="title" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
           Job Title <span class="text-[#CC0000]">*</span>
         </label>
         <input
@@ -70,7 +119,7 @@ const webPage = JSON.stringify({
 
       <!-- Description -->
       <div class="space-y-2.5">
-        <label for="description" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+        <label for="description" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
           Description <span class="text-[#CC0000]">*</span>
         </label>
         <textarea
@@ -88,7 +137,7 @@ const webPage = JSON.stringify({
 
       <!-- Link -->
       <div class="space-y-2.5">
-        <label for="link" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
+        <label for="link" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
           Application URL <span class="text-[#CC0000]">*</span>
         </label>
         <input
@@ -106,8 +155,8 @@ const webPage = JSON.stringify({
 
       <!-- Image upload -->
       <div class="space-y-2.5">
-        <label for="image" class="block font-mono text-[9px] tracking-[0.3em] uppercase text-[#888]">
-          Cover Image <span class="text-[#ccc]">(optional)</span>
+        <label for="image" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Cover Image <span class="text-[#999]">(optional)</span>
         </label>
         <div
           id="drop-zone"
@@ -123,18 +172,18 @@ const webPage = JSON.stringify({
           />
           <div id="drop-prompt">
             <p class="font-serif text-[1.4rem] font-black mb-2 text-[#1A1A1A]">Drop image here</p>
-            <p class="font-mono text-[9px] tracking-[0.2em] text-[#bbb] uppercase">
+            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
               or click to browse &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
             </p>
           </div>
           <div id="image-preview-wrap" class="hidden">
             <img id="image-preview" src="" alt="Preview"
               class="max-h-52 mx-auto border border-[#1A1A1A] grayscale" />
-            <p class="font-mono text-[9px] tracking-[0.2em] text-[#bbb] uppercase mt-3" id="image-name"></p>
+            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase mt-3" id="image-name"></p>
             <button
               type="button"
               id="remove-image"
-              class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#CC0000]
+              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
                      border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity"
             >Remove</button>
           </div>
@@ -146,7 +195,7 @@ const webPage = JSON.stringify({
         <button
           type="submit"
           id="submit-btn"
-          class="font-mono text-[9px] tracking-[0.3em] uppercase
+          class="font-mono text-[11px] tracking-[0.3em] uppercase
                  bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
                  hover:bg-[#CC0000] transition-colors duration-200
                  disabled:opacity-40 disabled:cursor-not-allowed"
@@ -154,7 +203,7 @@ const webPage = JSON.stringify({
           Publish Position →
         </button>
         <a href="/"
-          class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#bbb] hover:text-[#1A1A1A] transition-colors duration-200">
+          class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777] hover:text-[#1A1A1A] transition-colors duration-200">
           Cancel
         </a>
       </div>
@@ -166,8 +215,68 @@ const webPage = JSON.stringify({
 </Layout>
 
 <script>
+  import { supabase } from '../lib/supabase';
+
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  // ── Auth state ────────────────────────────────────────────
+  const authCheckingEl = document.getElementById('auth-checking')!;
+  const authWallEl     = document.getElementById('auth-wall')!;
+  const submitFormEl   = document.getElementById('submit-form') as HTMLFormElement;
+  let currentToken: string = SUPABASE_ANON_KEY;
+
+  function showAuthWall() {
+    authCheckingEl.classList.add('hidden');
+    authWallEl.classList.remove('hidden');
+    submitFormEl.classList.add('hidden');
+  }
+
+  function showForm() {
+    authCheckingEl.classList.add('hidden');
+    authWallEl.classList.add('hidden');
+    submitFormEl.classList.remove('hidden');
+  }
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentToken = session?.access_token ?? SUPABASE_ANON_KEY;
+    if (session) {
+      showForm();
+    } else {
+      showAuthWall();
+    }
+  });
+
+  // ── Login form ────────────────────────────────────────────
+  const loginFormEl   = document.getElementById('login-form') as HTMLFormElement;
+  const loginBtn      = document.getElementById('login-btn') as HTMLButtonElement;
+  const emailSentEl   = document.getElementById('email-sent')!;
+  const authErrorEl   = document.getElementById('auth-error')!;
+  const authErrorMsg  = document.getElementById('auth-error-msg')!;
+
+  loginFormEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('login-email') as HTMLInputElement).value.trim();
+    if (!email) return;
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Sending…';
+    authErrorEl.classList.add('hidden');
+
+    const redirectTo = window.location.origin + '/submit';
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Send link →';
+
+    if (error) {
+      authErrorMsg.textContent = error.message;
+      authErrorEl.classList.remove('hidden');
+    } else {
+      loginFormEl.classList.add('hidden');
+      emailSentEl.classList.remove('hidden');
+    }
+  });
 
   // ── Image preview ─────────────────────────────────────────
   const imageInput = document.getElementById('image') as HTMLInputElement;
@@ -201,10 +310,9 @@ const webPage = JSON.stringify({
   }
 
   // ── Form submission ───────────────────────────────────────
-  const form = document.getElementById('submit-form') as HTMLFormElement;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-  const successEl = document.getElementById('success-state')!;
-  const errorBanner = document.getElementById('error-banner')!;
+  const submitBtn  = document.getElementById('submit-btn') as HTMLButtonElement;
+  const successEl  = document.getElementById('success-state')!;
+  const errorBanner  = document.getElementById('error-banner')!;
   const errorMessage = document.getElementById('error-message')!;
 
   function showError(msg: string) {
@@ -217,18 +325,18 @@ const webPage = JSON.stringify({
     errorBanner.classList.add('hidden');
   }
 
-  form.addEventListener('submit', async (e) => {
+  submitFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideError();
 
-    const title = (document.getElementById('title') as HTMLInputElement).value.trim();
+    const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
     const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
-    const link = (document.getElementById('link') as HTMLInputElement).value.trim();
-    const imageFile = imageInput.files?.[0] ?? null;
+    const link        = (document.getElementById('link') as HTMLInputElement).value.trim();
+    const imageFile   = imageInput.files?.[0] ?? null;
 
-    if (!title) { showError('Job title is required.'); return; }
+    if (!title)       { showError('Job title is required.'); return; }
     if (!description) { showError('Description is required.'); return; }
-    if (!link) { showError('Application URL is required.'); return; }
+    if (!link)        { showError('Application URL is required.'); return; }
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Publishing…';
@@ -251,7 +359,7 @@ const webPage = JSON.stringify({
             method: 'POST',
             headers: {
               apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              Authorization: `Bearer ${currentToken}`,
               'Content-Type': imageFile.type,
               'x-upsert': 'false',
             },
@@ -271,7 +379,7 @@ const webPage = JSON.stringify({
         method: 'POST',
         headers: {
           apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${currentToken}`,
           'Content-Type': 'application/json',
           Prefer: 'return=minimal',
         },
@@ -283,7 +391,7 @@ const webPage = JSON.stringify({
         throw new Error(err?.message || 'Failed to save the position.');
       }
 
-      form.classList.add('hidden');
+      submitFormEl.classList.add('hidden');
       successEl.classList.remove('hidden');
       successEl.scrollIntoView({ behavior: 'smooth' });
 

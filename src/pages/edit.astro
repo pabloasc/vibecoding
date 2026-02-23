@@ -1,0 +1,476 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Edit Position — vibecoding.work"
+  description="Edit a job listing."
+  noindex={true}
+>
+  <Header />
+
+  <main class="px-5 md:px-12 py-12 max-w-2xl">
+
+    <!-- Section header -->
+    <div class="border-b-2 border-[#1A1A1A] pb-5 mb-10 flex items-baseline justify-between">
+      <div>
+        <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Admin</p>
+        <h2 class="font-serif text-[2rem] md:text-[2.5rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">Edit Position</h2>
+      </div>
+      <a id="back-link" href="/"
+         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#777]
+                hover:text-[#1A1A1A] transition-colors duration-150">
+        ← Back
+      </a>
+    </div>
+
+    <!-- Auth checking -->
+    <div id="auth-checking" class="py-12 text-center">
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">Verifying access…</p>
+    </div>
+
+    <!-- Access denied -->
+    <div id="access-denied" class="hidden py-12 text-center">
+      <p class="font-serif text-[2rem] font-black text-[#888] mb-4 leading-none">Access denied.</p>
+      <a href="/" class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666]
+                         hover:text-[#CC0000] transition-colors underline underline-offset-4">
+        ← Back to listings
+      </a>
+    </div>
+
+    <!-- Job not found -->
+    <div id="not-found" class="hidden py-12 text-center">
+      <p class="font-serif text-[2rem] font-black text-[#888] mb-4 leading-none">Position not found.</p>
+      <a href="/" class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666]
+                         hover:text-[#CC0000] transition-colors underline underline-offset-4">
+        ← Back to listings
+      </a>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-state" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-10 mb-8">
+      <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Saved</p>
+      <p class="font-serif text-[2rem] font-black mb-6 leading-none">Position updated.</p>
+      <a id="success-back-link" href="/"
+         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]
+                hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
+        ← View position
+      </a>
+    </div>
+
+    <!-- Error banner -->
+    <div id="error-banner" class="hidden bg-[#CC0000] text-white px-5 py-3.5 mb-6">
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
+    </div>
+
+    <!-- Edit form -->
+    <form id="edit-form" class="hidden space-y-8" novalidate>
+
+      <!-- Title -->
+      <div class="space-y-2.5">
+        <label for="title" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Job Title <span class="text-[#CC0000]">*</span>
+        </label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          required
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-serif text-lg text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2.5">
+        <label for="description" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Description <span class="text-[#CC0000]">*</span>
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          required
+          rows="7"
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-sans text-sm leading-relaxed text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200 resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Link -->
+      <div class="space-y-2.5">
+        <label for="link" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Application URL <span class="text-[#CC0000]">*</span>
+        </label>
+        <input
+          type="url"
+          id="link"
+          name="link"
+          required
+          class="w-full border border-[#ccc] bg-white px-4 py-4
+                 font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                 focus:outline-none focus:border-[#1A1A1A]
+                 transition-colors duration-200"
+        />
+      </div>
+
+      <!-- Image -->
+      <div class="space-y-2.5">
+        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Cover Image <span class="text-[#999]">(optional)</span>
+        </label>
+
+        <!-- Current image preview -->
+        <div id="current-image-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
+          <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-[#888] mb-3">Current image</p>
+          <img id="current-image" src="" alt="Current cover"
+               class="max-h-40 border border-[#1A1A1A] grayscale mb-3" />
+          <button
+            type="button"
+            id="remove-current-image"
+            class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
+                   border-b border-[#CC0000] pb-px hover:opacity-70 transition-opacity"
+          >Remove image</button>
+        </div>
+
+        <!-- No image placeholder -->
+        <div id="no-image-notice" class="hidden border border-dashed border-[#D0CEC8] px-5 py-4">
+          <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">No image set</p>
+        </div>
+
+        <!-- New image upload zone -->
+        <div
+          id="drop-zone"
+          class="border border-dashed border-[#ccc] bg-white p-10 text-center cursor-pointer
+                 hover:border-[#1A1A1A] transition-colors duration-200 relative"
+        >
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/jpeg,image/png,image/webp"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          <div id="drop-prompt">
+            <p class="font-serif text-[1.2rem] font-black mb-1 text-[#1A1A1A]">Upload new image</p>
+            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
+              JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
+            </p>
+          </div>
+          <div id="image-preview-wrap" class="hidden">
+            <img id="image-preview" src="" alt="New preview"
+              class="max-h-40 mx-auto border border-[#1A1A1A] grayscale mb-3" />
+            <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase" id="image-name"></p>
+            <button
+              type="button"
+              id="remove-new-image"
+              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
+                     border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity"
+            >Cancel new image</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action row -->
+      <div class="flex items-center gap-6 pt-6 border-t border-[#1A1A1A]">
+        <button
+          type="submit"
+          id="save-btn"
+          class="font-mono text-[11px] tracking-[0.3em] uppercase
+                 bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
+                 hover:bg-[#CC0000] transition-colors duration-200
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Save changes →
+        </button>
+        <a id="cancel-link" href="/"
+           class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
+                  hover:text-[#1A1A1A] transition-colors duration-200">
+          Cancel
+        </a>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="border-t border-[#D0CEC8] pt-8 mt-4">
+        <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#888] mb-4">Danger zone</p>
+        <button
+          type="button"
+          id="delete-btn"
+          class="font-mono text-[11px] tracking-[0.25em] uppercase
+                 border border-[#CC0000] text-[#CC0000] px-6 py-3
+                 hover:bg-[#CC0000] hover:text-white transition-colors duration-200"
+        >
+          Delete position
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  const SUPABASE_URL    = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const ADMIN_EMAIL     = 'hi@vibecoders.co';
+
+  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; };
+
+  // ── Elements ──────────────────────────────────────────────
+  const authCheckingEl  = document.getElementById('auth-checking')!;
+  const accessDeniedEl  = document.getElementById('access-denied')!;
+  const notFoundEl      = document.getElementById('not-found')!;
+  const editFormEl      = document.getElementById('edit-form') as HTMLFormElement;
+  const successEl       = document.getElementById('success-state')!;
+  const errorBannerEl   = document.getElementById('error-banner')!;
+  const errorMessageEl  = document.getElementById('error-message')!;
+
+  function showAccessDenied() {
+    authCheckingEl.classList.add('hidden');
+    accessDeniedEl.classList.remove('hidden');
+  }
+
+  function showNotFound() {
+    authCheckingEl.classList.add('hidden');
+    notFoundEl.classList.remove('hidden');
+  }
+
+  function showError(msg: string) {
+    errorMessageEl.textContent = msg;
+    errorBannerEl.classList.remove('hidden');
+    errorBannerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideError() {
+    errorBannerEl.classList.add('hidden');
+  }
+
+  // ── Auth & job load ───────────────────────────────────────
+  let sessionToken = SUPABASE_ANON_KEY;
+  let currentImageUrl: string | null = null;
+  let imageAction: 'keep' | 'remove' | File = 'keep';
+
+  const jobId = new URLSearchParams(window.location.search).get('id');
+
+  async function init() {
+    if (!jobId) { showNotFound(); return; }
+
+    // Validate JWT server-side — getUser() re-checks with Supabase auth server
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user || user.email !== ADMIN_EMAIL) {
+      showAccessDenied();
+      return;
+    }
+
+    // Store session token for authenticated API calls
+    const { data: { session } } = await supabase.auth.getSession();
+    sessionToken = session?.access_token ?? SUPABASE_ANON_KEY;
+
+    // Load the job
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId)}&select=*&limit=1`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${sessionToken}` } }
+    );
+
+    if (!res.ok) { showNotFound(); return; }
+    const jobs: Job[] = await res.json();
+    if (!jobs.length) { showNotFound(); return; }
+
+    populateForm(jobs[0]);
+  }
+
+  function populateForm(job: Job) {
+    currentImageUrl = job.image_url;
+
+    (document.getElementById('title') as HTMLInputElement).value = job.title;
+    (document.getElementById('description') as HTMLTextAreaElement).value = job.description;
+    (document.getElementById('link') as HTMLInputElement).value = job.link;
+
+    // Image state
+    const currentWrap   = document.getElementById('current-image-wrap')!;
+    const noImageNotice = document.getElementById('no-image-notice')!;
+    const currentImg    = document.getElementById('current-image') as HTMLImageElement;
+
+    if (job.image_url) {
+      currentImg.src = job.image_url;
+      currentWrap.classList.remove('hidden');
+    } else {
+      noImageNotice.classList.remove('hidden');
+    }
+
+    // Back/cancel links
+    const jobUrl = `/job?id=${job.id}`;
+    (document.getElementById('back-link') as HTMLAnchorElement).href = jobUrl;
+    (document.getElementById('cancel-link') as HTMLAnchorElement).href = jobUrl;
+    (document.getElementById('success-back-link') as HTMLAnchorElement).href = jobUrl;
+
+    authCheckingEl.classList.add('hidden');
+    editFormEl.classList.remove('hidden');
+  }
+
+  // ── Image handling ────────────────────────────────────────
+  const imageInput      = document.getElementById('image') as HTMLInputElement;
+  const dropPromptEl    = document.getElementById('drop-prompt')!;
+  const previewWrapEl   = document.getElementById('image-preview-wrap')!;
+  const previewImgEl    = document.getElementById('image-preview') as HTMLImageElement;
+  const imageNameEl     = document.getElementById('image-name')!;
+
+  document.getElementById('remove-current-image')!.addEventListener('click', () => {
+    imageAction = 'remove';
+    document.getElementById('current-image-wrap')!.classList.add('hidden');
+    document.getElementById('no-image-notice')!.classList.remove('hidden');
+  });
+
+  document.getElementById('remove-new-image')!.addEventListener('click', () => {
+    imageInput.value = '';
+    imageAction = 'keep';
+    previewWrapEl.classList.add('hidden');
+    dropPromptEl.classList.remove('hidden');
+    // Restore current image display if it wasn't removed
+    if (currentImageUrl) {
+      document.getElementById('current-image-wrap')!.classList.remove('hidden');
+      document.getElementById('no-image-notice')!.classList.add('hidden');
+    }
+  });
+
+  imageInput.addEventListener('change', () => {
+    const file = imageInput.files?.[0];
+    if (!file) return;
+    imageAction = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImgEl.src = e.target?.result as string;
+      imageNameEl.textContent = file.name;
+      dropPromptEl.classList.add('hidden');
+      previewWrapEl.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ── Form save ─────────────────────────────────────────────
+  const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+
+  editFormEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
+    const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
+    const link        = (document.getElementById('link') as HTMLInputElement).value.trim();
+
+    if (!title)       { showError('Job title is required.'); return; }
+    if (!description) { showError('Description is required.'); return; }
+    if (!link)        { showError('Application URL is required.'); return; }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      let image_url: string | null = currentImageUrl; // default: keep existing
+
+      if (imageAction === 'remove') {
+        image_url = null;
+      } else if (imageAction instanceof File) {
+        const file = imageAction;
+        if (file.size > 5 * 1024 * 1024) {
+          showError('Image must be smaller than 5 MB.');
+          return;
+        }
+        const ext = file.name.split('.').pop();
+        const filename = `${crypto.randomUUID()}.${ext}`;
+        const uploadRes = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/job-images/${filename}`,
+          {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${sessionToken}`,
+              'Content-Type': file.type,
+              'x-upsert': 'false',
+            },
+            body: file,
+          }
+        );
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(err?.message || 'Image upload failed.');
+        }
+        image_url = `${SUPABASE_URL}/storage/v1/object/public/job-images/${filename}`;
+      }
+
+      const patchRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId!)}`,
+        {
+          method: 'PATCH',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${sessionToken}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify({ title, description, link, image_url }),
+        }
+      );
+
+      if (!patchRes.ok) {
+        const err = await patchRes.json().catch(() => ({}));
+        throw new Error(err?.message || 'Failed to update the position.');
+      }
+
+      editFormEl.classList.add('hidden');
+      successEl.classList.remove('hidden');
+      successEl.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save changes →';
+    }
+  });
+
+  // ── Delete ────────────────────────────────────────────────
+  document.getElementById('delete-btn')!.addEventListener('click', async () => {
+    if (!confirm('Permanently delete this position? This cannot be undone.')) return;
+
+    const deleteBtn = document.getElementById('delete-btn') as HTMLButtonElement;
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting…';
+    hideError();
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId!)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || 'Failed to delete the position.');
+      }
+
+      window.location.href = '/';
+
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = 'Delete position';
+    }
+  });
+
+  init();
+</script>

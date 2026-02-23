@@ -25,13 +25,13 @@ CREATE POLICY "Public read" ON jobs
 CREATE POLICY "Authenticated insert" ON jobs
     FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Only authenticated users can update
-CREATE POLICY "Authenticated update" ON jobs
-    FOR UPDATE USING (auth.role() = 'authenticated');
+-- Only the admin can update
+CREATE POLICY "Admin update" ON jobs
+    FOR UPDATE USING (auth.jwt() ->> 'email' = 'hi@vibecoders.co');
 
--- Only authenticated users can delete
-CREATE POLICY "Authenticated delete" ON jobs
-    FOR DELETE USING (auth.role() = 'authenticated');
+-- Only the admin can delete
+CREATE POLICY "Admin delete" ON jobs
+    FOR DELETE USING (auth.jwt() ->> 'email' = 'hi@vibecoders.co');
 
 
 -- ── 2. Storage bucket ────────────────────────────────────────
@@ -51,9 +51,9 @@ CREATE POLICY "Authenticated upload images" ON storage.objects
         AND auth.role() = 'authenticated'
     );
 
--- Only authenticated users can delete images
-CREATE POLICY "Authenticated delete images" ON storage.objects
+-- Only the admin can delete images
+CREATE POLICY "Admin delete images" ON storage.objects
     FOR DELETE USING (
         bucket_id = 'job-images'
-        AND auth.role() = 'authenticated'
+        AND auth.jwt() ->> 'email' = 'hi@vibecoders.co'
     );

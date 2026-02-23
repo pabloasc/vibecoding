@@ -6,7 +6,7 @@ import Footer from '../components/Footer.astro';
 
 <Layout
   title="vibecoding.work — AI Developer Jobs & Remote Opportunities"
-  description="Browse open remote positions for vibecoders and AI-native developers. Find jobs that embrace AI-assisted development and ship at the speed of thought."
+  description="Browse open positions for vibecoders and AI-native developers. Find jobs that embrace AI-assisted development and ship at the speed of thought."
 >
   <Header />
 
@@ -19,11 +19,11 @@ import Footer from '../components/Footer.astro';
           Open Positions
         </h2>
         <div class="w-px h-4 bg-[#D0CEC8] hidden sm:block"></div>
-        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#CC0000] hidden sm:block">
-          Remote · AI-Native
+        <span class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] hidden sm:block">
+          AI-Native
         </span>
       </div>
-      <span id="job-count" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#bbb]">
+      <span id="job-count" class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#777]">
         Loading…
       </span>
     </div>
@@ -32,8 +32,7 @@ import Footer from '../components/Footer.astro';
     <div id="loading-state" class="divide-y divide-[#D0CEC8]">
       {[...Array(6)].map(() => (
         <div class="flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] animate-pulse">
-          <div class="w-7 h-2.5 bg-[#EFEFEC] rounded hidden sm:block shrink-0"></div>
-          <div class="flex-1 min-w-0 space-y-2">
+<div class="flex-1 min-w-0 space-y-2">
             <div class="h-4 bg-[#EFEFEC] rounded w-2/5"></div>
             <div class="h-3 bg-[#EFEFEC] rounded w-3/4"></div>
           </div>
@@ -46,16 +45,16 @@ import Footer from '../components/Footer.astro';
 
     <!-- ─── Empty state ─────────────────────────────────────── -->
     <div id="empty-state" class="hidden px-6 md:px-12 py-24 text-center border-b border-[#D0CEC8]">
-      <p class="font-serif text-[2rem] font-black text-[#ccc] mb-3 leading-none">No positions yet.</p>
+      <p class="font-serif text-[2rem] font-black text-[#888] mb-3 leading-none">No positions yet.</p>
       <a href="/submit"
-        class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#aaa] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
+        class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
         Be the first to submit one ↗
       </a>
     </div>
 
     <!-- ─── Error state ──────────────────────────────────────── -->
     <div id="error-state" class="hidden px-6 md:px-12 py-12 text-center">
-      <p class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#CC0000]">
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]">
         Failed to load positions — check your Supabase configuration.
       </p>
     </div>
@@ -73,33 +72,29 @@ import Footer from '../components/Footer.astro';
   <article class="group relative flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] cursor-pointer
                   hover:bg-[#F2F0EC] transition-colors duration-150">
 
-    <!-- Index number -->
-    <span class="job-num font-mono text-[9px] tracking-[0.1em] text-[#ccc] w-7 shrink-0 hidden sm:block"></span>
+    <!-- Thumbnail — fixed 96 × 64 -->
+    <div class="job-image-wrap w-[96px] h-[64px] shrink-0 overflow-hidden bg-[#EFEFEC]"></div>
 
-    <!-- Title + description -->
+<!-- Title + description -->
     <div class="flex-1 min-w-0">
       <h2 class="job-title font-serif font-black text-[1.05rem] leading-tight truncate
                  group-hover:text-[#CC0000] transition-colors duration-150"></h2>
-      <p class="job-description font-sans text-[0.72rem] text-[#999] truncate mt-0.5 leading-snug"></p>
+      <p class="job-description font-sans text-[0.8rem] text-[#666] truncate mt-0.5 leading-snug"></p>
     </div>
 
     <!-- Date -->
-    <span class="job-date font-mono text-[8px] tracking-[0.15em] text-[#bbb] uppercase
+    <span class="job-date font-mono text-[10px] tracking-[0.15em] text-[#777] uppercase
                  shrink-0 hidden md:block whitespace-nowrap"></span>
 
     <!-- Apply link -->
-    <a class="job-link relative z-10 font-mono text-[9px] tracking-[0.25em] uppercase
+    <a class="job-link relative z-10 font-mono text-[11px] tracking-[0.25em] uppercase
               border-b border-[#1A1A1A] pb-px shrink-0 whitespace-nowrap
               hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-150
               hidden sm:block"
        target="_blank" rel="noopener noreferrer">Apply ↗</a>
 
-    <!-- Thumbnail — fixed 96 × 64 -->
-    <div class="job-image-wrap w-[96px] h-[64px] shrink-0 overflow-hidden bg-[#EFEFEC]"></div>
-
     <!-- Full-row tap target -->
     <a class="job-card-link absolute inset-0 z-0"
-       target="_blank" rel="noopener noreferrer"
        aria-hidden="true" tabindex="-1"></a>
   </article>
 </template>
@@ -127,7 +122,7 @@ import Footer from '../components/Footer.astro';
         <div class="w-full h-full flex items-center justify-center bg-[#EFEFEC] relative overflow-hidden">
           <div class="absolute inset-0 opacity-[0.06]"
                style="background-image:repeating-linear-gradient(45deg,#1A1A1A 0,#1A1A1A 1px,transparent 0,transparent 50%);background-size:6px 6px;"></div>
-          <span class="font-mono text-[7px] tracking-[0.2em] uppercase text-[#ccc]">—</span>
+          <span class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#999]">—</span>
         </div>`;
     }
   }
@@ -135,12 +130,11 @@ import Footer from '../components/Footer.astro';
   function buildRow(job: Job, index: number): DocumentFragment {
     const frag = (document.getElementById('tpl-row') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
     const article = frag.querySelector('article')!;
-    (article.querySelector('.job-num') as HTMLElement).textContent = String(index + 1).padStart(2, '0');
-    (article.querySelector('.job-title') as HTMLElement).textContent = job.title;
+(article.querySelector('.job-title') as HTMLElement).textContent = job.title;
     (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
     (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
     (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
-    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = job.link;
+    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = `/job?id=${job.id}`;
     injectImage(article.querySelector('.job-image-wrap')!, job);
     return frag;
   }
@@ -187,7 +181,7 @@ import Footer from '../components/Footer.astro';
       '@context': 'https://schema.org',
       '@type': 'ItemList',
       name: 'Open AI Developer Positions — vibecoding.work',
-      description: 'Remote jobs for vibecoders and AI-native software engineers.',
+      description: 'Jobs for vibecoders and AI-native software engineers.',
       url: 'https://vibecoding.work/',
       numberOfItems: jobs.length,
       itemListElement: jobs.map((job, i) => ({
