@@ -115,6 +115,8 @@ import Footer from '../components/Footer.astro';
 </template>
 
 <script>
+  import { jobSlug } from '../lib/slug';
+
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   const PAGE_SIZE = 10;
@@ -164,7 +166,7 @@ import Footer from '../components/Footer.astro';
     (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
     (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
     (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
-    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = `/job?id=${job.id}`;
+    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = `/job/${jobSlug(job.id, job.title)}/`;
     injectImage(article.querySelector('.job-image-wrap')!, job);
     return frag;
   }

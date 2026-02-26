@@ -9,10 +9,13 @@ CREATE TABLE IF NOT EXISTS jobs (
     id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     title       TEXT        NOT NULL,
     description TEXT        NOT NULL,
-    image_url   TEXT,                         -- Public URL from Supabase Storage
+    image_url   TEXT,                         -- Public URL from Supabase Storage or external URL
     link        TEXT        NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- NOTE: URL slugs are derived at build time as slugify(title) + '-' + id[0:8]
+-- e.g. /job/staff-engineer-ai-productivity-a6b7c8d9/
+-- No slug column is needed — the first 8 chars of the UUID guarantee uniqueness.
 
 -- Enable Row Level Security
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
