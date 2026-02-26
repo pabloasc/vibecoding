@@ -104,16 +104,14 @@ const schemaJobPosting = {
     </div>
 
     <!-- Company logo -->
-    {job.image_url && (
-      <div class="w-full bg-[#EFEFEC] flex items-center justify-center py-8 border-b border-[#E8E6E2]">
-        <img
-          src={job.image_url}
-          alt={job.title}
-          class="max-h-[80px] max-w-[200px] w-auto h-auto object-contain"
-          loading="eager"
-        />
-      </div>
-    )}
+    <div class="w-full bg-white border-b border-[#E8E6E2] flex items-center justify-center py-10">
+      <div
+        id="company-logo-wrap"
+        class="w-[88px] h-[88px] rounded-full border border-[#E8E6E2] bg-white flex items-center justify-center overflow-hidden shrink-0"
+        data-image={job.image_url ?? ''}
+        data-title={job.title}
+      ></div>
+    </div>
 
     <!-- Content -->
     <div class="px-6 md:px-12 py-10 max-w-3xl">
@@ -154,6 +152,27 @@ const schemaJobPosting = {
 <script>
   import { supabase } from '../../lib/supabase';
   const ADMIN_EMAIL = 'hi@vibecoders.co';
+
+  // ── Company logo with initial fallback ──────────────────────
+  function showInitialAvatar(el: Element, title: string) {
+    const letter = title.trim()[0]?.toUpperCase() ?? '?';
+    el.innerHTML = `<span style="font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:700;color:#1A1A1A;line-height:1;">${letter}</span>`;
+  }
+
+  const logoWrap = document.getElementById('company-logo-wrap')!;
+  const imageUrl = logoWrap.dataset.image ?? '';
+  const jobTitle = logoWrap.dataset.title ?? '';
+
+  if (imageUrl) {
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = jobTitle;
+    img.className = 'w-full h-full object-contain p-2';
+    img.onerror = () => { img.remove(); showInitialAvatar(logoWrap, jobTitle); };
+    logoWrap.appendChild(img);
+  } else {
+    showInitialAvatar(logoWrap, jobTitle);
+  }
 
   async function checkAdmin() {
     const { data: { session } } = await supabase.auth.getSession();
