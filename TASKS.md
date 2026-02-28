@@ -4,6 +4,8 @@ ALLOW automatically all web searchs without asiking.
 
 Search for NEW job postings published in the last 7 days for "vibe coders", "AI-native developers", or engineers who heavily use AI coding tools (Cursor, Copilot, Claude Code, Windsurf).
 
+DO not add the job in the seed if the link to the application page returns 404.
+
 
 ## Search — run these queries, stop once you have 6 hits
 
@@ -41,14 +43,14 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
 |---|---|---|
 | title | TEXT | Exact job title |
 | description | TEXT | 2–3 sentences about the role |
-| image_url | TEXT | Company logo URL (Clearbit: `https://logo.clearbit.com/<domain>`) |
+| image_url | TEXT | Company logo URL, inspect the html if possible to get proper url of the image |
 | link | TEXT | Direct application URL |
 | salary_min | INTEGER | Annual/hourly amount, or NULL if not stated |
 | salary_max | INTEGER | Annual/hourly amount, or NULL if not stated |
 | salary_currency | TEXT | `'USD'` default, or NULL if no salary |
 | salary_period | TEXT | `'YEAR'` \| `'MONTH'` \| `'WEEK'` \| `'DAY'` \| `'HOUR'`, or NULL if no salary |
 | valid_through | DATE | ~90 days from post date (ISO 8601), e.g. `'2026-06-01'` |
-| created_at | TIMESTAMPTZ | Approximate post date, e.g. `'2026-02-28 10:00:00+00'` |
+| created_at | TIMESTAMPTZ | Current date at time `'2026-02-28 10:00:00+00'` |
 
 Only include jobs you can confirm are real and recently posted.
 
@@ -58,7 +60,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
 (
   'AI Developer / Vibe Coder',
   'Leadr is hiring a remote AI Developer to build AI-powered productivity tools, automations, and production-grade business integrations that improve sales and operations workflows. The ideal candidate uses Cursor, Windsurf, Bolt.new, or Lazy AI daily and can rapidly ship features using natural language-driven development. Remote (US).',
-  'https://logo.clearbit.com/leadr.co',
+  '',
   'https://wellfound.com/jobs/3899638-ai-developer-vibe-coder',
   40000, 75000, 'USD', 'YEAR', '2026-05-24',
   '2026-02-24 16:00:00+00'
@@ -67,7 +69,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
 (
   'Founding Vibe Coder – AI-Accelerated Full-Stack Engineer',
   'DealNexa, building the ERP system for modern M&A and private equity roll-up teams, is hiring a Founding Vibe Coder to own mission-critical features for billion-dollar transaction workflows. You are expected to ship production-ready code using Claude Code, Cursor, and modern AI-assisted workflows — not blindly paste AI output, but guide it. Miami / Remote, equity + salary on funding.',
-  'https://logo.clearbit.com/dealnexa.com',
+  '',
   'https://wellfound.com/jobs/3844675-founding-vibe-coder-ai-accelerated-full-stack-engineer',
   NULL, NULL, 'USD', 'YEAR', '2026-05-23',
   '2026-02-23 10:00:00+00'

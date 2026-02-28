@@ -120,20 +120,26 @@ const schemaJobPosting = {
                 hover:text-[#CC0000] transition-colors duration-150">
         Edit position →
       </a>
-    </div>
-
-    <!-- Company logo -->
-    <div class="w-full bg-white border-b border-[#E8E6E2] flex items-center justify-center py-10">
-      <div
-        id="company-logo-wrap"
-        class="w-[88px] h-[88px] rounded-full border border-[#E8E6E2] bg-white flex items-center justify-center overflow-hidden shrink-0"
-        data-image={job.image_url ?? ''}
-        data-title={job.title}
-      ></div>
+      <span class="w-px h-3 bg-[#333]"></span>
+      <button id="delete-btn"
+              data-job-id={job.id}
+              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]
+                     hover:text-[#CC0000] transition-colors duration-150">
+        Delete position ×
+      </button>
     </div>
 
     <!-- Content -->
     <div class="px-6 md:px-12 py-10 max-w-3xl">
+
+      <!-- Company logo -->
+      <div
+        id="company-logo-wrap"
+        class="mb-7"
+        data-job-id={job.id}
+        data-image={job.image_url ?? ''}
+        data-title={job.title}
+      ></div>
 
       <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-3">Open Position</p>
 
@@ -172,27 +178,48 @@ const schemaJobPosting = {
   import { supabase } from '../../lib/supabase';
   const ADMIN_EMAIL = 'hi@vibecoders.co';
 
-  // ── Company logo with initial fallback ──────────────────────
+  // ── Company logo ─────────────────────────────────────────────
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
   function showInitialAvatar(el: Element, title: string) {
     const letter = title.trim()[0]?.toUpperCase() ?? '?';
     el.innerHTML = `<span style="font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:700;color:#1A1A1A;line-height:1;">${letter}</span>`;
   }
 
-  const logoWrap = document.getElementById('company-logo-wrap')!;
-  const imageUrl = logoWrap.dataset.image ?? '';
-  const jobTitle = logoWrap.dataset.title ?? '';
-
-  if (imageUrl) {
+  function applyImage(el: Element, url: string, title: string) {
+    el.innerHTML = '';
+    if (!url) { showInitialAvatar(el, title); return; }
     const img = document.createElement('img');
-    img.src = imageUrl;
-    img.alt = jobTitle;
-    img.className = 'w-full h-full object-contain p-2';
-    img.onerror = () => { img.remove(); showInitialAvatar(logoWrap, jobTitle); };
-    logoWrap.appendChild(img);
-  } else {
-    showInitialAvatar(logoWrap, jobTitle);
+    img.src = url;
+    img.alt = title;
+    img.style.cssText = 'max-height:56px;max-width:180px;width:auto;height:auto;object-fit:contain;display:block;';
+    img.onerror = () => { img.remove(); showInitialAvatar(el, title); };
+    el.appendChild(img);
   }
 
+  const logoWrap    = document.getElementById('company-logo-wrap')!;
+  const jobId       = logoWrap.dataset.jobId ?? '';
+  const jobTitle    = logoWrap.dataset.title ?? '';
+  const buildImage  = logoWrap.dataset.image ?? '';
+
+  // Show build-time image immediately, then refresh from Supabase
+  applyImage(logoWrap, buildImage, jobTitle);
+
+  if (jobId) {
+    fetch(
+      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId)}&select=image_url`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    )
+      .then(r => r.ok ? r.json() : null)
+      .then((rows: { image_url: string | null }[] | null) => {
+        const freshUrl = rows?.[0]?.image_url ?? '';
+        if (freshUrl !== buildImage) applyImage(logoWrap, freshUrl, jobTitle);
+      })
+      .catch(() => {/* keep build-time image */});
+  }
+
+  // ── Admin check ───────────────────────────────────────────────
   async function checkAdmin() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user?.email === ADMIN_EMAIL) {
@@ -201,4 +228,40 @@ const schemaJobPosting = {
   }
 
   checkAdmin();
+
+  // ── Delete position ───────────────────────────────────────────
+  document.getElementById('delete-btn')?.addEventListener('click', async () => {
+    if (!confirm('Permanently delete this position? This cannot be undone.')) return;
+
+    const btn = document.getElementById('delete-btn') as HTMLButtonElement;
+    btn.textContent = 'Deleting…';
+    btn.disabled = true;
+
+    const jobId = btn.dataset.jobId!;
+    const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+    const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) { alert('Not authenticated.'); btn.textContent = 'Delete position ×'; btn.disabled = false; return; }
+
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+        },
+      }
+    );
+
+    if (res.ok) {
+      window.location.href = '/';
+    } else {
+      alert('Failed to delete position.');
+      btn.textContent = 'Delete position ×';
+      btn.disabled = false;
+    }
+  });
 </script>
