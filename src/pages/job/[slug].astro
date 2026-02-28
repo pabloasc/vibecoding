@@ -10,6 +10,11 @@ type Job = {
   description: string;
   image_url: string | null;
   link: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_currency: string | null;
+  salary_period: string | null;
+  valid_through: string | null;
   created_at: string;
 };
 
@@ -44,6 +49,7 @@ function formatDate(iso: string) {
 const canonicalSlug = jobSlug(job.id, job.title);
 const canonicalUrl  = `https://vibecoding.work/job/${canonicalSlug}/`;
 
+const hasSalary = job.salary_min != null || job.salary_max != null;
 const schemaJobPosting = {
   '@context': 'https://schema.org',
   '@type': 'JobPosting',
@@ -62,6 +68,19 @@ const schemaJobPosting = {
     sameAs: 'https://vibecoding.work',
     logo: 'https://vibecoding.work/images/logo.png',
   },
+  ...(job.valid_through ? { validThrough: job.valid_through } : {}),
+  ...(hasSalary ? {
+    baseSalary: {
+      '@type': 'MonetaryAmount',
+      currency: job.salary_currency ?? 'USD',
+      value: {
+        '@type': 'QuantitativeValue',
+        ...(job.salary_min != null ? { minValue: job.salary_min } : {}),
+        ...(job.salary_max != null ? { maxValue: job.salary_max } : {}),
+        unitText: job.salary_period ?? 'YEAR',
+      },
+    },
+  } : {}),
   ...(job.image_url ? { image: job.image_url } : {}),
 };
 ---

@@ -1,56 +1,43 @@
 -- ============================================================
 -- VibeCoding Jobs — Seed Data (NEW BATCH)
--- Fresh positions found: February 23–26, 2026
--- These are NEW jobs only — previous batch already inserted.
+-- Fresh positions found: February 28, 2026
 -- Run in Supabase SQL Editor to add these to your database.
 -- ============================================================
 
-INSERT INTO jobs (title, description, image_url, link, created_at) VALUES
+INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, salary_currency, salary_period, valid_through, created_at) VALUES
 
 (
-  'Vibe Coder – Applied AI & Rapid MVP Builder',
-  'Suncoast Venture Studio is hiring a hands-on builder to rapidly prototype and deploy MVPs using AI-assisted tooling across web, backend, and AI workflows. You will work directly with founders to convert concepts into validated, shippable products using Replit, Cursor, and Claude Code, integrating LLMs and agent-based systems from day one. In-person in Sarasota, FL, $75,000–$95,000/year.',
-  'https://logo.clearbit.com/suncoastventurestudio.com',
-  'https://www.indeed.com/viewjob?jk=4e0ca2efc363cfbb',
-  '2026-02-24 09:00:00+00'
+  'Vibe Coder / Software Developer (Low-Code / No-Code)',
+  'ATLAS ANALYTICS is hiring a Vibe Coder to build software products using low-code and no-code AI-assisted tools. The role focuses on rapid prototyping and delivery using modern AI coding platforms. Fully remote, open to candidates across Eastern Europe, Georgia, and Ukraine.',
+  'https://logo.clearbit.com/atlasanalytics.com',
+  'https://wellfound.com/jobs/2306588-vibe-coder-software-developer-low-code-no-code',
+  NULL, NULL, NULL, NULL, '2026-05-28',
+  '2026-02-28 10:00:00+00'
 ),
 
 (
-  'Senior Software Engineer – Agentic AI',
-  'M-Tech Systems is looking for an engineer to design and operate production-grade agentic AI systems combining LLMs, tools, planning, memory, and multi-agent communication. The role involves building on Azure AI Foundry, implementing RAG pipelines, and standardising tool access via Model Context Protocol — with daily use of Cursor and GitHub Copilot expected. Hybrid in Dunwoody, GA.',
-  'https://logo.clearbit.com/mtechsystems.com',
-  'https://emp.jobylon.com/jobs/334691-mtech-systems-senior-software-engineer-agentic-ai/',
-  '2026-02-25 11:00:00+00'
+  'Vibe Coder',
+  'LikeMinds is looking for a Vibe Coder to help build their community platform using AI-powered development tools. The role involves using AI coding assistants to rapidly prototype and ship features. Based in Gurugram with remote flexibility.',
+  'https://logo.clearbit.com/likeminds.community',
+  'https://wellfound.com/jobs/3249959-vibe-coder',
+  NULL, NULL, NULL, NULL, '2026-05-28',
+  '2026-02-28 10:00:00+00'
 ),
 
 (
-  'Freelance GenAI Developer – Prompt Engineering & Data Workflows',
-  'Mindrift (Tendem project) is seeking freelance developers to build and optimise Python scripts for AI data workflows, collaborating with automation to deliver accurate, real-world-ready outputs. You will generate precise answers for coding, automation, and data processing tasks while working efficiently with large datasets and troubleshooting AI pipelines. Remote, $20–$25/hr, part-time flexible.',
-  'https://logo.clearbit.com/mindrift.ai',
-  'https://apply.workable.com/toloka-ai/j/66D3FAC45E/',
-  '2026-02-23 14:00:00+00'
+  'Vibe Coding Intern (US Remote)',
+  'Untapped Ventures is seeking a Vibe Coding Intern to build internal tools, test emerging AI agents, and support early-stage diligence work to understand AI-native workflows. The role starts February/March 2026 and is fully remote within the US.',
+  'https://logo.clearbit.com/untappedventures.com',
+  'https://wellfound.com/jobs/3608636-vibe-coding-intern-us-remote',
+  NULL, NULL, NULL, NULL, '2026-05-28',
+  '2026-02-28 10:00:00+00'
 ),
 
 (
-  'AI Developer / Vibe Coder',
-  'Leadr is hiring a remote AI Developer to build AI-powered productivity tools, automations, and production-grade business integrations that improve sales and operations workflows. The ideal candidate uses Cursor, Windsurf, Bolt.new, or Lazy AI daily and can rapidly ship features using natural language-driven development. Remote (US), $40,000–$75,000/year.',
-  'https://logo.clearbit.com/leadr.co',
-  'https://wellfound.com/jobs/3899638-ai-developer-vibe-coder',
-  '2026-02-24 16:00:00+00'
-),
-
-(
-  'Founding Vibe Coder – AI-Accelerated Full-Stack Engineer',
-  'DealNexa, building the ERP system for modern M&A and private equity roll-up teams, is hiring a Founding Vibe Coder to own mission-critical features for billion-dollar transaction workflows. You are expected to ship production-ready code using Claude Code, Cursor, and modern AI-assisted workflows — not blindly paste AI output, but guide it. Miami / Remote, equity + salary on funding.',
-  'https://logo.clearbit.com/dealnexa.com',
-  'https://wellfound.com/jobs/3844675-founding-vibe-coder-ai-accelerated-full-stack-engineer',
-  '2026-02-23 10:00:00+00'
-),
-
-(
-  'Systems Operator – GCP / Cloud Operations',
-  'Sunstack.ai is seeking a hands-on systems operator to manage and improve cloud infrastructure and deployment pipelines supporting Node.js production environments on Google Cloud Platform. The role involves operating Kubernetes clusters, building Terraform IaC, developing CI/CD pipelines, and working alongside AI-native engineering teams building on LLMs. Hybrid in Orlando, FL (Lake Nona), $65,000–$80,000/year.',
-  'https://logo.clearbit.com/sunstack.ai',
-  'https://wellfound.com/l/2BZGqC',
-  '2026-02-23 08:00:00+00'
+  'Remote Junior Engineer – Vibe Coding',
+  'Elite Koach is hiring a Remote Junior Engineer to build modern SaaS products using Lovable and AI-assisted coding workflows. No years of experience required — just curiosity and a willingness to learn vibe coding. Fully remote.',
+  'https://logo.clearbit.com/elitekoach.com',
+  'https://wellfound.com/jobs/3803030-remote-junior-engineer-vibe-coding-fully-remote-using-loverable',
+  NULL, NULL, NULL, NULL, '2026-05-28',
+  '2026-02-28 10:00:00+00'
 );

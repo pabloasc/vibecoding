@@ -228,6 +228,76 @@ const webPage = JSON.stringify({
         />
       </div>
 
+      <!-- Salary -->
+      <div class="space-y-2.5">
+        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Salary Range <span class="text-[#999]">(optional — shown to Google)</span>
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            id="salary-min"
+            name="salary_min"
+            placeholder="Min (e.g. 80000)"
+            min="0"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          />
+          <input
+            type="number"
+            id="salary-max"
+            name="salary_max"
+            placeholder="Max (e.g. 150000)"
+            min="0"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <select
+            id="salary-currency"
+            name="salary_currency"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+          </select>
+          <select
+            id="salary-period"
+            name="salary_period"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          >
+            <option value="YEAR">Per year</option>
+            <option value="MONTH">Per month</option>
+            <option value="HOUR">Per hour</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Expires -->
+      <div class="space-y-2.5">
+        <label for="valid-through" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Listing expires on <span class="text-[#999]">(optional — shown to Google)</span>
+        </label>
+        <input
+          type="date"
+          id="valid-through"
+          name="valid_through"
+          class="w-full border border-[#ccc] bg-white px-4 py-3
+                 font-mono text-sm text-[#1A1A1A]
+                 focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+        />
+      </div>
+
       <!-- Image -->
       <div class="space-y-2.5">
         <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
@@ -547,7 +617,14 @@ const webPage = JSON.stringify({
 
     const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
     const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
-    const link        = (document.getElementById('link') as HTMLInputElement).value.trim();
+    const link         = (document.getElementById('link') as HTMLInputElement).value.trim();
+    const salaryMinRaw = (document.getElementById('salary-min') as HTMLInputElement).value.trim();
+    const salaryMaxRaw = (document.getElementById('salary-max') as HTMLInputElement).value.trim();
+    const salaryCurrency = (document.getElementById('salary-currency') as HTMLSelectElement).value;
+    const salaryPeriod   = (document.getElementById('salary-period') as HTMLSelectElement).value;
+    const validThrough   = (document.getElementById('valid-through') as HTMLInputElement).value;
+    const salary_min   = salaryMinRaw ? parseInt(salaryMinRaw, 10) : null;
+    const salary_max   = salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : null;
     const imageFile    = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
     const imageExtUrl  = imageSource === 'url'  ? imageUrlInput.value.trim() : null;
 
@@ -600,7 +677,14 @@ const webPage = JSON.stringify({
           'Content-Type': 'application/json',
           Prefer: 'return=minimal',
         },
-        body: JSON.stringify({ title, description, link, image_url }),
+        body: JSON.stringify({
+          title, description, link, image_url,
+          salary_min,
+          salary_max,
+          salary_currency: salary_min != null || salary_max != null ? salaryCurrency : null,
+          salary_period:   salary_min != null || salary_max != null ? salaryPeriod   : null,
+          valid_through:   validThrough || null,
+        }),
       });
 
       if (!insertRes.ok) {

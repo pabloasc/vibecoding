@@ -119,6 +119,76 @@ import Footer from '../components/Footer.astro';
         />
       </div>
 
+      <!-- Salary -->
+      <div class="space-y-2.5">
+        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Salary Range <span class="text-[#999]">(optional — shown to Google)</span>
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            id="salary-min"
+            name="salary_min"
+            placeholder="Min (e.g. 80000)"
+            min="0"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          />
+          <input
+            type="number"
+            id="salary-max"
+            name="salary_max"
+            placeholder="Max (e.g. 150000)"
+            min="0"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <select
+            id="salary-currency"
+            name="salary_currency"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+          </select>
+          <select
+            id="salary-period"
+            name="salary_period"
+            class="w-full border border-[#ccc] bg-white px-4 py-3
+                   font-mono text-sm text-[#1A1A1A]
+                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+          >
+            <option value="YEAR">Per year</option>
+            <option value="MONTH">Per month</option>
+            <option value="HOUR">Per hour</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Expires -->
+      <div class="space-y-2.5">
+        <label for="valid-through" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
+          Listing expires on <span class="text-[#999]">(optional — shown to Google)</span>
+        </label>
+        <input
+          type="date"
+          id="valid-through"
+          name="valid_through"
+          class="w-full border border-[#ccc] bg-white px-4 py-3
+                 font-mono text-sm text-[#1A1A1A]
+                 focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+        />
+      </div>
+
       <!-- Image -->
       <div class="space-y-2.5">
         <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
@@ -253,7 +323,7 @@ import Footer from '../components/Footer.astro';
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   const ADMIN_EMAIL     = 'hi@vibecoders.co';
 
-  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; };
+  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; salary_min: number | null; salary_max: number | null; salary_currency: string | null; salary_period: string | null; valid_through: string | null; created_at: string; };
 
   // ── Elements ──────────────────────────────────────────────
   const authCheckingEl  = document.getElementById('auth-checking')!;
@@ -324,6 +394,13 @@ import Footer from '../components/Footer.astro';
     (document.getElementById('title') as HTMLInputElement).value = job.title;
     (document.getElementById('description') as HTMLTextAreaElement).value = job.description;
     (document.getElementById('link') as HTMLInputElement).value = job.link;
+
+    // Salary + expiry
+    if (job.salary_min != null) (document.getElementById('salary-min') as HTMLInputElement).value = String(job.salary_min);
+    if (job.salary_max != null) (document.getElementById('salary-max') as HTMLInputElement).value = String(job.salary_max);
+    if (job.salary_currency) (document.getElementById('salary-currency') as HTMLSelectElement).value = job.salary_currency;
+    if (job.salary_period)   (document.getElementById('salary-period')   as HTMLSelectElement).value = job.salary_period;
+    if (job.valid_through)   (document.getElementById('valid-through')   as HTMLInputElement).value  = job.valid_through;
 
     // Image state
     const currentWrap   = document.getElementById('current-image-wrap')!;
@@ -496,7 +573,14 @@ import Footer from '../components/Footer.astro';
             'Content-Type': 'application/json',
             Prefer: 'return=minimal',
           },
-          body: JSON.stringify({ title, description, link, image_url }),
+          body: JSON.stringify({
+            title, description, link, image_url,
+            salary_min:      (document.getElementById('salary-min')  as HTMLInputElement).value  ? Number((document.getElementById('salary-min')  as HTMLInputElement).value)  : null,
+            salary_max:      (document.getElementById('salary-max')  as HTMLInputElement).value  ? Number((document.getElementById('salary-max')  as HTMLInputElement).value)  : null,
+            salary_currency: (document.getElementById('salary-currency') as HTMLSelectElement).value || null,
+            salary_period:   (document.getElementById('salary-period')   as HTMLSelectElement).value || null,
+            valid_through:   (document.getElementById('valid-through')   as HTMLInputElement).value  || null,
+          }),
         }
       );
 
