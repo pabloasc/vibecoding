@@ -28,7 +28,6 @@ const jobPages = await getJobSitemapPages();
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'hybrid',
   adapter: vercel(),
   site: 'https://vibecoding.work',
   integrations: [
