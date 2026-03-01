@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { jobSlug } from '../../lib/slug';
+import { createClient } from '@supabase/supabase-js';
 
 type Job = {
   id: string;
@@ -31,14 +32,15 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 let job: Job | null = null;
 try {
-  const res = await fetch(
-    `${supabaseUrl}/rest/v1/jobs?id=like.${idPrefix}%&select=*&limit=1`,
-    { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
-  );
-  if (res.ok) {
-    const rows: Job[] = await res.json();
-    job = rows[0] ?? null;
-  }
+  const db = createClient(supabaseUrl, supabaseKey);
+  const { data } = await db
+    .from('jobs')
+    .select('*')
+    .gte('id', `${idPrefix}-0000-0000-0000-000000000000`)
+    .lte('id', `${idPrefix}-ffff-ffff-ffff-ffffffffffff`)
+    .limit(1)
+    .maybeSingle();
+  job = (data as Job) ?? null;
 } catch { /* fall through */ }
 
 if (!job) return Astro.redirect('/');
