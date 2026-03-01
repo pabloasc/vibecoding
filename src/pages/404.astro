@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="404 — Page Not Found · vibecoding.work"
+  description="The page you're looking for doesn't exist. Browse open vibe coder positions at vibecoding.work."
+  noindex={true}
+>
+  <Header />
+
+  <main class="w-full">
+
+    <!-- Top rule -->
+    <div class="h-[2px] bg-[#CC0000]"></div>
+
+    <!-- Content -->
+    <div class="px-6 md:px-12 py-20 md:py-32 max-w-3xl">
+
+      <!-- Error label -->
+      <p class="font-mono text-[10px] tracking-[0.4em] uppercase text-[#CC0000] mb-6">
+        Error 404
+      </p>
+
+      <!-- Headline -->
+      <h1 class="font-serif text-[3rem] md:text-[5rem] font-black uppercase
+                 tracking-tight leading-none text-[#1A1A1A] mb-6">
+        Position<br />Not Found.
+      </h1>
+
+      <!-- Divider -->
+      <div class="w-12 h-[3px] bg-[#1A1A1A] mb-8"></div>
+
+      <!-- Copy -->
+      <p class="font-mono text-[0.85rem] leading-relaxed text-[#555] mb-12 max-w-md">
+        This position may have been filled, removed, or the link may be incorrect.
+        Browse all open positions below.
+      </p>
+
+      <!-- CTA -->
+      <div class="flex items-center gap-6">
+        <a href="/"
+           class="font-mono text-[11px] tracking-[0.3em] uppercase
+                  bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
+                  hover:bg-[#CC0000] transition-colors duration-200">
+          Browse open positions →
+        </a>
+        <a href="/submit"
+           class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
+                  hover:text-[#1A1A1A] transition-colors duration-200">
+          Submit a job ↗
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Bottom decorative rule -->
+    <div class="border-t border-[#D0CEC8] mx-6 md:mx-12"></div>
+
+    <!-- Pull quote -->
+    <div class="px-6 md:px-12 py-10 max-w-3xl">
+      <p class="font-serif italic text-[1.1rem] text-[#BBB] leading-relaxed">
+        "The best vibe coder jobs are still out there — you just have to look."
+      </p>
+    </div>
+
+  </main>
+
+  <Footer />
+</Layout>
