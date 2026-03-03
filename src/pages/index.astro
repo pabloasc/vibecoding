@@ -13,66 +13,63 @@ import Footer from '../components/Footer.astro';
   <main class="w-full">
 
     <!-- ─── Section header ─────────────────────────────────── -->
-    <div class="px-6 md:px-12 py-3 border-b-2 border-[#1A1A1A] flex items-baseline justify-between">
-      <div class="flex items-baseline gap-3">
-        <h2 class="font-serif text-[1.5rem] md:text-[1.9rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">
+    <div class="px-6 md:px-12 py-4 border-b border-[#EBEBEB] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <h2 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A]">
           Open Positions
         </h2>
-        <div class="w-px h-4 bg-[#D0CEC8] hidden sm:block"></div>
-        <span class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] hidden sm:block">
-          AI-Native
-        </span>
+        <span class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#CC0000]"></span>
       </div>
-      <span id="job-count" class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#777]">
+      <span id="job-count" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888]">
         Loading…
       </span>
     </div>
 
     <!-- ─── Loading skeleton ─────────────────────────────────── -->
-    <div id="loading-state" class="divide-y divide-[#D0CEC8]">
+    <div id="loading-state" class="divide-y divide-[#F4F4F4]">
       {[...Array(6)].map(() => (
-        <div class="flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] animate-pulse">
-<div class="flex-1 min-w-0 space-y-2">
-            <div class="h-4 bg-[#EFEFEC] rounded w-2/5"></div>
-            <div class="h-3 bg-[#EFEFEC] rounded w-3/4"></div>
+        <div class="flex items-center gap-5 px-6 md:px-12 h-[72px] animate-pulse">
+          <div class="w-[44px] h-[44px] bg-[#F4F4F4] shrink-0"></div>
+          <div class="flex-1 min-w-0 space-y-2">
+            <div class="h-3.5 bg-[#F4F4F4] rounded-sm w-2/5"></div>
+            <div class="h-2.5 bg-[#F4F4F4] rounded-sm w-3/4"></div>
           </div>
-          <div class="h-2.5 w-20 bg-[#EFEFEC] rounded hidden md:block shrink-0"></div>
-          <div class="h-2.5 w-14 bg-[#EFEFEC] rounded hidden sm:block shrink-0"></div>
-          <div class="w-[64px] h-[64px] bg-[#EFEFEC] rounded-full shrink-0"></div>
+          <div class="h-2.5 w-16 bg-[#F4F4F4] rounded-sm hidden md:block shrink-0"></div>
+          <div class="h-2.5 w-10 bg-[#F4F4F4] rounded-sm hidden sm:block shrink-0"></div>
         </div>
       ))}
     </div>
 
     <!-- ─── Empty state ─────────────────────────────────────── -->
-    <div id="empty-state" class="hidden px-6 md:px-12 py-24 text-center border-b border-[#D0CEC8]">
-      <p class="font-serif text-[2rem] font-black text-[#888] mb-3 leading-none">No positions yet.</p>
+    <div id="empty-state" class="hidden px-6 md:px-12 py-24 text-center border-b border-[#EBEBEB]">
+      <p class="font-sans font-semibold text-[1.5rem] text-[#888] mb-4 leading-none">No positions yet.</p>
       <a href="/submit"
-        class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
+        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
         Be the first to submit one ↗
       </a>
     </div>
 
     <!-- ─── Error state ──────────────────────────────────────── -->
     <div id="error-state" class="hidden px-6 md:px-12 py-12 text-center">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]">
-        Failed to load positions — check your Supabase configuration.
+      <p class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#CC0000]">
+        Failed to load positions.
       </p>
     </div>
 
     <!-- ─── Job list ─────────────────────────────────────────── -->
-    <div id="job-list" class="hidden divide-y divide-[#D0CEC8]"></div>
+    <div id="job-list" class="hidden"></div>
 
     <!-- ─── Pagination ───────────────────────────────────────── -->
-    <div id="pagination" class="hidden px-6 md:px-12 py-5 border-t border-[#D0CEC8] flex items-center justify-between gap-4">
+    <div id="pagination" class="hidden px-6 md:px-12 py-5 border-t border-[#EBEBEB] flex items-center justify-between gap-4">
       <button id="page-prev"
-        class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
-               hover:text-[#1A1A1A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
+        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666]
+               hover:text-[#0A0A0A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
         ← Prev
       </button>
-      <span id="page-indicator" class="font-mono text-[10px] tracking-[0.2em] uppercase text-[#999]"></span>
+      <span id="page-indicator" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888]"></span>
       <button id="page-next"
-        class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
-               hover:text-[#1A1A1A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
+        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666]
+               hover:text-[#0A0A0A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
         Next →
       </button>
     </div>
@@ -84,28 +81,27 @@ import Footer from '../components/Footer.astro';
 
 <!-- ═══════ ROW TEMPLATE ══════════════════════════════════════ -->
 <template id="tpl-row">
-  <article class="group relative flex items-center gap-4 md:gap-6 px-6 md:px-12 h-[88px] cursor-pointer
-                  hover:bg-[#F2F0EC] transition-colors duration-150">
+  <article class="group relative flex items-center gap-5 px-6 md:px-12 py-5 border-b border-[#F2F2F2]
+                  hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer">
 
-    <!-- Thumbnail — fixed 96 × 64 -->
-    <div class="job-image-wrap w-[64px] h-[64px] shrink-0 overflow-hidden bg-white rounded-full border border-[#E8E6E2] flex items-center justify-center"></div>
+    <!-- Thumbnail — clean square -->
+    <div class="job-image-wrap w-[44px] h-[44px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center"></div>
 
-<!-- Title + description -->
+    <!-- Title + description -->
     <div class="flex-1 min-w-0">
-      <h2 class="job-title font-serif font-black text-[1.05rem] leading-tight truncate
-                 group-hover:text-[#CC0000] transition-colors duration-150"></h2>
-      <p class="job-description font-sans text-[0.8rem] text-[#666] truncate mt-0.5 leading-snug"></p>
+      <h2 class="job-title font-sans font-semibold text-[0.92rem] leading-snug truncate text-[#0A0A0A]
+                 group-hover:text-[#CC0000] transition-colors duration-100"></h2>
+      <p class="job-description font-mono text-[0.65rem] text-[#777] truncate mt-1 leading-none"></p>
     </div>
 
     <!-- Date -->
-    <span class="job-date font-mono text-[10px] tracking-[0.15em] text-[#777] uppercase
+    <span class="job-date font-mono text-[0.6rem] tracking-[0.1em] text-[#888] uppercase
                  shrink-0 hidden md:block whitespace-nowrap"></span>
 
     <!-- Apply link -->
-    <a class="job-link relative z-10 font-mono text-[11px] tracking-[0.25em] uppercase
-              border-b border-[#1A1A1A] pb-px shrink-0 whitespace-nowrap
-              hover:border-[#CC0000] hover:text-[#CC0000] transition-colors duration-150
-              hidden sm:block"
+    <a class="job-link relative z-10 font-mono text-[0.6rem] tracking-[0.18em] uppercase
+              text-[#CC0000] shrink-0 whitespace-nowrap hidden sm:block
+              hover:underline underline-offset-2"
        target="_blank" rel="noopener noreferrer">Apply ↗</a>
 
     <!-- Full-row tap target -->
@@ -119,7 +115,7 @@ import Footer from '../components/Footer.astro';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 15;
 
   type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; };
 

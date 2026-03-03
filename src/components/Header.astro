@@ -1,81 +1,54 @@
 ---
-const today = new Date();
-const issue = 1;
-const vol = 1;
-const dateStr = today.toLocaleDateString('en-US', {
-  month: 'long',
-  year: 'numeric',
-}).toUpperCase();
 ---
 
-<header class="bg-white">
+<header class="bg-white border-b border-[#EBEBEB]">
 
-  <!-- ① 3px top accent rule -->
-  <div class="h-[3px] bg-[#1A1A1A]"></div>
+  <!-- 2px red top accent -->
+  <div class="h-[2px] bg-[#CC0000]"></div>
 
-  <!-- ② Meta + masthead row -->
-  <div class="px-6 md:px-12 pt-5 pb-5 border-b border-[#D0CEC8]">
-    <div class="flex items-center justify-between gap-4">
+  <!-- Single main row -->
+  <div class="px-6 md:px-12 h-[64px] flex items-center justify-between">
 
-      <!-- Left meta (hidden on mobile) -->
-      <div class="hidden md:flex flex-col gap-0.5 min-w-[130px]">
-        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">Jobs&nbsp;&amp;&nbsp;Opportunities</span>
-      </div>
-
-      <!-- Center: Logo + wordmark -->
-      <a href="/" class="flex-1 md:flex-none flex items-center justify-start md:justify-center gap-3 group" aria-label="vibecoding.work home">
-        <img
-          src="/images/logo.png"
-          alt="vibecoding.work"
-          class="h-12 md:h-14 w-auto object-contain transition-opacity duration-200 group-hover:opacity-60"
-        />
-        <div class="leading-none">
-          <div class="leading-none" style="font-size: clamp(1.5rem, 3.8vw, 2.3rem); letter-spacing: -0.03em;">
-            <span class="font-mono font-bold text-[#0F0F0F]">vibecoding</span><span
-              class="font-mono font-bold text-[#CC0000]">.</span><span
-              class="font-mono font-bold text-[#0F0F0F]">work</span>
-          </div>
-          <p class="font-mono text-[8px] tracking-[0.3em] uppercase text-[#bbb] mt-1.5 hidden sm:block">
-            For AI powered creators
-          </p>
+    <!-- Logo + wordmark -->
+    <a href="/" class="flex items-center gap-3 group shrink-0" aria-label="vibecoding.work home">
+      <img
+        src="/images/logo.png"
+        alt=""
+        class="h-8 w-auto object-contain opacity-90 group-hover:opacity-50 transition-opacity duration-200"
+      />
+      <div class="leading-none">
+        <div class="leading-none" style="font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em;">
+          <span class="text-[#0A0A0A]">vibecoding</span><span class="text-[#CC0000]">.work</span>
         </div>
+        <p style="font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 300; font-size: 0.55rem; letter-spacing: 0.22em;" class="uppercase text-[#888] mt-[3px] hidden sm:block">
+          The job board for vibecoders
+        </p>
+      </div>
+    </a>
+
+    <!-- Nav -->
+    <nav class="flex items-center gap-2">
+      <a href="/" class="nav-link font-mono text-[10px] tracking-[0.18em] uppercase px-3 py-2 text-[#555] hover:text-[#0A0A0A] transition-colors duration-150 relative hidden sm:block">
+        Open Positions
+      </a>
+      <a href="/submit"
+         class="font-mono text-[10px] tracking-[0.18em] uppercase px-4 py-2 border border-[#0A0A0A] text-[#0A0A0A]
+                hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150">
+        Submit ↗
       </a>
 
-      <!-- Right meta (hidden on mobile) -->
-      <div class="hidden md:flex flex-col items-end gap-0.5 min-w-[130px]">
-        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-[#888]">{dateStr}</span>
+      <!-- Auth status -->
+      <div id="auth-nav" class="hidden items-center gap-2 ml-1">
+        <span class="w-px h-3 bg-[#EBEBEB]"></span>
+        <span id="auth-username" class="font-mono text-[10px] tracking-[0.15em] uppercase text-[#666]"></span>
+        <button id="auth-signout"
+          class="font-mono text-[10px] tracking-[0.15em] uppercase text-[#666] hover:text-[#CC0000] transition-colors duration-150">
+          Sign out
+        </button>
       </div>
+    </nav>
 
-    </div>
   </div>
-
-  <!-- ③ Pull quote strip -->
-  <div class="px-6 md:px-12 py-2.5 border-b-[3px] border-[#1A1A1A] text-center">
-    <p class="font-serif italic text-[0.9rem] text-[#888] leading-snug">
-      "Build fast. Ship faster. Let the AI do the heavy lifting."
-    </p>
-  </div>
-
-  <!-- ④ Nav bar -->
-  <nav class="px-6 md:px-12 flex items-center gap-8 border-b border-[#D0CEC8]">
-    <a href="/" class="nav-link font-mono text-[9px] tracking-[0.25em] uppercase py-3 whitespace-nowrap relative text-[#1A1A1A]">
-      Open Positions
-    </a>
-    <a href="/submit" class="nav-link font-mono text-[9px] tracking-[0.25em] uppercase py-3 whitespace-nowrap relative text-[#888] hover:text-[#CC0000] transition-colors duration-200">
-      Submit a Job ↗
-    </a>
-
-    <!-- Auth status (hidden until session confirmed) -->
-    <div id="auth-nav" class="hidden ml-auto flex items-center gap-3">
-      <span class="w-px h-3 bg-[#D0CEC8]"></span>
-      <span id="auth-username" class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888]"></span>
-      <button id="auth-signout"
-        class="font-mono text-[9px] tracking-[0.2em] uppercase text-[#888]
-               hover:text-[#CC0000] transition-colors duration-150 whitespace-nowrap">
-        Sign out
-      </button>
-    </div>
-  </nav>
 
 </header>
 
@@ -88,7 +61,7 @@ const dateStr = today.toLocaleDateString('en-US', {
     width: 0;
     height: 2px;
     background: #CC0000;
-    transition: width 0.25s ease;
+    transition: width 0.2s ease;
   }
   .nav-link:hover::after,
   .nav-link[aria-current="page"]::after {
@@ -97,10 +70,9 @@ const dateStr = today.toLocaleDateString('en-US', {
 </style>
 
 <script>
-  // Active nav link
   document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
     if (new URL(link.href).pathname === window.location.pathname) {
-      link.style.color = '#1A1A1A';
+      link.style.color = '#0A0A0A';
       link.setAttribute('aria-current', 'page');
     }
   });
@@ -118,14 +90,15 @@ const dateStr = today.toLocaleDateString('en-US', {
       const email = session.user.email ?? '';
       authUsername.textContent = email.split('@')[0];
       authNav.classList.remove('hidden');
+      authNav.classList.add('flex');
     } else {
       authNav.classList.add('hidden');
+      authNav.classList.remove('flex');
     }
   });
 
   signoutBtn.addEventListener('click', async () => {
     await supabase.auth.signOut();
-    // If on a gated page, redirect home
     const gated = ['/submit', '/edit'];
     if (gated.some(p => window.location.pathname.startsWith(p))) {
       window.location.href = '/';

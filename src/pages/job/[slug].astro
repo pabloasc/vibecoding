@@ -110,69 +110,69 @@ const schemaJobPosting = {
   <main class="w-full">
 
     <!-- Back bar -->
-    <div class="px-6 md:px-12 py-3 border-b border-[#D0CEC8] flex items-center justify-between">
+    <div class="px-6 md:px-12 py-3 border-b border-[#EBEBEB] flex items-center justify-between">
       <a href="/"
-         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#777]
-                hover:text-[#1A1A1A] transition-colors duration-150">
+         class="font-mono text-[0.65rem] tracking-[0.18em] uppercase text-[#666]
+                hover:text-[#0A0A0A] transition-colors duration-150">
         ← All Positions
       </a>
-      <span class="font-mono text-[10px] tracking-[0.15em] uppercase text-[#777]">
+      <span class="font-mono text-[0.6rem] tracking-[0.12em] uppercase text-[#888]">
         {formatDate(job.created_at)}
       </span>
     </div>
 
-    <!-- Admin bar (revealed client-side on auth check) -->
-    <div id="admin-bar" class="hidden px-6 md:px-12 py-2.5 bg-[#1A1A1A] flex items-center gap-4">
-      <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-[#555]">Admin</span>
-      <span class="w-px h-3 bg-[#333]"></span>
+    <!-- Admin bar -->
+    <div id="admin-bar" class="hidden px-6 md:px-12 py-2.5 bg-[#0A0A0A] flex items-center gap-4">
+      <span class="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-[#444]">Admin</span>
+      <span class="w-px h-3 bg-[#222]"></span>
       <a href={`/edit?id=${job.id}`}
-         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#F8F7F4]
+         class="font-mono text-[0.65rem] tracking-[0.18em] uppercase text-white
                 hover:text-[#CC0000] transition-colors duration-150">
-        Edit position →
+        Edit →
       </a>
-      <span class="w-px h-3 bg-[#333]"></span>
+      <span class="w-px h-3 bg-[#222]"></span>
       <button id="delete-btn"
               data-job-id={job.id}
-              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]
+              class="font-mono text-[0.65rem] tracking-[0.18em] uppercase text-[#555]
                      hover:text-[#CC0000] transition-colors duration-150">
-        Delete position ×
+        Delete ×
       </button>
     </div>
 
     <!-- Content -->
-    <div class="px-6 md:px-12 py-10 max-w-3xl">
+    <div class="px-6 md:px-12 py-12 max-w-2xl">
 
       <!-- Company logo -->
       <div
         id="company-logo-wrap"
-        class="mb-7"
+        class="mb-8"
         data-job-id={job.id}
         data-image={job.image_url ?? ''}
         data-title={job.title}
       ></div>
 
-      <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-3">Open Position</p>
+      <p class="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Open Position</p>
 
-      <h1 class="font-serif text-[2rem] md:text-[2.8rem] font-black uppercase
-                 tracking-tight leading-none text-[#1A1A1A] mb-8">{job.title}</h1>
+      <h1 class="font-sans font-bold text-[1.8rem] md:text-[2.4rem]
+                 leading-tight tracking-tight text-[#0A0A0A] mb-8">{job.title}</h1>
 
-      <div class="border-t border-[#D0CEC8] pt-8 mb-10">
-        <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-[#888] mb-4">About this role</p>
-        <p class="font-sans text-[1rem] leading-relaxed text-[#333] whitespace-pre-wrap">{job.description}</p>
+      <div class="border-t border-[#EBEBEB] pt-8 mb-10">
+        <p class="font-mono text-[0.6rem] tracking-[0.25em] uppercase text-[#888] mb-5">About this role</p>
+        <p class="font-sans text-[0.95rem] leading-[1.75] text-[#444] whitespace-pre-wrap">{job.description}</p>
       </div>
 
-      <div class="border-t-2 border-[#1A1A1A] pt-8 flex items-center gap-6">
+      <div class="pt-2 flex items-center gap-5">
         <a href={job.link}
            target="_blank"
            rel="noopener noreferrer"
-           class="font-mono text-[11px] tracking-[0.3em] uppercase
-                  bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
+           class="font-mono text-[0.65rem] tracking-[0.25em] uppercase
+                  bg-[#0A0A0A] text-white px-7 py-3.5
                   hover:bg-[#CC0000] transition-colors duration-200">
           Apply for this position ↗
         </a>
         <a href="/"
-           class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
-                  hover:text-[#1A1A1A] transition-colors duration-200">
+           class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666]
+                  hover:text-[#0A0A0A] transition-colors duration-200">
           ← Back
         </a>
       </div>
