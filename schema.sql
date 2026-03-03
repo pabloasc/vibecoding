@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS jobs (
     salary_currency  TEXT        DEFAULT 'USD',
     salary_period    TEXT        DEFAULT 'YEAR', -- YEAR | MONTH | WEEK | DAY | HOUR
     valid_through    DATE,                    -- job expiry date (ISO 8601)
+    is_remote        BOOLEAN     DEFAULT true,
+    locations        TEXT[],                  -- e.g. '{"USA","Germany","Worldwide"}' — empty/null means unspecified
+    employment_type  TEXT        DEFAULT 'FULL_TIME', -- FULL_TIME | PART_TIME | CONTRACTOR | INTERN | TEMPORARY
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- NOTE: URL slugs are derived at build time as slugify(title) + '-' + id[0:8]
@@ -34,7 +37,10 @@ ALTER TABLE jobs
   ADD COLUMN IF NOT EXISTS salary_max      INTEGER,
   ADD COLUMN IF NOT EXISTS salary_currency TEXT    DEFAULT 'USD',
   ADD COLUMN IF NOT EXISTS salary_period   TEXT    DEFAULT 'YEAR',
-  ADD COLUMN IF NOT EXISTS valid_through   DATE;
+  ADD COLUMN IF NOT EXISTS valid_through   DATE,
+  ADD COLUMN IF NOT EXISTS is_remote       BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS locations       TEXT[],
+  ADD COLUMN IF NOT EXISTS employment_type TEXT    DEFAULT 'FULL_TIME';
 
 -- Enable Row Level Security
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;

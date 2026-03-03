@@ -4,7 +4,7 @@
 -- Run in Supabase SQL Editor to add these to your database.
 -- ============================================================
 
-INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, salary_currency, salary_period, valid_through, created_at) VALUES
+INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, salary_currency, salary_period, valid_through, is_remote, locations, employment_type, created_at) VALUES
 
 (
   'Vibe Coder / Software Developer (Low-Code / No-Code)',
@@ -12,6 +12,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
   'https://logo.clearbit.com/atlasanalytics.com',
   'https://wellfound.com/jobs/2306588-vibe-coder-software-developer-low-code-no-code',
   NULL, NULL, NULL, NULL, '2026-05-28',
+  true, '{"Eastern Europe","Georgia","Ukraine"}', 'FULL_TIME',
   '2026-02-28 10:00:00+00'
 ),
 
@@ -21,6 +22,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
   'https://logo.clearbit.com/likeminds.community',
   'https://wellfound.com/jobs/3249959-vibe-coder',
   NULL, NULL, NULL, NULL, '2026-05-28',
+  false, '{"India"}', 'FULL_TIME',
   '2026-02-28 10:00:00+00'
 ),
 
@@ -30,6 +32,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
   'https://logo.clearbit.com/untappedventures.com',
   'https://wellfound.com/jobs/3608636-vibe-coding-intern-us-remote',
   NULL, NULL, NULL, NULL, '2026-05-28',
+  true, '{"USA"}', 'INTERN',
   '2026-02-28 10:00:00+00'
 ),
 
@@ -39,5 +42,6 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
   'https://logo.clearbit.com/elitekoach.com',
   'https://wellfound.com/jobs/3803030-remote-junior-engineer-vibe-coding-fully-remote-using-loverable',
   NULL, NULL, NULL, NULL, '2026-05-28',
+  true, '{}', 'FULL_TIME',
   '2026-02-28 10:00:00+00'
 );

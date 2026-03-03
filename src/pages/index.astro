@@ -92,6 +92,7 @@ import Footer from '../components/Footer.astro';
       <h2 class="job-title font-sans font-semibold text-[0.92rem] leading-snug truncate text-[#0A0A0A]
                  group-hover:text-[#CC0000] transition-colors duration-100"></h2>
       <p class="job-description font-mono text-[0.65rem] text-[#777] truncate mt-1 leading-none"></p>
+      <div class="job-tags flex items-center gap-1.5 mt-2 flex-wrap"></div>
     </div>
 
     <!-- Date -->
@@ -117,7 +118,7 @@ import Footer from '../components/Footer.astro';
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   const PAGE_SIZE = 15;
 
-  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; };
+  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; is_remote: boolean | null; locations: string[] | null; salary_min: number | null; salary_max: number | null; };
 
   let currentPage = 0;
   let totalCount   = 0;
@@ -155,6 +156,29 @@ import Footer from '../components/Footer.astro';
     }
   }
 
+  const IC_GLOBE = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="5"/><path d="M1 6h10"/><path d="M6 1c-1.5 2-2 3.5-2 5s.5 3 2 5"/><path d="M6 1c1.5 2 2 3.5 2 5s-.5 3-2 5"/></svg>`;
+  const IC_PIN   = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5S2.5 7 2.5 5a3.5 3.5 0 0 1 7 0C9.5 7 6 10.5 6 10.5z"/><circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/></svg>`;
+  const IC_DOLLAR = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1.5v9M4.5 3.5h2a1.5 1.5 0 0 1 0 3H5a1.5 1.5 0 0 0 0 3h2.5"/></svg>`;
+  const TAG_CLS  = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase border border-[#E8E8E8] text-[#666] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
+
+  function buildTags(el: Element, job: Job) {
+    const parts: string[] = [];
+
+    if (job.is_remote === true)  parts.push(`<span class="${TAG_CLS}">${IC_GLOBE}Remote</span>`);
+    if (job.is_remote === false) parts.push(`<span class="${TAG_CLS}">${IC_PIN}On-site</span>`);
+
+    const locs = (job.locations ?? []).filter(l => job.is_remote !== true || l !== 'Worldwide');
+    if (locs.length > 0) {
+      const label = locs.length > 2 ? `${locs[0]}, ${locs[1]} +${locs.length - 2}` : locs.join(', ');
+      parts.push(`<span class="${TAG_CLS}">${IC_PIN}${label}</span>`);
+    }
+
+    if (job.salary_min != null || job.salary_max != null)
+      parts.push(`<span class="${TAG_CLS}">${IC_DOLLAR}Salary listed</span>`);
+
+    el.innerHTML = parts.join('');
+  }
+
   function buildRow(job: Job): DocumentFragment {
     const frag = (document.getElementById('tpl-row') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
     const article = frag.querySelector('article')!;
@@ -164,6 +188,7 @@ import Footer from '../components/Footer.astro';
     (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
     (article.querySelector('.job-card-link') as HTMLAnchorElement).href = `/job/${jobSlug(job.id, job.title)}/`;
     injectImage(article.querySelector('.job-image-wrap')!, job);
+    buildTags(article.querySelector('.job-tags')!, job);
     return frag;
   }
 

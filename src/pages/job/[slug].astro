@@ -18,6 +18,8 @@ type Job = {
   salary_currency: string | null;
   salary_period: string | null;
   valid_through: string | null;
+  is_remote: boolean | null;
+  locations: string[] | null;
   created_at: string;
 };
 
@@ -154,7 +156,42 @@ const schemaJobPosting = {
       <p class="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Open Position</p>
 
       <h1 class="font-sans font-bold text-[1.8rem] md:text-[2.4rem]
-                 leading-tight tracking-tight text-[#0A0A0A] mb-8">{job.title}</h1>
+                 leading-tight tracking-tight text-[#0A0A0A] mb-4">{job.title}</h1>
+
+      <!-- Meta tags: remote, location, salary -->
+      {(job.is_remote !== null || (job.locations && job.locations.length > 0) || hasSalary) && (
+        <div class="flex items-center gap-2 flex-wrap mb-8">
+
+          {job.is_remote === true && (
+            <span class="inline-flex items-center gap-1.5 font-mono text-[0.6rem] tracking-[0.1em] uppercase border border-[#E0E0E0] text-[#666] px-2.5 py-[3px] rounded-full">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="5"/><path d="M1 6h10"/><path d="M6 1c-1.5 2-2 3.5-2 5s.5 3 2 5"/><path d="M6 1c1.5 2 2 3.5 2 5s-.5 3-2 5"/></svg>
+              Remote
+            </span>
+          )}
+
+          {job.is_remote === false && (
+            <span class="inline-flex items-center gap-1.5 font-mono text-[0.6rem] tracking-[0.1em] uppercase border border-[#E0E0E0] text-[#666] px-2.5 py-[3px] rounded-full">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2" width="9" height="9" rx="0.5"/><path d="M4.5 11V7.5h3V11"/><path d="M4 4.5h.5M7.5 4.5h.5"/></svg>
+              On-site
+            </span>
+          )}
+
+          {job.locations && job.locations.map(loc => (
+            <span class="inline-flex items-center gap-1.5 font-mono text-[0.6rem] tracking-[0.1em] uppercase border border-[#E0E0E0] text-[#666] px-2.5 py-[3px] rounded-full">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5S2.5 7 2.5 5a3.5 3.5 0 0 1 7 0C9.5 7 6 10.5 6 10.5z"/><circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/></svg>
+              {loc}
+            </span>
+          ))}
+
+          {hasSalary && (
+            <span class="inline-flex items-center gap-1.5 font-mono text-[0.6rem] tracking-[0.1em] uppercase border border-[#E0E0E0] text-[#666] px-2.5 py-[3px] rounded-full">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1.5v9M4.5 3.5h2a1.5 1.5 0 0 1 0 3H5a1.5 1.5 0 0 0 0 3h2.5"/></svg>
+              Salary listed
+            </span>
+          )}
+
+        </div>
+      )}
 
       <div class="border-t border-[#EBEBEB] pt-8 mb-10">
         <p class="font-mono text-[0.6rem] tracking-[0.25em] uppercase text-[#888] mb-5">About this role</p>
