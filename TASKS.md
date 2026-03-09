@@ -7,9 +7,9 @@ Search for NEW job postings published in the last 7 days for "vibe coders", "AI-
 DO not add the job in the seed if the link to the application page returns 404.
 
 
-## Search — run these queries, stop once you have 6 hits
+## Search — run these queries, stop once you have a few results
 
-Make sure you dont take to much time doing the searches. Do only one per website.
+Make sure you dont take to much time doing the searches. You can find in google responses publications from the last days, but also in some job portals like:
 
 - vibecodecareers.com
 - weworkremotely.com
@@ -23,7 +23,7 @@ Do searchs like:
 
 1. site:wellfound.com "vibe coder" OR "vibecoding" posted this week
 
-Stop searching as soon as you have 6 confirmed new jobs.
+Stop searching as soon as you have a few jobs to add.
 
 
 
@@ -42,7 +42,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
 | Field | Type | Notes |
 |---|---|---|
 | title | TEXT | Exact job title |
-| description | TEXT | description about the role |
+| description | TEXT | description about the role, dont summirize too much. Keep is as the original description. |
 | image_url | TEXT | Company logo URL, inspect the html if possible to get proper url of the image |
 | link | TEXT | Direct application URL |
 | salary_min | INTEGER | Annual/hourly amount, or NULL if not stated |
@@ -57,7 +57,7 @@ INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, s
 
 Only include jobs you can confirm are real and recently posted.
 
-Example of inserts:
+Example of inserts -Descritpion should not be summarized- keep it as mush possible as the description from the original source-:
 
 INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, salary_currency, salary_period, valid_through, is_remote, locations, employment_type, created_at) VALUES
 (
