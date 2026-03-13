@@ -20,6 +20,7 @@ type Job = {
   valid_through: string | null;
   is_remote: boolean | null;
   locations: string[] | null;
+  employment_type: string | null;
   created_at: string;
 };
 
@@ -69,10 +70,13 @@ const schemaJobPosting = {
   description: job.description,
   datePosted: job.created_at.split('T')[0],
   url: canonicalUrl,
+  '@id': canonicalUrl,
   directApply: true,
-  jobLocationType: 'TELECOMMUTE',
-  applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
-  employmentType: ['FULL_TIME', 'CONTRACTOR'],
+  ...(job.is_remote === true ? {
+    jobLocationType: 'TELECOMMUTE',
+    applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
+  } : {}),
+  employmentType: job.employment_type ?? 'FULL_TIME',
   occupationalCategory: '15-1252',
   hiringOrganization: {
     '@type': 'Organization',

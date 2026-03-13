@@ -1,13 +1,109 @@
 ---
+export const prerender = false;
+
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { jobSlug } from '../lib/slug';
+
+type Job = {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  link: string;
+  created_at: string;
+  is_remote: boolean | null;
+  locations: string[] | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  employment_type: string | null;
+};
+
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const PAGE_SIZE = 15;
+
+let ssrJobs: Job[] = [];
+let ssrTotal = 0;
+
+if (SUPABASE_URL && SUPABASE_KEY) {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          Range: `0-${PAGE_SIZE - 1}`,
+          Prefer: 'count=exact',
+        },
+      }
+    );
+    if (res.ok) {
+      ssrJobs = await res.json();
+      const range = res.headers.get('Content-Range');
+      if (range) {
+        const m = range.match(/\/(\d+)$/);
+        if (m) ssrTotal = parseInt(m[1], 10);
+      }
+    }
+  } catch { /* fall through — JS will load client-side */ }
+}
+
+// Server-side JSON-LD for Google
+const schemaItemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Open AI Developer Positions — vibecoding.work',
+  description: 'Jobs for vibecoders and AI-native software engineers.',
+  url: 'https://vibecoding.work/',
+  numberOfItems: ssrTotal,
+  itemListElement: ssrJobs.map((job, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'JobPosting',
+      '@id': `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
+      title: job.title,
+      description: job.description,
+      datePosted: job.created_at.split('T')[0],
+      url: `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
+      directApply: false,
+      ...(job.is_remote === true ? {
+        jobLocationType: 'TELECOMMUTE',
+        applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
+      } : {}),
+      employmentType: job.employment_type ?? 'FULL_TIME',
+      occupationalCategory: '15-1252',
+      hiringOrganization: {
+        '@type': 'Organization',
+        name: 'vibecoding.work',
+        sameAs: 'https://vibecoding.work',
+        logo: 'https://vibecoding.work/images/logo.png',
+      },
+      ...(job.image_url ? { image: job.image_url } : {}),
+    },
+  })),
+};
+
+const TAG_CLS = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase border border-[#E8E8E8] text-[#666] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
+
+function formatDate(iso: string) {
+  return new Date(iso)
+    .toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
+    .toUpperCase();
+}
 ---
 
 <Layout
   title="vibecoding.work — AI Developer Jobs & Remote Opportunities"
   description="Browse open positions for vibecoders and AI-native developers. Find jobs that embrace AI-assisted development and ship at the speed of thought."
 >
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
+  </Fragment>
+
   <Header />
 
   <main class="w-full">
@@ -15,18 +111,18 @@ import Footer from '../components/Footer.astro';
     <!-- ─── Section header ─────────────────────────────────── -->
     <div class="px-6 md:px-12 py-4 border-b border-[#EBEBEB] flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <h2 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A]">
+        <h1 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A]">
           Open Positions
-        </h2>
+        </h1>
         <span class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#CC0000]"></span>
       </div>
       <span id="job-count" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888]">
-        Loading…
+        {ssrTotal > 0 ? `${ssrTotal} position${ssrTotal !== 1 ? 's' : ''}` : 'Loading…'}
       </span>
     </div>
 
-    <!-- ─── Loading skeleton ─────────────────────────────────── -->
-    <div id="loading-state" class="divide-y divide-[#F4F4F4]">
+    <!-- ─── Loading skeleton (hidden when SSR succeeds) ──────── -->
+    <div id="loading-state" class={`${ssrJobs.length > 0 ? 'hidden ' : ''}divide-y divide-[#F4F4F4]`}>
       {[...Array(6)].map(() => (
         <div class="flex items-start gap-5 px-6 md:px-12 py-5 animate-pulse">
           <div class="w-[52px] h-[52px] md:w-[80px] md:h-[80px] bg-[#F4F4F4] shrink-0 mt-0.5"></div>
@@ -61,8 +157,45 @@ import Footer from '../components/Footer.astro';
       </p>
     </div>
 
-    <!-- ─── Job list ─────────────────────────────────────────── -->
-    <div id="job-list" class="hidden"></div>
+    <!-- ─── Job list — SSR-populated for page 0 ─────────────── -->
+    <div id="job-list" data-ssr-total={ssrTotal} class={ssrJobs.length === 0 ? 'hidden' : ''}>
+      {ssrJobs.map(job => {
+        const slug = jobSlug(job.id, job.title);
+        const locs = (job.locations ?? []).filter(l => job.is_remote !== true || l !== 'Worldwide');
+        const locLabel = locs.length > 2 ? `${locs[0]}, ${locs[1]} +${locs.length - 2}` : locs.join(', ');
+        return (
+          <article class="group relative flex items-start gap-5 px-6 md:px-12 py-5 border-b border-[#F2F2F2] hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer">
+
+            <div class="w-[52px] h-[52px] md:w-[80px] md:h-[80px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center mt-0.5 job-image-wrap">
+              {job.image_url
+                ? <img src={job.image_url} alt={job.title} loading="lazy" width="80" height="80" class="w-full h-full object-contain p-1" />
+                : <span style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;font-weight:600;color:#1A1A1A;line-height:1;">{(job.title.trim()[0] ?? '?').toUpperCase()}</span>
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h2 class="job-title font-sans font-semibold text-[0.92rem] md:text-[1rem] leading-snug truncate text-[#0A0A0A] group-hover:text-[#CC0000] transition-colors duration-100">{job.title}</h2>
+              <p class="job-description font-mono text-[0.65rem] md:text-[0.75rem] text-[#888] mt-1.5 leading-relaxed line-clamp-2 md:line-clamp-3">{job.description}</p>
+              <div class="flex items-center gap-2 mt-2 flex-wrap">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  {job.is_remote === true  && <span class={TAG_CLS}>Remote</span>}
+                  {job.is_remote === false && <span class={TAG_CLS}>On-site</span>}
+                  {locs.length > 0         && <span class={TAG_CLS}>{locLabel}</span>}
+                  {(job.salary_min != null || job.salary_max != null) && <span class={TAG_CLS}>Salary listed</span>}
+                </div>
+                <span class="font-mono text-[0.52rem] tracking-[0.08em] text-[#B0B0B0] uppercase whitespace-nowrap">{formatDate(job.created_at)}</span>
+              </div>
+            </div>
+
+            <a href={job.link}
+               class="relative z-10 font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#CC0000] shrink-0 whitespace-nowrap hidden sm:block mt-0.5 hover:underline underline-offset-2"
+               target="_blank" rel="noopener noreferrer">Apply ↗</a>
+
+            <a href={`/job/${slug}/`} class="absolute inset-0 z-0" aria-hidden="true" tabindex="-1"></a>
+          </article>
+        );
+      })}
+    </div>
 
     <!-- ─── Pagination ───────────────────────────────────────── -->
     <div id="pagination" class="hidden px-6 md:px-12 py-5 border-t border-[#EBEBEB] flex items-center justify-between gap-4">
@@ -84,7 +217,7 @@ import Footer from '../components/Footer.astro';
   <Footer />
 </Layout>
 
-<!-- ═══════ ROW TEMPLATE ══════════════════════════════════════ -->
+<!-- ═══════ ROW TEMPLATE — used by JS for pages 1+ ══════════════ -->
 <template id="tpl-row">
   <article class="group relative flex items-start gap-5 px-6 md:px-12 py-5 border-b border-[#F2F2F2]
                   hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer">
@@ -136,6 +269,10 @@ import Footer from '../components/Footer.astro';
   const prevBtn     = document.getElementById('page-prev') as HTMLButtonElement;
   const nextBtn     = document.getElementById('page-next') as HTMLButtonElement;
   const indicatorEl = document.getElementById('page-indicator')!;
+
+  // Detect SSR-rendered content
+  const ssrTotal = parseInt(listEl.dataset.ssrTotal ?? '', 10);
+  const hasSSR   = !isNaN(ssrTotal) && ssrTotal > 0;
 
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
@@ -211,7 +348,7 @@ import Footer from '../components/Footer.astro';
       }
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const range = res.headers.get('Content-Range'); // e.g. "0-9/42"
+    const range = res.headers.get('Content-Range');
     if (range) {
       const match = range.match(/\/(\d+)$/);
       if (match) totalCount = parseInt(match[1], 10);
@@ -227,6 +364,48 @@ import Footer from '../components/Footer.astro';
     indicatorEl.textContent = `Page ${currentPage + 1} of ${totalPages}`;
     (prevBtn as HTMLButtonElement).disabled = currentPage === 0;
     (nextBtn as HTMLButtonElement).disabled = currentPage >= totalPages - 1;
+  }
+
+  function injectJobPostingSchema(jobs: Job[]) {
+    document.getElementById('ld-jobs')?.remove();
+    const itemList = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Open AI Developer Positions — vibecoding.work',
+      description: 'Jobs for vibecoders and AI-native software engineers.',
+      url: 'https://vibecoding.work/',
+      numberOfItems: totalCount,
+      itemListElement: jobs.map((job, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'JobPosting',
+          '@id': `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
+          title: job.title,
+          description: job.description,
+          datePosted: job.created_at.split('T')[0],
+          url: `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
+          directApply: false,
+          ...(job.is_remote === true ? {
+            jobLocationType: 'TELECOMMUTE',
+            applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
+          } : {}),
+          occupationalCategory: '15-1252',
+          hiringOrganization: {
+            '@type': 'Organization',
+            name: 'vibecoding.work',
+            sameAs: 'https://vibecoding.work',
+            logo: 'https://vibecoding.work/images/logo.png',
+          },
+          ...(job.image_url ? { image: job.image_url } : {}),
+        },
+      })),
+    };
+    const script = document.createElement('script');
+    script.id = 'ld-jobs';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(itemList);
+    document.head.appendChild(script);
   }
 
   async function loadPage(page: number) {
@@ -250,8 +429,7 @@ import Footer from '../components/Footer.astro';
       jobs.forEach(job => listEl.appendChild(buildRow(job)));
       listEl.classList.remove('hidden');
       renderPagination();
-
-      if (page === 0) injectJobPostingSchema(jobs);
+      injectJobPostingSchema(jobs);
 
     } catch {
       loadingEl.classList.add('hidden');
@@ -277,46 +455,11 @@ import Footer from '../components/Footer.astro';
     }
   });
 
-  function injectJobPostingSchema(jobs: Job[]) {
-    document.getElementById('ld-jobs')?.remove();
-    const itemList = {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: 'Open AI Developer Positions — vibecoding.work',
-      description: 'Jobs for vibecoders and AI-native software engineers.',
-      url: 'https://vibecoding.work/',
-      numberOfItems: totalCount,
-      itemListElement: jobs.map((job, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: {
-          '@type': 'JobPosting',
-          '@id': job.link,
-          title: job.title,
-          description: job.description,
-          datePosted: job.created_at.split('T')[0],
-          url: job.link,
-          directApply: true,
-          jobLocationType: 'TELECOMMUTE',
-          applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
-          employmentType: ['FULL_TIME', 'CONTRACTOR'],
-          occupationalCategory: '15-1252',
-          hiringOrganization: {
-            '@type': 'Organization',
-            name: 'vibecoding.work',
-            sameAs: 'https://vibecoding.work',
-            logo: 'https://vibecoding.work/images/logo.png',
-          },
-          ...(job.image_url ? { image: job.image_url } : {}),
-        },
-      })),
-    };
-    const script = document.createElement('script');
-    script.id = 'ld-jobs';
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(itemList);
-    document.head.appendChild(script);
+  // Init: if SSR rendered page 0, skip the initial fetch
+  if (hasSSR) {
+    totalCount = ssrTotal;
+    renderPagination();
+  } else {
+    loadPage(0);
   }
-
-  loadPage(0);
 </script>
