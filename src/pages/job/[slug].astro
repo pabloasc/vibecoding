@@ -71,11 +71,21 @@ const schemaJobPosting = {
   datePosted: job.created_at.split('T')[0],
   url: canonicalUrl,
   '@id': canonicalUrl,
-  directApply: true,
+  directApply: false,
   ...(job.is_remote === true ? {
     jobLocationType: 'TELECOMMUTE',
-    applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
-  } : {}),
+    applicantLocationRequirements: (job.locations && job.locations.length > 0)
+      ? job.locations.map(loc => ({ '@type': 'Country', name: loc }))
+      : [{ '@type': 'Country', name: 'Worldwide' }],
+  } : {
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: job.locations?.[0] ?? '',
+      },
+    },
+  }),
   employmentType: job.employment_type ?? 'FULL_TIME',
   occupationalCategory: '15-1252',
   hiringOrganization: {

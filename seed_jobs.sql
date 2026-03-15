@@ -118,4 +118,230 @@ Email jobs@opencouncil.gr with subject ''Job: Civic Tech Software Engineer'' and
   55000, 65000, 'EUR', 'YEAR', '2026-06-09',
   false, '{"Greece"}', 'FULL_TIME',
   '2026-03-11 10:00:00+00'
+),
+
+(
+  'Senior Product Manager, Code',
+  'Harness is looking for a Senior Product Manager to lead Harness Code Repository — our source control and code collaboration product. You''ll own the strategy and execution for source control, pull requests, governance, and AI-assisted developer workflows, and help integrate code into the broader software delivery lifecycle.
+
+This is an individual contributor role focused on technical execution, enterprise trust, developer experience, and driving adoption across the Harness platform.
+
+What You''ll Do:
+- Define product strategy and multi-quarter roadmap for repo fundamentals: PRs, branch protections/policies, reviews/approvals, permissions/RBAC, and auditability
+- Deepen and scale integration of Code with the broader Harness platform (build, security, deploy)
+- Define success metrics (adoption, migration velocity, PR throughput, time-to-merge) and drive data-informed decisions using telemetry and customer feedback
+- Define and deliver AI-assisted workflows grounded in repo/PR context — with clear evaluation criteria, guardrails, and iteration plans
+- Partner with engineering and design to ensure AI experiences are trustworthy, controllable, and aligned with enterprise requirements
+- Engage customers and prospects to understand workflows and governance needs
+- Drive competitive intelligence across source control and adjacent tooling
+- Write and manage technical requirements/specs
+- Collaborate cross-functionally with GTM, product marketing, and DevRel
+
+What We''re Looking For:
+- BSc in Computer Science or equivalent practical experience
+- 7+ years total experience, including 2+ years in software development and 5+ years in product management for developer tools, DevOps, SCM, or CI/CD
+- Proven track record shipping complex products with measurable adoption and positive developer feedback
+- Familiarity with GitHub, GitLab, or Bitbucket ecosystems — how engineers use them, what enterprises need
+- Strong technical aptitude: ability to reason about architecture, systems tradeoffs, and API design
+- Experience with AI-assisted developer workflows is a strong plus (vibe-coding and using coding copilots/agents for fast prototyping; expects AI-native workflows)
+- Enterprise SaaS governance experience a plus
+
+Compensation: $170,000–$185,000 USD base salary annually, depending on experience. Location: Remote, ideally with proximity to Mountain View, CA for occasional on-site collaboration.',
+  'https://cdn.prod.website-files.com/6222ca42ea87e1bd1aa1d10c/67c1e03a066112554425a47b_harness-logo%20white.webp',
+  'https://job-boards.greenhouse.io/harnessinc/jobs/5074953007',
+  170000, 185000, 'USD', 'YEAR', '2026-06-10',
+  true, '{"USA"}', 'FULL_TIME',
+  '2026-03-10 10:00:00+00'
+),
+
+(
+  'Director of Technical Operations',
+  'Aesthetix CRM is the #1 CRM and marketing automation platform built exclusively for medical aesthetics practices. We are a HIPAA Business Associate running on GoHighLevel with integrations across Twilio, Vercel, Supabase, and more.
+
+We''re hiring a Director of Technical Operations — a player-coach role that combines hands-on troubleshooting with leading and developing a support team, building processes, documentation, and AI-augmented tooling.
+
+What You''ll Do:
+- Run daily support operations: ticket triage, escalations, SLAs, quality control, process improvements
+- Serve as the top-tier escalation point for complex GoHighLevel issues, automation failures, Twilio/telephony problems, API integrations, and webhook debugging
+- Meet directly with clients to scope requirements, diagnose issues, and implement live fixes
+- Build and optimize GHL workflows using Zapier, Make, N8N, Active Pieces, and custom integrations
+- Use AI tools to write code, build utilities, and accelerate delivery — heavy vibe-coding and AI-conductor focus: you''ll use AI assistants (Claude, ChatGPT, Cursor) to generate scripts and iterate quickly
+- Create help articles, SOPs, video walkthroughs, and internal documentation
+- Coach and mentor support team members (team of 3+), run 1:1s and performance reviews
+
+What We''re Looking For:
+- 2+ years hands-on GoHighLevel experience (required)
+- CRM automation experience: Zapier, Make, N8N, Active Pieces
+- Ability to write or AI-generate scripts in JavaScript, Python, or TypeScript
+- Proven experience using AI assistants effectively (Prompt Engineering / AI-assisted Development)
+- Experience producing help docs, knowledge base articles, and video tutorials
+- Comfort in client-facing meetings and live troubleshooting
+- Strong troubleshooting skills across CRM, telephony, APIs, webhooks, DNS, email delivery
+- Experience managing or mentoring a support team of 3+
+- Self-starter who can operate independently
+
+Preferred Qualifications:
+- Healthcare, health IT, or medical aesthetics background
+- Twilio experience (Studio, messaging, voice/IVR)
+- EMR systems familiarity (Zenoti, Nextech, PatientNow, Meevo)
+- HIPAA awareness and PHI handling experience
+- Supabase, Vercel, Google Cloud, or Cloudflare Workers familiarity
+
+Success Milestones:
+- 30 days: fully onboarded, understand the stack, handle escalated tickets independently
+- 60 days: running daily support operations, taking client calls, shipping initial help articles
+- 90 days: founder removed from escalation chain; you fully own the function
+- 12 months: become product expert with a clear CTO path
+
+Benefits: 14 days PTO, 7 paid holidays, 401(k) matching after 1 year, fully remote.',
+  'https://workablehr.s3.amazonaws.com/uploads/account/logo/669046/logo',
+  'https://jobs.workable.com/view/wUqJtiU42SNkXUaa2NUvaP/remote-director-of-technical-operations-in-united-states-at-aesthetix-crm',
+  80000, 100000, 'USD', 'YEAR', '2026-06-12',
+  true, '{"USA"}', 'FULL_TIME',
+  '2026-03-12 10:00:00+00'
+),
+
+(
+  'AI Product Manager',
+  'Imagine Learning is the leading provider of digital-first K–12 curriculum solutions, committed to igniting learning breakthroughs and empowering potential in every student and educator.
+
+We are seeking a mid-level AI Product Manager to develop AI-driven learning experiences that solve real classroom challenges. This role combines user empathy, technical AI fluency, and rapid execution to deliver data-driven innovation with measurable educational impact.
+
+Key Responsibilities:
+- Lead user-centered discovery through educator interviews, classroom research, analytics, and cross-functional stakeholder collaboration
+- Ship iterative solutions quickly to real classrooms, measuring student and teacher outcomes
+- Drive cross-functional alignment across Engineering, Design, Curriculum, Sales, and Marketing
+- Operate as an AI-native product manager — using tools like ChatGPT, Claude, Claude Code, Lovable, Replit, and similar platforms to prototype concepts and accelerate analysis
+- Develop and launch AI-powered features leveraging LLMs, NLP, and computer vision for K–12 learning
+- Design evaluation frameworks addressing hallucinations, bias, safety, and instructional quality in AI features
+- Run experiments, define success metrics, and maintain data-driven product decisions
+- Champion responsible AI innovation while protecting student privacy and data integrity
+
+Required Qualifications:
+- Bachelor''s degree in Computer Science, Product Management, Education, Business, or related field
+- Minimum 5 years Product Management experience; at least 3 years with SaaS or AI/ML products
+- Proven AI adoption — regularly using AI across your work
+- Experience with vibe coding tools such as Figma Make, Claude Code, OpenAI Codex, Replit, v0, Lovable, Bolt, etc.
+- Software development and cloud infrastructure understanding
+- Agile/Scrum and product discovery expertise
+- Strong LLM, prompt design, and responsible AI knowledge
+- Data-driven analytical thinking with strong cross-functional collaboration
+- Up to 20% travel
+
+Preferred:
+- EdTech industry background
+- Software engineering or computer science background
+
+Compensation & Benefits:
+- Base salary $110,862–$160,000 annually, plus incentive/bonus eligibility
+- Zero-premium medical plans, 401(k) match, 16 paid holidays, PTO, winter shutdown
+- Fertility/maternity benefits, mental health resources, tuition reimbursement
+- Fully remote (US-based)',
+  'https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/128x128/437626d72f6cff3f25cd8662c77e5c3b',
+  'https://jobs.jobvite.com/careers/imagine-learning/job/oQlPzfwj',
+  110862, 160000, 'USD', 'YEAR', '2026-06-13',
+  true, '{"USA"}', 'FULL_TIME',
+  '2026-03-13 10:00:00+00'
+),
+
+(
+  'Staff Developer Advocacy Engineer',
+  'Grafana Labs is looking for a Staff Developer Advocacy Engineer to join the team responsible for building the Interactive Learning Plugin — an open source, in-product learning experience inside Grafana.
+
+About the Role:
+This is a senior individual contributor role at the intersection of production-grade software engineering, developer advocacy, and AI-assisted development. You will create scalable, in-product learning experiences that help users succeed with Grafana and its observability ecosystem.
+
+What You''ll Do:
+- Develop and deploy features for the Interactive Learning Plugin, ensuring learning experiences are obvious, smooth, and scalable
+- Enhance end-to-end learner journeys with trustworthy progress tracking and completion metrics
+- Enable contribution workflows so non-technical contributors can safely generate and manage learning content
+- Instrument learning flows with metrics, logs, and traces to surface what is working and where learners get stuck
+- Employ fast feedback loops and visibility into production and real user experiences as a core product principle
+- Ship code using agent-based tooling such as Claude Code or Cursor alongside rigorous engineering practices
+- Participate in on-call rotations with full production ownership
+- Generate documentation, design notes, and PR descriptions; communicate decisions internally and externally (~20% of time)
+
+What You''ll Need:
+- Robust software engineering fundamentals with production-grade capability and architectural reasoning
+- Demonstrated experience with AI-assisted development and agentic workflows — daily use of Claude Code or Cursor is expected
+- Working familiarity with Grafana and observability methodologies (dashboards, monitoring, on-call operations)
+- Willingness to participate in production on-call rotations
+- Strong written communication aptitude for documentation and async collaboration
+
+Nice to Have:
+- Open source contribution or maintainer background
+- Full-stack capability (front-end or back-end specialization both acceptable)
+- TypeScript and/or Go proficiency
+- Kubernetes experience
+- Observability ecosystem knowledge (Prometheus, Loki, Tempo, Mimir, OpenTelemetry)
+
+Compensation & Benefits:
+- Base salary: $174,986 – $209,983 USD annually
+- Restricted Stock Units (RSUs)
+- Company-funded AI tool budget with frontier model access (GPT-Codex, Claude Opus, Gemini)
+- 100% remote with global culture; in-person onboarding provided
+- 30 annual leave days plus 3 Grafana Shutdown Days
+
+Grafana Labs is committed to empowering its community through open source and world-class observability software.',
+  'https://s4-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/744/400/original/GrafanaLabs_Logo.png?1772554471',
+  'https://job-boards.greenhouse.io/grafanalabs/jobs/5825937004',
+  174986, 209983, 'USD', 'YEAR', '2026-06-12',
+  true, '{"USA"}', 'FULL_TIME',
+  '2026-03-14 10:00:00+00'
+),
+
+(
+  'Senior Director, Analyst - AI-Native, Agentic and Low-Code Software Development',
+  'Gartner (NYSE: IT) is the world''s leading research and advisory company, serving approximately 14,000 client enterprises across 90 countries and territories. Gartner Analysts are industry thought leaders who create must-have insights, market predictions and best practices for a broad range of world-leading organizations.
+
+About the Role:
+A Senior Director, Analyst serves as a leader within Gartner''s Business and Technology Insights (BTI) group, establishing oneself as a credible voice within their designated market. This role sits within Gartner''s Software Engineering Practice, advising engineering leaders worldwide on emerging development techniques — including AI-native, agentic, and low-code software development. Utilizing exceptional research and analytical skills, a Senior Director plays a significant role in producing pragmatic and provocative insights which Gartner clients consume and apply to propel their business toward key objectives.
+
+What You''ll Do:
+- Create innovative, thought-provoking, and highly leveraged must-have insights content
+- Develop new insights through thought leadership offering compelling, actionable approaches to client needs
+- Develop in-depth analysis to identify root causes of client barriers and reframe thinking
+- Demonstrate thought leadership in establishing insights positions across analyst teams
+- Bring provocative, independent insights to Gartner leaders regarding research agendas
+- Research, analyze, and predict market trends to provide actionable insights to clients and vendors
+- Provide clients and prospects actionable advice via virtual or face-to-face interactions
+- Create and deliver high-value presentation materials for Gartner events and conferences
+- Support sales by serving as voice of the market to help teams create content
+- Provide high-quality, timely peer review of content
+- Build credibility as industry expert representing Gartner insights and methodology
+- Participate actively in innovation and research discussions with peers
+- Identify process improvements to enhance service delivery
+- Mentor and coach junior team members
+- Remain client-centric while promoting regular Gartner engagement
+
+What You''ll Need:
+- Bachelor''s degree or equivalent experience; graduate degree preferred
+- 12+ years of relevant field or industry experience
+- Experience leading teams to modernize developer tooling, particularly with tools transforming the software developer lifecycle
+- Deep knowledge of AI-related development tools including code assistants and agentic platforms
+- Practical knowledge of low-code application tools in professional environments
+- Knowledge of leading low-code vendors and ability to identify benefits and risks
+- Executive presence with ability to establish immediate credibility with executives
+- Strong organizational skills and ability to work under tight deadlines
+- Excellence in research and writing ability
+- Strong written and verbal proficiency with analytical and presentation skills
+- Ability to analyze and synthesize data with critical thinking application
+- Strong communication skills explaining complex concepts concisely
+- Track record of presenting at large and small-scale speaking engagements
+- Strong business and financial acumen
+- Deep knowledge of global competitive landscape in subject area
+- Ability to work independently while collaborating across multicultural global teams
+- Ability to represent Gartner''s research methodology effectively at all levels
+- Willingness and ability to travel up to 25% (where applicable)
+
+What Gartner Offers:
+- World-class benefits and highly competitive compensation
+- Disproportionate rewards for top performers
+- Hybrid work environment emphasizing flexibility and collaboration
+- 21,000 associates globally supporting client enterprises across 90 countries',
+  'https://logo.clearbit.com/gartner.com',
+  'https://gartner.wd5.myworkdayjobs.com/EXT/job/Remote---United-Kingdom/Senior-Director--Analyst-----AI-Native--Agentic-and-Low-Code-Software-Development--Remote-UK-and-Remote-Ireland-_108255-1',
+  NULL, NULL, NULL, NULL, '2026-06-13',
+  true, '{"United Kingdom","Ireland"}', 'FULL_TIME',
+  '2026-03-15 10:00:00+00'
 );
