@@ -5,3 +5,7 @@ Allow: /
 Disallow: /_astro/
 
 Sitemap: https://vibecoding.work/sitemap.xml
+
+# Plain-text listing for AI assistants and LLMs
+# https://llmstxt.org
+LLMs: https://vibecoding.work/llms.txt
