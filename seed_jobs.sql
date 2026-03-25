@@ -1,347 +1,165 @@
 -- ============================================================
 -- VibeCoding Jobs — Seed Data (NEW BATCH)
--- Fresh positions found: March 11, 2026
+-- Fresh positions found: March 25, 2026
 -- Run in Supabase SQL Editor to add these to your database.
 -- ============================================================
 
 INSERT INTO jobs (title, description, image_url, link, salary_min, salary_max, salary_currency, salary_period, valid_through, is_remote, locations, employment_type, created_at) VALUES
 
 (
-  'Senior Vibe Coder',
-  'Appnovation is a global, full-service digital partner that combines Strategy, Experience & Design, Engineering and Managed Services. We build digital solutions that deliver real impact today and serve as foundations for future growth.
+  'Product Designer (Design+Code/Vibe Coding) - TikTok UX (San Jose)',
+  'About The Team
 
-As a Senior Vibe Coder at Appnovation, you will join our team in a unique role that blends business and technology. We are seeking a highly creative and technically skilled individual who is passionate about innovation with AI, can rapidly prototype business applications using AI tools, and bring these ideas to life. The ideal candidate has a deep understanding of both business and technology, particularly within the pharmaceutical or life sciences sector, and thrives on experimentation and speed.
+TikTok UX team is responsible for the product design of the TikTok app, with ownership over Core app infrastructure, Social, Search, and Creation areas.
 
-Key Responsibilities:
-- Thrive on experimentation, moving at a rapid pace: build quick hacks in 24–48 hours, develop prototypes within a week, and deploy solutions to production the following week
-- Design and develop rapid prototypes of business applications using modern technologies (e.g., React, Python)
-- Apply creative problem-solving to address complex commercial and pharmaceutical challenges
-- Rapidly understand evolving business needs and translate them into innovative technical prototypes
-- Collaborate with an evolving team in Commercial to establish strong relationships and build partnerships
-- Stay at the forefront of AI and industry trends, continuously bringing new ideas and technologies to the team
+Responsibilities
 
-What We''re Looking For:
-- Proven experience in software development with a focus on rapid prototyping and application development
-- Strong understanding of both the business and technical aspects of application development, particularly within the pharmaceutical or life sciences sector
-- Preferred experience with NextJS, N8N, and AI-powered IDEs (e.g., Cursor)
-- Familiarity with leading AI platforms and services such as OpenAI, Anthropic, and open-source AI models
-- Passionate about leveraging cutting-edge AI tools to build real-world solutions at speed
-- Ability to thrive in a fast-paced, experimental environment
+- Design intuitive product experiences and bring them to life through working prototypes.
+- Use coding and AI tools (e.g., Vibe Coding, AI coding assistants) to rapidly turn product ideas into interactive prototypes that bridge design and engineering.
+- Translate product concepts into functional experiences, reducing the gap between design exploration and real product behavior.
+- Identify UX improvement opportunities across social interaction, content creation, or AI-driven workflows.
+- Collaborate closely with product managers and engineers on product direction and shipping.
 
-What Appnovation Offers:
-- Challenging and rewarding work with real impact
-- Direct access to cutting-edge AI platforms
-- Diverse and inclusive culture
-- Growth opportunities for personal and professional development
-- A collaborative and innovative work environment
-- Exposure to exciting projects and high-profile clients
-- Hybrid working model
-- Health Benefits Package, Mental Health Support, Personal Days Off, Fertility and Menopause Leave, Fitness Allowance
+Minimum Qualifications
 
-At Appnovation, we recognize that diverse teams are the strongest teams. We are an Equal Opportunity Employer and encourage applicants from all backgrounds, lived experiences and industries to apply. Accommodations are available upon request throughout the recruitment process.',
-  'https://www.appnovation.com/themes/custom/appnovation/assets/images/logos/appnovation_wordmark_simple.svg',
-  'https://job-boards.greenhouse.io/appnovation/jobs/8078007002',
-  NULL, NULL, NULL, NULL, '2026-06-03',
-  false, '{"Canada","USA"}', 'FULL_TIME',
-  '2026-03-05 10:00:00+00'
+- 3+ years of product design experience for mobile or web products.
+- Strong visual and interaction design skills.
+- Ability to code prototypes or lightweight product features (e.g., HTML/CSS/JS, React, Swift, or similar).
+- Experience using AI coding tools or Vibe Coding workflows.
+- Strong product thinking and problem-solving ability.
+
+Preferred Qualifications
+
+- Production-quality UI building or shipped side projects.
+- Experience working on AI-driven product experiences or agent-based workflows.
+- Experience with social products or creator tools.
+- Passion for TikTok and creator communities.
+
+Compensation
+
+Base salary range: $103,680 - $230,280 annually. Actual compensation is based on individual qualifications, skill set, experience, and relevant education or training. The listed compensation is the range for this position in the selected city only. TikTok total compensation includes cash compensation, long-term incentives, and benefits.
+
+Benefits
+
+TikTok offers benefits including medical insurance, dental insurance, vision insurance, disability insurance, life insurance, 401(k) matching, parental leave, wellbeing benefits, 10 paid holidays per year, 10 paid sick days per year, and 17 paid personal/vacation days per year (pro-rated for the first year).
+
+Job Code: A118997',
+  'https://sf16-sg.tiktokcdn.com/obj/eden-sg/0eh7lpquhpanuhf/overseaCMSAssets/images/c065c8aa747a15062b8d609eefeb5463a06f348c-148x36.png',
+  'https://lifeattiktok.com/search/7620521322171664645?spread=XKM9ZXE',
+  103680, 230280, 'USD', 'YEAR', '2026-06-22',
+  false, '{"USA"}', 'FULL_TIME',
+  '2026-03-25 10:00:00+00'
 ),
 
 (
-  'Vibe Coding Instructor & Office Manager',
-  'Platinum Edge Tutoring is hiring a Vibe Coding Instructor & Office Manager based in Belcamp, MD.
+  'UX Engineer, AI User Experience, DeepMind (Fixed-Term Contract)',
+  'About The Team
 
-About the Role:
-We''re looking for a passionate, community-minded educator to lead small group coding classes (10–15 students) and help manage our growing Belcamp office. This is a hands-on role that combines teaching and administrative responsibilities in equal measure.
+The AI User Experience (AIUX) team at Google DeepMind works to advance people-centric futures for emerging technologies across Google DeepMind. The team drives technical strategy and execution, partnering with leadership across UX, product, and engineering.
 
-Teaching Responsibilities:
-- Lead beginner-friendly vibe coding sessions using AI-assisted and no-code/low-code tools
-- Guide participants with zero prior technical experience to build and launch a working application by program end
-- Foster an inclusive, encouraging learning environment that welcomes students from all backgrounds
-- Develop lesson materials and activities that make technical concepts approachable and exciting
+Minimum Qualifications
 
-Office & Community Responsibilities:
-- Coordinate scheduling, manage logistics, and support student onboarding
-- Organize community events and demo days to celebrate student work
-- Serve as a point of contact for students and families
-- Help build and sustain an engaged creator community beyond the classroom
+- Bachelor''s degree or equivalent practical experience.
+- 6 years of experience in front-end development, technical UX design, or prototyping.
+- Experience developing applications for web, iOS, Android, CompDes, or XR platforms.
 
-What We''re Looking For:
-- Hands-on experience experimenting with AI coding tools or vibe coding workflows
-- Comfort building applications using no-code/low-code platforms (e.g., Bubble, Glide, Webflow, Replit, etc.)
-- Strong communication and organizational skills; ability to explain technical ideas simply
-- Teaching or mentoring experience is a plus, but not required — we care more about your energy and commitment to community
-- Self-starter mentality with a genuine interest in building inclusive tech spaces
+Preferred Qualifications
 
-How We Define Success:
-- Participants complete the program with a working application they built themselves
-- Students feel welcomed, supported, and excited about technology
-- A sustained, engaged community of creators forms around the program
+- Experience with the latest web standards, including JavaScript/ES6, HTML5, CSS, REST, and mobile web.
+- Experience with React, Lit, Angular, or a similar JavaScript framework.
+- Experience leading teams implementing UI design and technical frameworks.
+- Experience with "vibe coding" approaches and prompt engineering to accelerate UX and engineering workflows.
+- Knowledge of AI applications and AI-assisted tooling for accelerating UX and engineering workflows.
 
-To Apply:
-Submit a brief (1–3 minute) video describing your background and interest to christian@platinumedgetutoring.com',
-  'https://images.squarespace-cdn.com/content/v1/55f8a7d8e4b0c432ff779320/826f8016-beb9-45a0-b79e-12994e1b0891/PE+Long+Logo.png',
-  'https://www.indeed.com/viewjob?jk=421f32b5f9c41a92',
-  20, 40, 'USD', 'HOUR', '2026-06-05',
-  false, '{"USA"}', 'PART_TIME',
-  '2026-03-07 10:00:00+00'
+Responsibilities
+
+- Serve as a subject matter expert establishing best practices for browsers, devices, and AI systems.
+- Act as a cross-functional liaison driving consensus among designers, researchers, product managers, and engineers.
+- Architect front-end solutions addressing complex problems and research questions.
+- Design and develop user-facing products using human-centered approaches to information architecture, interaction design, and visual design.
+- Lead the creation of high-fidelity prototypes to support user studies through product release.
+
+Compensation
+
+The US base salary range for this full-time position is $159,000 - $231,000 + bonus + equity + benefits. Individual pay is determined by work location and additional factors, including job-related skills, experience, and relevant education or training.
+
+Contract: 12-month Fixed-Term Contract.',
+  'https://vibecodecareers.com/wp-content/uploads/2026/02/Screenshot-2026-02-28-at-9.24.23-PM-400x400.png',
+  'https://www.google.com/about/careers/applications/jobs/results/112357427822633670-ux-engineer/',
+  159000, 231000, 'USD', 'YEAR', '2026-06-23',
+  false, '{"United Kingdom", "USA"}', 'FULL_TIME',
+  '2026-03-25 10:00:00+00'
 ),
 
 (
-  'Civic Tech Software Engineer',
-  'Schema Labs is a 4-person non-profit building OpenCouncil (https://opencouncil.gr), an AI platform that makes Greek municipal council meetings accessible to citizens. We take hours-long council sessions and turn them into searchable, per-topic video clips, SMS/email notifications, and speaker analytics.
+  'AI Vibe Coding Web Designer',
+  'The Role
 
-We''re live with 10 municipalities including Athens, and the project is open source: https://github.com/schemalabz/opencouncil
+We''re an AI Website Builder that allows businesses to create beautiful, functional websites and applications. Customers can generate complete websites and applications from the ground up using our coding agent. Instead of manually assembling layouts, users prompt an AI agent that builds structure, content, and design in seconds. You can also edit the code anytime you want.
 
-Stack: TypeScript, Next.js, React, PostgreSQL, Elasticsearch. Heavy use of LLMs for transcription, speaker ID, and turning unstructured PDFs/transcripts into structured data. We use Claude Code, Cursor, and similar tools daily.
+To support our community of millions of users, we are expanding the B12 Expert Marketplace and onboarding experts with strong technical foundations who are excited about vibe coding and AI-first website creation.
 
-What We''re Looking For:
-- Minimum 2 years of software engineering experience with a relevant degree
-- Strong modern web development skills: TypeScript, Next.js, React, PostgreSQL, Elasticsearch
-- AI/LLM software development experience using tools like Claude Code, Cursor, Windsurf, and Greptile
-- Genuine commitment to civic tech and democracy-focused technology
-- Excellence in at least one of:
-  • Data Engineering & LLM Integration — converting unstructured information (PDFs, transcripts, audio) into structured data
-  • Frontend Development & UX Design — creating intuitive, accessible interfaces for complex civic information
-- Permanently based in Athens (or willing to relocate); fluent in Greek and English
-- High self-initiative, sense of responsibility, and genuine interest in the mission
+As a Marketplace Partner, you will work directly with B12 customers on DIY plans who want professional support building, refining, or enhancing their AI-generated sites. This is an independent freelance partnership opportunity for experienced builders who are comfortable directing AI output and stepping into code when needed.
 
-What We Offer:
-- Performance bonus up to 30% of annual OpenCouncil profits
-- Work-from-home flexibility (up to 3 days per week)
-- Lunch provided on office days
-- Small team, high ownership, real impact: your work is used by 10+ municipalities and tens of thousands of citizens nationwide
+How the Expert Marketplace Works
 
-To Apply:
-Email jobs@opencouncil.gr with subject ''Job: Civic Tech Software Engineer'' and include your CV or LinkedIn profile plus an optional GitHub link.',
-  'https://logo.clearbit.com/schemalabs.gr',
-  'https://schemalabs.gr/jobs/civic-tech-software-engineer',
-  55000, 65000, 'EUR', 'YEAR', '2026-06-09',
-  false, '{"Greece"}', 'FULL_TIME',
-  '2026-03-11 10:00:00+00'
-),
+The B12 Expert Marketplace is a resource for customers on DIY plans who want additional help with design, development, SEO, copywriting, or marketing for their B12 website.
 
-(
-  'Senior Product Manager, Code',
-  'Harness is looking for a Senior Product Manager to lead Harness Code Repository — our source control and code collaboration product. You''ll own the strategy and execution for source control, pull requests, governance, and AI-assisted developer workflows, and help integrate code into the broader software delivery lifecycle.
+Customers browse the marketplace and choose partners to hire directly.
 
-This is an individual contributor role focused on technical execution, enterprise trust, developer experience, and driving adoption across the Harness platform.
+As a Marketplace Partner:
 
-What You''ll Do:
-- Define product strategy and multi-quarter roadmap for repo fundamentals: PRs, branch protections/policies, reviews/approvals, permissions/RBAC, and auditability
-- Deepen and scale integration of Code with the broader Harness platform (build, security, deploy)
-- Define success metrics (adoption, migration velocity, PR throughput, time-to-merge) and drive data-informed decisions using telemetry and customer feedback
-- Define and deliver AI-assisted workflows grounded in repo/PR context — with clear evaluation criteria, guardrails, and iteration plans
-- Partner with engineering and design to ensure AI experiences are trustworthy, controllable, and aligned with enterprise requirements
-- Engage customers and prospects to understand workflows and governance needs
-- Drive competitive intelligence across source control and adjacent tooling
-- Write and manage technical requirements/specs
-- Collaborate cross-functionally with GTM, product marketing, and DevRel
+- You set your own pricing and services
+- Customers contact and hire you directly
+- You manage communication, scope, and delivery
+- You operate independently and are not a B12 employee
 
-What We''re Looking For:
-- BSc in Computer Science or equivalent practical experience
-- 7+ years total experience, including 2+ years in software development and 5+ years in product management for developer tools, DevOps, SCM, or CI/CD
-- Proven track record shipping complex products with measurable adoption and positive developer feedback
-- Familiarity with GitHub, GitLab, or Bitbucket ecosystems — how engineers use them, what enterprises need
-- Strong technical aptitude: ability to reason about architecture, systems tradeoffs, and API design
-- Experience with AI-assisted developer workflows is a strong plus (vibe-coding and using coding copilots/agents for fast prototyping; expects AI-native workflows)
-- Enterprise SaaS governance experience a plus
+Learn more at marketplace.b12.io.
 
-Compensation: $170,000–$185,000 USD base salary annually, depending on experience. Location: Remote, ideally with proximity to Mountain View, CA for occasional on-site collaboration.',
-  'https://cdn.prod.website-files.com/6222ca42ea87e1bd1aa1d10c/67c1e03a066112554425a47b_harness-logo%20white.webp',
-  'https://job-boards.greenhouse.io/harnessinc/jobs/5074953007',
-  170000, 185000, 'USD', 'YEAR', '2026-06-10',
-  true, '{"USA"}', 'FULL_TIME',
-  '2026-03-10 10:00:00+00'
-),
+What You Will Be Doing
 
-(
-  'Director of Technical Operations',
-  'Aesthetix CRM is the #1 CRM and marketing automation platform built exclusively for medical aesthetics practices. We are a HIPAA Business Associate running on GoHighLevel with integrations across Twilio, Vercel, Supabase, and more.
+- Building new websites using B12
+- Refining and regenerating AI-generated sites through structured prompting
+- Improving layout, hierarchy, clarity, and overall user experience
+- Applying your coding background when deeper customization is needed
+- Working directly with customers to scope and deliver projects
+- Providing feedback that helps improve the Expert Marketplace experience
 
-We''re hiring a Director of Technical Operations — a player-coach role that combines hands-on troubleshooting with leading and developing a support team, building processes, documentation, and AI-augmented tooling.
+We Are Looking for Someone Who
 
-What You''ll Do:
-- Run daily support operations: ticket triage, escalations, SLAs, quality control, process improvements
-- Serve as the top-tier escalation point for complex GoHighLevel issues, automation failures, Twilio/telephony problems, API integrations, and webhook debugging
-- Meet directly with clients to scope requirements, diagnose issues, and implement live fixes
-- Build and optimize GHL workflows using Zapier, Make, N8N, Active Pieces, and custom integrations
-- Use AI tools to write code, build utilities, and accelerate delivery — heavy vibe-coding and AI-conductor focus: you''ll use AI assistants (Claude, ChatGPT, Cursor) to generate scripts and iterate quickly
-- Create help articles, SOPs, video walkthroughs, and internal documentation
-- Coach and mentor support team members (team of 3+), run 1:1s and performance reviews
+Has a strong technical foundation - You have 3 to 5 years of experience in web design or front-end development and solid coding skills. Proficiency in HTML, CSS, and JavaScript is required. You should be comfortable reviewing and extending front-end output beyond what AI generates.
 
-What We''re Looking For:
-- 2+ years hands-on GoHighLevel experience (required)
-- CRM automation experience: Zapier, Make, N8N, Active Pieces
-- Ability to write or AI-generate scripts in JavaScript, Python, or TypeScript
-- Proven experience using AI assistants effectively (Prompt Engineering / AI-assisted Development)
-- Experience producing help docs, knowledge base articles, and video tutorials
-- Comfort in client-facing meetings and live troubleshooting
-- Strong troubleshooting skills across CRM, telephony, APIs, webhooks, DNS, email delivery
-- Experience managing or mentoring a support team of 3+
-- Self-starter who can operate independently
+Understands AI-first website creation and vibe coding - You are comfortable building with AI as a collaborator. You know how to guide output through thoughtful prompting, regenerate strategically, and iterate quickly.
 
-Preferred Qualifications:
-- Healthcare, health IT, or medical aesthetics background
-- Twilio experience (Studio, messaging, voice/IVR)
-- EMR systems familiarity (Zenoti, Nextech, PatientNow, Meevo)
-- HIPAA awareness and PHI handling experience
-- Supabase, Vercel, Google Cloud, or Cloudflare Workers familiarity
+Is confident working directly with clients - You can translate customer ideas into polished, high-quality websites and communicate clearly throughout the process.
 
-Success Milestones:
-- 30 days: fully onboarded, understand the stack, handle escalated tickets independently
-- 60 days: running daily support operations, taking client calls, shipping initial help articles
-- 90 days: founder removed from escalation chain; you fully own the function
-- 12 months: become product expert with a clear CTO path
+Thinks beyond visuals - You care about structure, usability, and results, not just aesthetics.
 
-Benefits: 14 days PTO, 7 paid holidays, 401(k) matching after 1 year, fully remote.',
-  'https://workablehr.s3.amazonaws.com/uploads/account/logo/669046/logo',
-  'https://jobs.workable.com/view/wUqJtiU42SNkXUaa2NUvaP/remote-director-of-technical-operations-in-united-states-at-aesthetix-crm',
-  80000, 100000, 'USD', 'YEAR', '2026-06-12',
-  true, '{"USA"}', 'FULL_TIME',
-  '2026-03-12 10:00:00+00'
-),
+Is curious about what is next - You are excited about how AI is changing the way websites are built and want to be part of that shift.
 
-(
-  'AI Product Manager',
-  'Imagine Learning is the leading provider of digital-first K–12 curriculum solutions, committed to igniting learning breakthroughs and empowering potential in every student and educator.
+Bonus Points If
 
-We are seeking a mid-level AI Product Manager to develop AI-driven learning experiences that solve real classroom challenges. This role combines user empathy, technical AI fluency, and rapid execution to deliver data-driven innovation with measurable educational impact.
+- You have worked with small to mid-sized businesses
+- You have experimented with AI builders or vibe coding workflows
+- You are comfortable balancing automation with custom code
+- You enjoy improving systems, not just executing tasks
 
-Key Responsibilities:
-- Lead user-centered discovery through educator interviews, classroom research, analytics, and cross-functional stakeholder collaboration
-- Ship iterative solutions quickly to real classrooms, measuring student and teacher outcomes
-- Drive cross-functional alignment across Engineering, Design, Curriculum, Sales, and Marketing
-- Operate as an AI-native product manager — using tools like ChatGPT, Claude, Claude Code, Lovable, Replit, and similar platforms to prototype concepts and accelerate analysis
-- Develop and launch AI-powered features leveraging LLMs, NLP, and computer vision for K–12 learning
-- Design evaluation frameworks addressing hallucinations, bias, safety, and instructional quality in AI features
-- Run experiments, define success metrics, and maintain data-driven product decisions
-- Champion responsible AI innovation while protecting student privacy and data integrity
+Important
 
-Required Qualifications:
-- Bachelor''s degree in Computer Science, Product Management, Education, Business, or related field
-- Minimum 5 years Product Management experience; at least 3 years with SaaS or AI/ML products
-- Proven AI adoption — regularly using AI across your work
-- Experience with vibe coding tools such as Figma Make, Claude Code, OpenAI Codex, Replit, v0, Lovable, Bolt, etc.
-- Software development and cloud infrastructure understanding
-- Agile/Scrum and product discovery expertise
-- Strong LLM, prompt design, and responsible AI knowledge
-- Data-driven analytical thinking with strong cross-functional collaboration
-- Up to 20% travel
+This is a freelance marketplace partnership, not a full-time position. Partners operate independently and work directly with customers who choose to hire them through the B12 Expert Marketplace.
 
-Preferred:
-- EdTech industry background
-- Software engineering or computer science background
+How to Apply
 
-Compensation & Benefits:
-- Base salary $110,862–$160,000 annually, plus incentive/bonus eligibility
-- Zero-premium medical plans, 401(k) match, 16 paid holidays, PTO, winter shutdown
-- Fertility/maternity benefits, mental health resources, tuition reimbursement
-- Fully remote (US-based)',
-  'https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/128x128/437626d72f6cff3f25cd8662c77e5c3b',
-  'https://jobs.jobvite.com/careers/imagine-learning/job/oQlPzfwj',
-  110862, 160000, 'USD', 'YEAR', '2026-06-13',
-  true, '{"USA"}', 'FULL_TIME',
-  '2026-03-13 10:00:00+00'
-),
+Submit your resume, portfolio, and LinkedIn profile. If you have examples of AI-assisted builds or experimental workflows, we would love to see them.
 
-(
-  'Staff Developer Advocacy Engineer',
-  'Grafana Labs is looking for a Staff Developer Advocacy Engineer to join the team responsible for building the Interactive Learning Plugin — an open source, in-product learning experience inside Grafana.
+About B12
 
-About the Role:
-This is a senior individual contributor role at the intersection of production-grade software engineering, developer advocacy, and AI-assisted development. You will create scalable, in-product learning experiences that help users succeed with Grafana and its observability ecosystem.
+B12''s AI-powered website platform has helped over one million businesses create professional websites quickly and efficiently. Founded in 2015, B12 is a fully remote company backed by Breyer Capital, General Catalyst, SV Angel, and Tola Capital.
 
-What You''ll Do:
-- Develop and deploy features for the Interactive Learning Plugin, ensuring learning experiences are obvious, smooth, and scalable
-- Enhance end-to-end learner journeys with trustworthy progress tracking and completion metrics
-- Enable contribution workflows so non-technical contributors can safely generate and manage learning content
-- Instrument learning flows with metrics, logs, and traces to surface what is working and where learners get stuck
-- Employ fast feedback loops and visibility into production and real user experiences as a core product principle
-- Ship code using agent-based tooling such as Claude Code or Cursor alongside rigorous engineering practices
-- Participate in on-call rotations with full production ownership
-- Generate documentation, design notes, and PR descriptions; communicate decisions internally and externally (~20% of time)
-
-What You''ll Need:
-- Robust software engineering fundamentals with production-grade capability and architectural reasoning
-- Demonstrated experience with AI-assisted development and agentic workflows — daily use of Claude Code or Cursor is expected
-- Working familiarity with Grafana and observability methodologies (dashboards, monitoring, on-call operations)
-- Willingness to participate in production on-call rotations
-- Strong written communication aptitude for documentation and async collaboration
-
-Nice to Have:
-- Open source contribution or maintainer background
-- Full-stack capability (front-end or back-end specialization both acceptable)
-- TypeScript and/or Go proficiency
-- Kubernetes experience
-- Observability ecosystem knowledge (Prometheus, Loki, Tempo, Mimir, OpenTelemetry)
-
-Compensation & Benefits:
-- Base salary: $174,986 – $209,983 USD annually
-- Restricted Stock Units (RSUs)
-- Company-funded AI tool budget with frontier model access (GPT-Codex, Claude Opus, Gemini)
-- 100% remote with global culture; in-person onboarding provided
-- 30 annual leave days plus 3 Grafana Shutdown Days
-
-Grafana Labs is committed to empowering its community through open source and world-class observability software.',
-  'https://s4-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/744/400/original/GrafanaLabs_Logo.png?1772554471',
-  'https://job-boards.greenhouse.io/grafanalabs/jobs/5825937004',
-  174986, 209983, 'USD', 'YEAR', '2026-06-12',
-  true, '{"USA"}', 'FULL_TIME',
-  '2026-03-14 10:00:00+00'
-),
-
-(
-  'Senior Director, Analyst - AI-Native, Agentic and Low-Code Software Development',
-  'Gartner (NYSE: IT) is the world''s leading research and advisory company, serving approximately 14,000 client enterprises across 90 countries and territories. Gartner Analysts are industry thought leaders who create must-have insights, market predictions and best practices for a broad range of world-leading organizations.
-
-About the Role:
-A Senior Director, Analyst serves as a leader within Gartner''s Business and Technology Insights (BTI) group, establishing oneself as a credible voice within their designated market. This role sits within Gartner''s Software Engineering Practice, advising engineering leaders worldwide on emerging development techniques — including AI-native, agentic, and low-code software development. Utilizing exceptional research and analytical skills, a Senior Director plays a significant role in producing pragmatic and provocative insights which Gartner clients consume and apply to propel their business toward key objectives.
-
-What You''ll Do:
-- Create innovative, thought-provoking, and highly leveraged must-have insights content
-- Develop new insights through thought leadership offering compelling, actionable approaches to client needs
-- Develop in-depth analysis to identify root causes of client barriers and reframe thinking
-- Demonstrate thought leadership in establishing insights positions across analyst teams
-- Bring provocative, independent insights to Gartner leaders regarding research agendas
-- Research, analyze, and predict market trends to provide actionable insights to clients and vendors
-- Provide clients and prospects actionable advice via virtual or face-to-face interactions
-- Create and deliver high-value presentation materials for Gartner events and conferences
-- Support sales by serving as voice of the market to help teams create content
-- Provide high-quality, timely peer review of content
-- Build credibility as industry expert representing Gartner insights and methodology
-- Participate actively in innovation and research discussions with peers
-- Identify process improvements to enhance service delivery
-- Mentor and coach junior team members
-- Remain client-centric while promoting regular Gartner engagement
-
-What You''ll Need:
-- Bachelor''s degree or equivalent experience; graduate degree preferred
-- 12+ years of relevant field or industry experience
-- Experience leading teams to modernize developer tooling, particularly with tools transforming the software developer lifecycle
-- Deep knowledge of AI-related development tools including code assistants and agentic platforms
-- Practical knowledge of low-code application tools in professional environments
-- Knowledge of leading low-code vendors and ability to identify benefits and risks
-- Executive presence with ability to establish immediate credibility with executives
-- Strong organizational skills and ability to work under tight deadlines
-- Excellence in research and writing ability
-- Strong written and verbal proficiency with analytical and presentation skills
-- Ability to analyze and synthesize data with critical thinking application
-- Strong communication skills explaining complex concepts concisely
-- Track record of presenting at large and small-scale speaking engagements
-- Strong business and financial acumen
-- Deep knowledge of global competitive landscape in subject area
-- Ability to work independently while collaborating across multicultural global teams
-- Ability to represent Gartner''s research methodology effectively at all levels
-- Willingness and ability to travel up to 25% (where applicable)
-
-What Gartner Offers:
-- World-class benefits and highly competitive compensation
-- Disproportionate rewards for top performers
-- Hybrid work environment emphasizing flexibility and collaboration
-- 21,000 associates globally supporting client enterprises across 90 countries',
-  'https://logo.clearbit.com/gartner.com',
-  'https://gartner.wd5.myworkdayjobs.com/EXT/job/Remote---United-Kingdom/Senior-Director--Analyst-----AI-Native--Agentic-and-Low-Code-Software-Development--Remote-UK-and-Remote-Ireland-_108255-1',
-  NULL, NULL, NULL, NULL, '2026-06-13',
-  true, '{"United Kingdom","Ireland"}', 'FULL_TIME',
-  '2026-03-15 10:00:00+00'
+Visit www.b12.io to learn more.',
+  'https://recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/000/005/605/original/B12_310x310_transparent.png?1469286085',
+  'https://job-boards.greenhouse.io/b12/jobs/7663502',
+  NULL, NULL, NULL, NULL, '2026-06-23',
+  true, '{"USA", "Canada", "Brazil", "Spain", "Philippines", "India"}', 'CONTRACTOR',
+  '2026-03-25 10:00:00+00'
 );
