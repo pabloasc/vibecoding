@@ -89,6 +89,12 @@ const schemaItemList = {
 
 const TAG_CLS = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase bg-[#F5F5F5] border border-[#E8E8E8] text-[#555] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
 
+const now = Date.now();
+const MS_72H = 72 * 60 * 60 * 1000;
+const MS_7D  =  7 * 24 * 60 * 60 * 1000;
+const isNew72h = (iso: string) => (now - new Date(iso).getTime()) < MS_72H;
+const newThisWeek = ssrJobs.filter(j => (now - new Date(j.created_at).getTime()) < MS_7D).length;
+
 function formatDate(iso: string) {
   return new Date(iso)
     .toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -110,15 +116,30 @@ function formatDate(iso: string) {
   <div class="max-w-6xl mx-auto">
 
     <!-- ─── Section header ─────────────────────────────────── -->
-    <div class="px-6 md:px-8 py-4 border-b border-[#EBEBEB] flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <h1 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A]">
+    <div class="px-6 md:px-8 py-4 border-b border-[#EBEBEB] flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <h1 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A] shrink-0">
           Vibe Coder Jobs &amp; AI Developer Positions
         </h1>
+        {newThisWeek > 0 && (
+          <span class="hidden sm:inline-flex items-center gap-1.5 font-mono text-[0.5rem] tracking-[0.08em] uppercase text-white bg-[#CC0000] px-2 py-[3px] rounded-full whitespace-nowrap shrink-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-white/80 vc-pulse"></span>
+            {newThisWeek} new this week
+          </span>
+        )}
       </div>
-      <span id="job-count" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888]">
+      <span id="job-count" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888] shrink-0">
         {ssrTotal > 0 ? `${ssrTotal} position${ssrTotal !== 1 ? 's' : ''}` : 'Open positions'}
       </span>
+    </div>
+
+    <!-- ─── "New since last visit" banner (shown by JS) ──────── -->
+    <div id="new-visit-banner" class="hidden items-center justify-between px-6 md:px-8 py-2.5 bg-[#FFF5F5] border-b border-[#FFE0E0]">
+      <span class="flex items-center gap-2 font-mono text-[0.58rem] tracking-[0.1em] uppercase text-[#CC0000]">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#CC0000] shrink-0 vc-pulse"></span>
+        <span id="new-visit-text"></span>
+      </span>
+      <button id="dismiss-visit-banner" class="font-mono text-[0.65rem] text-[#CCC] hover:text-[#999] transition-colors leading-none ml-4 shrink-0">✕</button>
     </div>
 
     <!-- ─── Loading skeleton (hidden when SSR succeeds) ──────── -->
@@ -159,12 +180,12 @@ function formatDate(iso: string) {
 
     <!-- ─── Job list — SSR-populated for page 0 ─────────────── -->
     <div id="job-list" data-ssr-total={ssrTotal} class={ssrJobs.length === 0 ? 'hidden' : ''}>
-      {ssrJobs.map(job => {
+      {ssrJobs.map((job, i) => {
         const slug = jobSlug(job.id, job.title);
         const locs = (job.locations ?? []).filter(l => job.is_remote !== true || l !== 'Worldwide');
         const locLabel = locs.length > 2 ? `${locs[0]}, ${locs[1]} +${locs.length - 2}` : locs.join(', ');
         return (
-          <article class="group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2] hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer">
+          <article class="job-card group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2] hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer" style={`animation-delay:${i * 45}ms`} data-created-at={job.created_at}>
 
             <div class="w-[52px] h-[52px] md:w-[80px] md:h-[80px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center mt-0.5 job-image-wrap">
               {job.image_url
@@ -178,6 +199,11 @@ function formatDate(iso: string) {
               <p class="job-description font-sans text-[0.82rem] text-[#777] mt-1.5 leading-relaxed line-clamp-2 md:line-clamp-3">{job.description}</p>
               <div class="flex items-center gap-2 mt-2 flex-wrap">
                 <div class="flex items-center gap-1.5 flex-wrap">
+                  {isNew72h(job.created_at) && (
+                    <span class="inline-flex items-center gap-1 font-mono text-[0.5rem] tracking-[0.1em] uppercase text-white bg-[#CC0000] px-1.5 py-[2px] rounded-full whitespace-nowrap leading-none">
+                      <span class="w-1 h-1 rounded-full bg-white/70 vc-pulse inline-block shrink-0"></span>New
+                    </span>
+                  )}
                   {job.is_remote === true  && <span class={TAG_CLS}>Remote</span>}
                   {job.is_remote === false && <span class={TAG_CLS}>On-site</span>}
                   {locs.length > 0         && <span class={TAG_CLS}>{locLabel}</span>}
@@ -218,10 +244,23 @@ function formatDate(iso: string) {
   <Footer />
 </Layout>
 
+<style>
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes vcPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+  }
+  .job-card { animation: fadeSlideIn 0.32s ease both; }
+  .vc-pulse  { animation: vcPulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+</style>
+
 <!-- ═══════ ROW TEMPLATE — used by JS for pages 1+ ══════════════ -->
 <template id="tpl-row">
-  <article class="group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2]
-                  hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer">
+  <article class="job-card group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2]
+                  hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer" data-created-at="">
 
     <!-- Thumbnail — clean square -->
     <div class="job-image-wrap w-[52px] h-[52px] md:w-[80px] md:h-[80px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center mt-0.5"></div>
@@ -303,8 +342,13 @@ function formatDate(iso: string) {
   const IC_DOLLAR = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1.5v9M4.5 3.5h2a1.5 1.5 0 0 1 0 3H5a1.5 1.5 0 0 0 0 3h2.5"/></svg>`;
   const TAG_CLS  = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase bg-[#F5F5F5] border border-[#E8E8E8] text-[#555] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
 
+  const NEW_BADGE = `<span style="display:inline-flex;align-items:center;gap:3px;font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:#CC0000;padding:2px 6px;border-radius:999px;white-space:nowrap;line-height:1;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.7);display:inline-block;animation:vcPulse 2s cubic-bezier(0.4,0,0.6,1) infinite;flex-shrink:0;"></span>New</span>`;
+
   function buildTags(el: Element, job: Job) {
     const parts: string[] = [];
+
+    if ((Date.now() - new Date(job.created_at).getTime()) < 72 * 60 * 60 * 1000)
+      parts.push(NEW_BADGE);
 
     if (job.is_remote === true)  parts.push(`<span class="${TAG_CLS}">${IC_GLOBE}Remote</span>`);
     if (job.is_remote === false) parts.push(`<span class="${TAG_CLS}">${IC_PIN}On-site</span>`);
@@ -324,6 +368,7 @@ function formatDate(iso: string) {
   function buildRow(job: Job): DocumentFragment {
     const frag = (document.getElementById('tpl-row') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
     const article = frag.querySelector('article')!;
+    article.dataset.createdAt = job.created_at;
     (article.querySelector('.job-title') as HTMLElement).textContent = job.title;
     (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
     (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
@@ -409,6 +454,45 @@ function formatDate(iso: string) {
     document.head.appendChild(script);
   }
 
+  // ── Count-up animation ────────────────────────────────────
+  function animateCount(el: HTMLElement, target: number) {
+    const duration = 700;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(eased * target);
+      el.textContent = `${val} position${val !== 1 ? 's' : ''}`;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ── "New since last visit" banner ─────────────────────────
+  const VISIT_KEY = 'vc_last_visit';
+  let visitBannerShown = false;
+
+  function showNewSinceVisit(jobs: Job[]) {
+    if (visitBannerShown) return;
+    const lastVisit = parseInt(localStorage.getItem(VISIT_KEY) ?? '0', 10);
+    localStorage.setItem(VISIT_KEY, Date.now().toString());
+    if (lastVisit <= 0) return;
+    const n = jobs.filter(j => new Date(j.created_at).getTime() > lastVisit).length;
+    if (n <= 0) return;
+    visitBannerShown = true;
+    const banner = document.getElementById('new-visit-banner')!;
+    document.getElementById('new-visit-text')!.textContent =
+      `${n} new position${n !== 1 ? 's' : ''} since your last visit`;
+    banner.classList.remove('hidden');
+    banner.classList.add('flex');
+  }
+
+  document.getElementById('dismiss-visit-banner')?.addEventListener('click', () => {
+    const banner = document.getElementById('new-visit-banner')!;
+    banner.classList.add('hidden');
+    banner.classList.remove('flex');
+  });
+
   async function loadPage(page: number) {
     listEl.classList.add('hidden');
     paginationEl.classList.add('hidden');
@@ -425,10 +509,16 @@ function formatDate(iso: string) {
         return;
       }
 
-      countEl.textContent = `${totalCount} position${totalCount !== 1 ? 's' : ''}`;
+      animateCount(countEl, totalCount);
       listEl.innerHTML = '';
-      jobs.forEach(job => listEl.appendChild(buildRow(job)));
+      jobs.forEach((job, i) => {
+        const frag = buildRow(job);
+        const article = frag.querySelector('article') as HTMLElement;
+        if (article) article.style.animationDelay = `${i * 45}ms`;
+        listEl.appendChild(frag);
+      });
       listEl.classList.remove('hidden');
+      showNewSinceVisit(jobs);
       renderPagination();
       injectJobPostingSchema(jobs);
 
@@ -459,7 +549,11 @@ function formatDate(iso: string) {
   // Init: if SSR rendered page 0, skip the initial fetch
   if (hasSSR) {
     totalCount = ssrTotal;
+    animateCount(countEl, ssrTotal);
     renderPagination();
+    const ssrCards = Array.from(document.querySelectorAll<HTMLElement>('#job-list article'));
+    const ssrJobDates = ssrCards.map(el => ({ created_at: el.dataset.createdAt ?? '' } as Job));
+    showNewSinceVisit(ssrJobDates);
   } else {
     loadPage(0);
   }
