@@ -2,38 +2,30 @@
  * Client-side helpers for the shared <ProfileFields /> form and <ProfileCard /> markup.
  */
 import type { Profile } from './profile';
-import { lookingFor, formatRate, locationLabel, initials, isNew, formatDate } from './profile';
+import { lookingFor, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from './profile';
 import { profileSlug } from './slug';
 
 const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
 
-export type ProfileFieldValues = Omit<Profile, 'id' | 'created_at' | 'image_url'>;
+export type ProfileFieldValues = Omit<Profile, 'id' | 'created_at' | 'image_url' | 'user_id'>;
 
 export function readProfileFields(): ProfileFieldValues {
-  const salaryMinRaw = $('salary-min').value.trim();
-  const salaryMaxRaw = $('salary-max').value.trim();
-  const salary_min = salaryMinRaw ? parseInt(salaryMinRaw, 10) : null;
-  const salary_max = salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : null;
-  const hasRate = salary_min != null || salary_max != null;
-
   return {
+    name:            $('name').value.trim(),
     title:           $('title').value.trim(),
     description:     $<HTMLTextAreaElement>('description').value.trim(),
     link:            $('link').value.trim(),
     employment_type: document.querySelector<HTMLInputElement>('input[name="employment_type"]:checked')?.value ?? 'FULL_TIME',
     is_remote:       $('is-remote').checked,
     locations:       $('locations').value.split(',').map(s => s.trim()).filter(Boolean),
-    salary_min,
-    salary_max,
-    salary_currency: hasRate ? $<HTMLSelectElement>('salary-currency').value : null,
-    salary_period:   hasRate ? $<HTMLSelectElement>('salary-period').value : null,
     valid_through:   $('valid-through').value || null,
   };
 }
 
 /** Returns an error message, or null when the required fields are filled in */
 export function validateProfileFields(v: ProfileFieldValues): string | null {
-  if (!v.title)       return 'Add a headline — your name and what you build.';
+  if (!v.name)        return 'Add your name so mentors know who they\'re talking to.';
+  if (!v.title)       return 'Add a headline — what you build, in a few words.';
   if (!v.description) return 'Tell mentors a bit about yourself.';
   if (!v.link)        return 'Profile URL is required — link your GitHub, portfolio or LinkedIn.';
   try { new URL(v.link); } catch { return 'Profile URL should be a full link, e.g. https://github.com/you'; }
@@ -41,18 +33,30 @@ export function validateProfileFields(v: ProfileFieldValues): string | null {
 }
 
 export function fillProfileFields(p: Profile) {
-  $('title').value = p.title;
+  $('name').value = profileName(p);
+  $('title').value = profileHeadline(p) || p.title;
   $<HTMLTextAreaElement>('description').value = p.description;
   $('link').value = p.link;
   const radio = document.querySelector<HTMLInputElement>(`input[name="employment_type"][value="${p.employment_type ?? 'FULL_TIME'}"]`);
   if (radio) radio.checked = true;
   $('is-remote').checked = p.is_remote !== false;
   $('locations').value = (p.locations ?? []).join(', ');
-  if (p.salary_min != null) $('salary-min').value = String(p.salary_min);
-  if (p.salary_max != null) $('salary-max').value = String(p.salary_max);
-  if (p.salary_currency) $<HTMLSelectElement>('salary-currency').value = p.salary_currency;
-  if (p.salary_period)   $<HTMLSelectElement>('salary-period').value = p.salary_period;
   if (p.valid_through)   $('valid-through').value = p.valid_through;
+}
+
+/** The signed-in builder's own profile, if they have one */
+export async function fetchOwnProfile(userId: string, supabaseUrl: string, anonKey: string): Promise<Profile | null> {
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/jobs?user_id=eq.${encodeURIComponent(userId)}&select=*&order=created_at.desc&limit=1`,
+      { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } }
+    );
+    if (!res.ok) return null;
+    const rows: Profile[] = await res.json();
+    return rows[0] ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Upload an avatar to the public storage bucket and return its public URL */
@@ -86,42 +90,45 @@ function chip(text: string, extra = '') {
   return el;
 }
 
-function fillAvatar(wrap: HTMLElement, p: Pick<Profile, 'image_url' | 'title'>) {
+function fillAvatar(wrap: HTMLElement, imageUrl: string | null, name: string) {
   wrap.textContent = '';
-  if (p.image_url) {
+  if (imageUrl) {
     const img = document.createElement('img');
-    img.src = p.image_url;
+    img.src = imageUrl;
     img.alt = '';
     img.loading = 'lazy';
     img.className = 'w-full h-full object-cover';
-    img.onerror = () => { wrap.textContent = initials(p.title); };
+    img.onerror = () => { wrap.textContent = initials(name); };
     wrap.appendChild(img);
   } else {
-    wrap.textContent = initials(p.title);
+    wrap.textContent = initials(name);
   }
 }
 
 /** Fill an (empty or previously filled) .p-card element with a profile */
 export function fillCard(card: HTMLElement, p: Profile) {
   const want = lookingFor(p.employment_type);
+  const name = profileName(p);
+  const headline = profileHeadline(p);
 
   card.dataset.createdAt = p.created_at;
-  card.querySelector('.p-title')!.textContent = p.title;
+  card.querySelector('.p-name')!.textContent = name;
+  const titleEl = card.querySelector('.p-title')!;
+  titleEl.textContent = headline;
+  titleEl.classList.toggle('hidden', !headline);
   card.querySelector('.p-want')!.textContent = `${want.emoji} ${want.label}`;
   card.querySelector('.p-desc')!.textContent = p.description;
   card.querySelector('.p-date')!.textContent = `Joined ${formatDate(p.created_at)}`;
   card.querySelector<HTMLAnchorElement>('.p-link')!.href = p.link;
   const cardLink = card.querySelector<HTMLAnchorElement>('.p-card-link')!;
-  cardLink.href = `/profile/${profileSlug(p.id, p.title)}/`;
-  cardLink.setAttribute('aria-label', `View ${p.title}`);
+  cardLink.href = `/profile/${profileSlug(p)}/`;
+  cardLink.setAttribute('aria-label', `View ${name}'s profile`);
   card.querySelector('.p-new')!.classList.toggle('hidden', !isNew(p.created_at));
-  fillAvatar(card.querySelector<HTMLElement>('.p-avatar')!, p);
+  fillAvatar(card.querySelector<HTMLElement>('.p-avatar')!, p.image_url, name);
 
   const tags = card.querySelector('.p-tags')!;
   const loc  = locationLabel(p);
-  const rate = formatRate(p);
   tags.textContent = '';
   if (p.is_remote === true) tags.appendChild(chip('🌍 Open to remote'));
   if (loc)  tags.appendChild(chip(`📍 ${loc}`));
-  if (rate) tags.appendChild(chip(rate, 'chip-violet'));
 }

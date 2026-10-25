@@ -8,7 +8,8 @@
 
 -- ── 1. Profiles (stored in the `jobs` table) ─────────────────
 -- Column → meaning on the site (form label in quotes):
---   title           → "Headline"             e.g. 'Maya · AI-native frontend builder'
+--   name            → "Your name"            e.g. 'Maya Chen'
+--   title           → "Headline"             e.g. 'AI-native frontend builder'
 --   description     → "About you"
 --   image_url       → "Avatar"
 --   link            → "Profile URL"          GitHub, portfolio, LinkedIn…
@@ -16,10 +17,12 @@
 --                                            | TEMPORARY (short project) | PART_TIME | FULL_TIME
 --   is_remote       → "Open to remote work"
 --   locations       → "Based in"
---   salary_*        → "Rate expectation"
+--   salary_*        → not used by the site anymore (kept so no data is lost)
 --   valid_through   → "Open to offers until"
+--   user_id         → the builder who owns the profile (set automatically on insert)
 CREATE TABLE IF NOT EXISTS jobs (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    name             TEXT,                    -- builder's name (NULL on profiles created before the column existed)
     title            TEXT        NOT NULL,
     description      TEXT        NOT NULL,
     image_url        TEXT,                    -- Public URL from Supabase Storage or external URL
@@ -32,10 +35,11 @@ CREATE TABLE IF NOT EXISTS jobs (
     is_remote        BOOLEAN     DEFAULT true,
     locations        TEXT[],                  -- e.g. '{"USA","Germany","Worldwide"}' — empty/null means unspecified
     employment_type  TEXT        DEFAULT 'FULL_TIME', -- MENTORSHIP | INTERN | CONTRACTOR | TEMPORARY | PART_TIME | FULL_TIME
+    user_id          UUID        DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
--- NOTE: URL slugs are derived at request time as slugify(title) + '-' + id[0:8]
--- e.g. /profile/maya-ainative-frontend-builder-a6b7c8d9/  (legacy /job/… URLs 301-redirect here)
+-- NOTE: URL slugs are derived at request time as slugify(name + ' ' + title) + '-' + id[0:8]
+-- e.g. /profile/maya-chen-ainative-frontend-builder-a6b7c8d9/  (legacy /job/… URLs 301-redirect here)
 -- No slug column is needed — the first 8 chars of the UUID guarantee uniqueness.
 
 -- ── Migration: add Google JobPosting structured-data fields ──
@@ -55,24 +59,62 @@ ALTER TABLE jobs
   ADD COLUMN IF NOT EXISTS locations       TEXT[],
   ADD COLUMN IF NOT EXISTS employment_type TEXT    DEFAULT 'FULL_TIME';
 
--- Enable Row Level Security
+-- ── Migration: profile ownership ─────────────────────────────
+-- Lets builders edit and delete their own profile.
+-- user_id is filled automatically with the creator's account (DEFAULT auth.uid()),
+-- and the RLS policies below only let that same user (or the admin) change the row.
+-- Safe to re-run.
+--
+-- Rows created BEFORE this column existed have user_id = NULL (the old table never
+-- recorded who created them), so only the admin can edit those. To give one back
+-- to the person who originally created it:
+--   UPDATE jobs SET user_id = (SELECT id FROM auth.users WHERE email = 'original-creator@example.com')
+--   WHERE id = '<profile id>';
+
+ALTER TABLE jobs
+  ADD COLUMN IF NOT EXISTS user_id UUID DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS jobs_user_id_idx ON jobs (user_id);
+
+-- ── Migration: separate name field ───────────────────────────
+-- Safe to re-run. Older profiles keep name = NULL; the site then falls back to
+-- the part of the title before " · " (e.g. 'Maya · Builder' → 'Maya').
+-- Optional backfill that splits such titles into name + headline:
+--   UPDATE jobs
+--   SET name  = split_part(title, ' · ', 1),
+--       title = substr(title, length(split_part(title, ' · ', 1)) + 4)
+--   WHERE name IS NULL AND title LIKE '% · %';
+
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS name TEXT;
+
+-- ── Row Level Security ───────────────────────────────────────
+-- Safe to re-run: every policy is dropped (including the old admin-only ones) and recreated.
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read"            ON jobs;
+DROP POLICY IF EXISTS "Authenticated insert"   ON jobs;
+DROP POLICY IF EXISTS "Admin update"           ON jobs;
+DROP POLICY IF EXISTS "Admin delete"           ON jobs;
+DROP POLICY IF EXISTS "Owner or admin update"  ON jobs;
+DROP POLICY IF EXISTS "Owner or admin delete"  ON jobs;
 
 -- Anyone can read profiles
 CREATE POLICY "Public read" ON jobs
     FOR SELECT USING (true);
 
--- Only authenticated users can insert
+-- Signed-in users can create profiles, always owned by themselves
 CREATE POLICY "Authenticated insert" ON jobs
-    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated' AND user_id = auth.uid());
 
--- Only the admin can update
-CREATE POLICY "Admin update" ON jobs
-    FOR UPDATE USING (auth.jwt() ->> 'email' = 'hi@vibecoders.co');
+-- Owners can update their own profile (and can't hand it to someone else); the admin can update any
+CREATE POLICY "Owner or admin update" ON jobs
+    FOR UPDATE
+    USING      (auth.uid() = user_id OR auth.jwt() ->> 'email' = 'hi@vibecoders.co')
+    WITH CHECK (auth.uid() = user_id OR auth.jwt() ->> 'email' = 'hi@vibecoders.co');
 
--- Only the admin can delete
-CREATE POLICY "Admin delete" ON jobs
-    FOR DELETE USING (auth.jwt() ->> 'email' = 'hi@vibecoders.co');
+-- Owners can delete their own profile; the admin can delete any
+CREATE POLICY "Owner or admin delete" ON jobs
+    FOR DELETE USING (auth.uid() = user_id OR auth.jwt() ->> 'email' = 'hi@vibecoders.co');
 
 
 -- ── 2. Storage bucket ────────────────────────────────────────

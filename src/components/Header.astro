@@ -27,8 +27,8 @@
       <a href="/#mentors" class="nav-link hidden md:block text-[0.88rem] text-fog hover:text-snow px-3 py-2 transition-colors">
         For mentors
       </a>
-      <a href="/submit" class="btn-primary !py-2 !px-4 !text-[0.85rem] ml-1">
-        <span class="sm:hidden">Join</span><span class="hidden sm:inline">Drop your profile</span> <span aria-hidden="true">→</span>
+      <a id="header-cta" href="/submit" class="btn-primary !py-2 !px-4 !text-[0.85rem] ml-1">
+        <span id="header-cta-label"><span class="sm:hidden">Join</span><span class="hidden sm:inline">Drop your profile</span></span> <span aria-hidden="true">→</span>
       </a>
 
       <!-- Auth status -->
@@ -46,9 +46,14 @@
 
 <script>
   import { supabase } from '../lib/supabase';
+  import { profileSlug } from '../lib/slug';
+  import { fetchOwnProfile } from '../lib/profileForm';
 
   const authNav      = document.getElementById('auth-nav')!;
   const authUsername = document.getElementById('auth-username')!;
+  const headerCta    = document.getElementById('header-cta') as HTMLAnchorElement;
+  const ctaLabel     = document.getElementById('header-cta-label')!;
+  const ctaDefault   = ctaLabel.innerHTML;
   const signoutBtn   = document.getElementById('auth-signout')!;
 
   supabase.auth.onAuthStateChange((_event, session) => {
@@ -57,9 +62,19 @@
       authUsername.textContent = `@${email.split('@')[0]}`;
       authNav.classList.remove('hidden');
       authNav.classList.add('flex');
+
+      // Builders who already have a profile get "My profile" instead of "Drop your profile"
+      fetchOwnProfile(session.user.id, import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY)
+        .then(p => {
+          if (!p) return;
+          headerCta.href = `/profile/${profileSlug(p)}/`;
+          ctaLabel.textContent = 'My profile';
+        });
     } else {
       authNav.classList.add('hidden');
       authNav.classList.remove('flex');
+      headerCta.href = '/submit';
+      ctaLabel.innerHTML = ctaDefault;
     }
   });
 

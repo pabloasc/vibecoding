@@ -102,6 +102,20 @@ const webPage = JSON.stringify({
       </div>
       </div>
 
+      <!-- Already has a profile -->
+      <div id="has-profile" class="hidden card relative overflow-hidden p-8 sm:p-12 text-center max-w-2xl mx-auto">
+        <div class="orb w-[300px] h-[300px] bg-violet -top-40 left-1/2 -translate-x-1/2 !opacity-30"></div>
+        <p class="relative text-[3rem]">👋</p>
+        <p class="relative font-bold text-[2rem] tracking-tight mt-2">You're already on the board.</p>
+        <p class="relative text-fog mt-2 max-w-sm mx-auto">
+          <span id="has-profile-title" class="text-snow"></span> is live. Keep it fresh — update what you've shipped and what you're after.
+        </p>
+        <div class="relative flex flex-wrap justify-center gap-3 mt-8">
+          <a id="has-profile-edit" href="/" class="btn-primary">Edit my profile →</a>
+          <a id="has-profile-view" href="/" class="btn-ghost">View it</a>
+        </div>
+      </div>
+
       <!-- Success state -->
       <div id="success-state" class="hidden card relative overflow-hidden p-8 sm:p-12 text-center max-w-2xl mx-auto">
         <div class="orb w-[300px] h-[300px] bg-acid -top-40 left-1/2 -translate-x-1/2 !opacity-25"></div>
@@ -110,7 +124,7 @@ const webPage = JSON.stringify({
         <p class="relative text-fog mt-2 max-w-sm mx-auto">Your profile is on the board. Share it around — the more eyes, the faster that first gig shows up.</p>
         <div class="relative flex flex-wrap justify-center gap-3 mt-8">
           <a id="success-profile-link" href="/" class="btn-primary">See your profile →</a>
-          <a href="/#builders" class="btn-ghost">Browse builders</a>
+          <a id="success-edit-link" href="/" class="btn-ghost">Edit it anytime</a>
         </div>
       </div>
 
@@ -186,7 +200,8 @@ const webPage = JSON.stringify({
 <script>
   import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
-  import { readProfileFields, validateProfileFields, uploadAvatar, fillCard } from '../lib/profileForm';
+  import { ADMIN_EMAIL, profileName, type Profile } from '../lib/profile';
+  import { readProfileFields, validateProfileFields, uploadAvatar, fillCard, fetchOwnProfile } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -197,12 +212,14 @@ const webPage = JSON.stringify({
   const formWrapEl     = document.getElementById('form-wrap')!;
   const submitFormEl   = document.getElementById('submit-form') as HTMLFormElement;
   const successEl      = document.getElementById('success-state')!;
+  const hasProfileEl   = document.getElementById('has-profile')!;
   let currentToken: string = SUPABASE_ANON_KEY;
 
   function showAuthWall() {
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.remove('hidden');
     formWrapEl.classList.add('hidden');
+    hasProfileEl.classList.add('hidden');
   }
 
   function showForm() {
@@ -211,13 +228,25 @@ const webPage = JSON.stringify({
     if (successEl.classList.contains('hidden')) formWrapEl.classList.remove('hidden');
   }
 
+  function showHasProfile(p: Profile) {
+    authCheckingEl.classList.add('hidden');
+    authWallEl.classList.add('hidden');
+    document.getElementById('has-profile-title')!.textContent = `${profileName(p)}'s profile`;
+    (document.getElementById('has-profile-edit') as HTMLAnchorElement).href = `/edit?id=${p.id}`;
+    (document.getElementById('has-profile-view') as HTMLAnchorElement).href = `/profile/${profileSlug(p)}/`;
+    hasProfileEl.classList.remove('hidden');
+  }
+
   supabase.auth.onAuthStateChange((_event, session) => {
     currentToken = session?.access_token ?? SUPABASE_ANON_KEY;
-    if (session) {
-      showForm();
-    } else {
-      showAuthWall();
-    }
+    if (!session) { showAuthWall(); return; }
+
+    // One profile per builder — send returning builders to edit instead (the admin can add more)
+    if (session.user.email === ADMIN_EMAIL || !successEl.classList.contains('hidden')) { showForm(); return; }
+    fetchOwnProfile(session.user.id, SUPABASE_URL, SUPABASE_ANON_KEY).then(existing => {
+      if (existing) showHasProfile(existing);
+      else showForm();
+    });
   });
 
   // ── Tab switching ─────────────────────────────────────────
@@ -360,7 +389,9 @@ const webPage = JSON.stringify({
     fillCard(previewCard, {
       ...v,
       id: 'preview',
-      title: v.title || 'Your name · what you build',
+      user_id: null,
+      name: v.name || 'Your name',
+      title: v.title || 'What you build',
       description: v.description || "What you've shipped, the tools you vibe with, and what you want to learn next.",
       link: v.link || '#',
       image_url: imageSource === 'file' ? fileDataUrl : (imageUrlInput.value.trim() || null),
@@ -421,7 +452,8 @@ const webPage = JSON.stringify({
       const [created] = await insertRes.json().catch(() => []);
       if (created?.id) {
         (document.getElementById('success-profile-link') as HTMLAnchorElement).href =
-          `/profile/${profileSlug(created.id, created.title)}/`;
+          `/profile/${profileSlug(created)}/`;
+        (document.getElementById('success-edit-link') as HTMLAnchorElement).href = `/edit?id=${created.id}`;
       }
 
       formWrapEl.classList.add('hidden');

@@ -17,7 +17,7 @@ import ProfileFields from '../components/ProfileFields.astro';
     <!-- Page header -->
     <div class="flex items-end justify-between gap-4 mb-10">
       <div>
-        <span class="eyebrow">// admin</span>
+        <span id="edit-eyebrow" class="eyebrow">// edit</span>
         <h1 class="font-bold tracking-[-0.03em] text-[clamp(2rem,5vw,2.8rem)] leading-none mt-2">Edit profile</h1>
       </div>
       <a id="back-link" href="/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">← Back</a>
@@ -28,10 +28,19 @@ import ProfileFields from '../components/ProfileFields.astro';
       <p class="font-mono text-[0.8rem] text-fog"><span class="caret inline-block w-2 h-3.5 bg-acid align-middle mr-2"></span>Verifying access…</p>
     </div>
 
-    <!-- Access denied -->
-    <div id="access-denied" class="hidden card py-14 text-center">
+    <!-- Signed out -->
+    <div id="signed-out" class="hidden card py-14 px-6 text-center">
+      <p class="text-[2.2rem]">🔑</p>
+      <p class="font-semibold text-[1.5rem] mt-2">Sign in to edit your profile.</p>
+      <p class="text-fog mt-2 mb-6">Use the account you created your profile with.</p>
+      <a href="/submit" class="btn-primary">Sign in →</a>
+    </div>
+
+    <!-- Not the owner -->
+    <div id="access-denied" class="hidden card py-14 px-6 text-center">
       <p class="text-[2.2rem]">🔒</p>
-      <p class="font-semibold text-[1.5rem] mt-2 mb-6">Access denied.</p>
+      <p class="font-semibold text-[1.5rem] mt-2">This isn't your profile.</p>
+      <p class="text-fog mt-2 mb-6">Only the builder who created it can make changes.</p>
       <a href="/" class="btn-ghost">← Back to builders</a>
     </div>
 
@@ -108,9 +117,9 @@ import ProfileFields from '../components/ProfileFields.astro';
 </Layout>
 
 <script>
-  import { supabase, ADMIN_EMAIL } from '../lib/supabase';
+  import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
-  import { initials, type Profile } from '../lib/profile';
+  import { initials, canEdit, profileName, type Profile } from '../lib/profile';
   import { readProfileFields, validateProfileFields, fillProfileFields, uploadAvatar } from '../lib/profileForm';
 
   const SUPABASE_URL      = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -118,12 +127,18 @@ import ProfileFields from '../components/ProfileFields.astro';
 
   // ── Elements ──────────────────────────────────────────────
   const authCheckingEl = document.getElementById('auth-checking')!;
+  const signedOutEl    = document.getElementById('signed-out')!;
   const accessDeniedEl = document.getElementById('access-denied')!;
   const notFoundEl     = document.getElementById('not-found')!;
   const editFormEl     = document.getElementById('edit-form') as HTMLFormElement;
   const successEl      = document.getElementById('success-state')!;
   const errorBannerEl  = document.getElementById('error-banner')!;
   const errorMessageEl = document.getElementById('error-message')!;
+
+  function showSignedOut() {
+    authCheckingEl.classList.add('hidden');
+    signedOutEl.classList.remove('hidden');
+  }
 
   function showAccessDenied() {
     authCheckingEl.classList.add('hidden');
@@ -144,7 +159,7 @@ import ProfileFields from '../components/ProfileFields.astro';
   // ── Auth & profile load ───────────────────────────────────
   let sessionToken = SUPABASE_ANON_KEY;
   let currentImageUrl: string | null = null;
-  let currentTitle = '';
+  let currentName = '';
   let imageAction: 'keep' | 'remove' | File = 'keep';
 
   const profileId = new URLSearchParams(window.location.search).get('id');
@@ -154,10 +169,7 @@ import ProfileFields from '../components/ProfileFields.astro';
 
     // Validate JWT server-side — getUser() re-checks with Supabase auth server
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user || user.email !== ADMIN_EMAIL) {
-      showAccessDenied();
-      return;
-    }
+    if (authError || !user) { showSignedOut(); return; }
 
     // Store session token for authenticated API calls
     const { data: { session } } = await supabase.auth.getSession();
@@ -172,6 +184,12 @@ import ProfileFields from '../components/ProfileFields.astro';
     const rows: Profile[] = await res.json();
     if (!rows.length) { showNotFound(); return; }
 
+    // UI gate only — the RLS policies in schema.sql are what actually enforce this
+    if (!canEdit(user, rows[0])) { showAccessDenied(); return; }
+
+    document.getElementById('edit-eyebrow')!.textContent =
+      rows[0].user_id === user.id ? '// your profile' : '// admin';
+
     populateForm(rows[0]);
   }
 
@@ -185,10 +203,10 @@ import ProfileFields from '../components/ProfileFields.astro';
       const img = document.createElement('img');
       img.src = url;
       img.className = 'w-full h-full object-cover';
-      img.onerror = () => { currentAvatarEl.textContent = initials(currentTitle); };
+      img.onerror = () => { currentAvatarEl.textContent = initials(currentName); };
       currentAvatarEl.replaceChildren(img);
     } else {
-      currentAvatarEl.textContent = currentTitle ? initials(currentTitle) : '🙂';
+      currentAvatarEl.textContent = currentName ? initials(currentName) : '🙂';
     }
     avatarStatusEl.textContent = status;
     removeCurrentBtn.classList.toggle('hidden', !url);
@@ -196,11 +214,11 @@ import ProfileFields from '../components/ProfileFields.astro';
 
   function populateForm(p: Profile) {
     currentImageUrl = p.image_url;
-    currentTitle = p.title;
+    currentName = profileName(p);
     fillProfileFields(p);
     renderCurrentAvatar(p.image_url, p.image_url ? 'Current avatar' : 'No image set');
 
-    const profileUrl = `/profile/${profileSlug(p.id, p.title)}/`;
+    const profileUrl = `/profile/${profileSlug(p)}/`;
     (document.getElementById('back-link') as HTMLAnchorElement).href = profileUrl;
     (document.getElementById('cancel-link') as HTMLAnchorElement).href = profileUrl;
 
@@ -281,7 +299,7 @@ import ProfileFields from '../components/ProfileFields.astro';
             apikey: SUPABASE_ANON_KEY,
             Authorization: `Bearer ${sessionToken}`,
             'Content-Type': 'application/json',
-            Prefer: 'return=minimal',
+            Prefer: 'return=representation',
           },
           body: JSON.stringify({ ...values, image_url }),
         }
@@ -291,9 +309,12 @@ import ProfileFields from '../components/ProfileFields.astro';
         const err = await patchRes.json().catch(() => ({}));
         throw new Error(err?.message || 'Failed to update the profile.');
       }
+      // RLS filters out rows you can't edit, so a blocked update comes back as an empty list
+      const updated = await patchRes.json().catch(() => []);
+      if (!updated.length) throw new Error("You don't have permission to edit this profile.");
 
       (document.getElementById('success-back-link') as HTMLAnchorElement).href =
-        `/profile/${profileSlug(profileId!, values.title)}/`;
+        `/profile/${profileSlug({ id: profileId!, name: values.name, title: values.title })}/`;
       editFormEl.classList.add('hidden');
       successEl.classList.remove('hidden');
       successEl.scrollIntoView({ behavior: 'smooth' });
@@ -323,6 +344,7 @@ import ProfileFields from '../components/ProfileFields.astro';
           headers: {
             apikey: SUPABASE_ANON_KEY,
             Authorization: `Bearer ${sessionToken}`,
+            Prefer: 'return=representation',
           },
         }
       );
@@ -331,6 +353,8 @@ import ProfileFields from '../components/ProfileFields.astro';
         const err = await res.json().catch(() => ({}));
         throw new Error(err?.message || 'Failed to delete the profile.');
       }
+      const deleted = await res.json().catch(() => []);
+      if (!deleted.length) throw new Error("You don't have permission to delete this profile.");
 
       window.location.href = '/';
 

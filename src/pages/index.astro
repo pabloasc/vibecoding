@@ -6,7 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProfileCard from '../components/ProfileCard.astro';
 import { profileSlug } from '../lib/slug';
-import { type Profile, displayName } from '../lib/profile';
+import { type Profile, profileName } from '../lib/profile';
 
 const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -50,8 +50,8 @@ const schemaItemList = {
   itemListElement: ssrProfiles.map((p, i) => ({
     '@type': 'ListItem',
     position: i + 1,
-    url: `https://vibecoding.work/profile/${profileSlug(p.id, p.title)}/`,
-    name: displayName(p.title),
+    url: `https://vibecoding.work/profile/${profileSlug(p)}/`,
+    name: profileName(p),
   })),
 };
 

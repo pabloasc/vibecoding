@@ -10,5 +10,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export const ADMIN_EMAIL = 'hi@vibecoders.co';

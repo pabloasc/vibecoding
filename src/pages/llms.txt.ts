@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { profileSlug } from '../lib/slug';
-import { type Profile, lookingFor, formatRate } from '../lib/profile';
+import { type Profile, lookingFor, profileName, profileHeadline } from '../lib/profile';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -40,15 +40,14 @@ export const GET: APIRoute = async () => {
     const remote = p.is_remote === true ? 'Open to remote' : p.is_remote === false ? 'Not open to remote' : null;
     const locationParts = [remote, ...(p.locations ?? [])].filter(Boolean);
     const location = locationParts.join(', ') || 'Location not specified';
-    const rate = formatRate(p);
 
-    lines.push(`### ${p.title}`);
+    const headline = profileHeadline(p);
+    lines.push(`### ${profileName(p)}${headline ? ` — ${headline}` : ''}`);
     lines.push(`Joined: ${date}`);
     lines.push(`Looking for: ${lookingFor(p.employment_type).label}`);
     lines.push(`Location: ${location}`);
-    if (rate) lines.push(`Rate expectation: ${rate}`);
     lines.push(`Profile: ${p.link}`);
-    lines.push(`Page: https://vibecoding.work/profile/${profileSlug(p.id, p.title)}/`);
+    lines.push(`Page: https://vibecoding.work/profile/${profileSlug(p)}/`);
     lines.push('');
     lines.push(p.description);
     lines.push('');

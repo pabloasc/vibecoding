@@ -14,11 +14,13 @@ export function slugify(text: string): string {
 }
 
 /**
- * Build the canonical URL slug for a profile.
+ * Build the canonical URL slug for a profile from its name + headline.
  * Uses the first 8 chars of the UUID to guarantee uniqueness
- * even if two profiles share the same headline.
- * e.g. "maya-ainative-frontend-builder-a6b7c8d9"
+ * even if two profiles share the same name.
+ * e.g. "maya-chen-ainative-frontend-builder-a6b7c8d9"
+ * Legacy profiles (name = NULL) keep their old title-only slug.
+ * Keep in sync with getProfileSitemapPages() in astro.config.mjs.
  */
-export function profileSlug(id: string, title: string): string {
-  return `${slugify(title)}-${id.slice(0, 8)}`;
+export function profileSlug(p: { id: string; title: string; name?: string | null }): string {
+  return `${slugify(`${p.name ?? ''} ${p.title}`)}-${p.id.slice(0, 8)}`;
 }

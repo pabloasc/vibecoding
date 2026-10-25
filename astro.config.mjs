@@ -10,13 +10,13 @@ async function getProfileSitemapPages() {
   const key = process.env.PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return [];
   try {
-    const res = await fetch(`${url}/rest/v1/jobs?select=id,title&order=created_at.desc`, {
+    const res = await fetch(`${url}/rest/v1/jobs?select=id,name,title&order=created_at.desc`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
     });
     if (!res.ok) return [];
     const profiles = await res.json();
     return profiles.map((p) => {
-      const slug = `${p.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').substring(0, 60).replace(/-+$/, '')}-${p.id.slice(0, 8)}`;
+      const slug = `${`${p.name ?? ''} ${p.title}`.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').substring(0, 60).replace(/-+$/, '')}-${p.id.slice(0, 8)}`;
       return `https://vibecoding.work/profile/${slug}/`;
     });
   } catch {

@@ -6,7 +6,7 @@
  * (see the `.p-*` hooks).
  */
 import { profileSlug } from '../lib/slug';
-import { type Profile, lookingFor, formatRate, locationLabel, initials, isNew, formatDate } from '../lib/profile';
+import { type Profile, lookingFor, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from '../lib/profile';
 
 export interface Props {
   profile?: Profile;
@@ -16,9 +16,10 @@ export interface Props {
 const { profile: p, index = 0 } = Astro.props;
 
 const want  = p ? lookingFor(p.employment_type) : null;
-const rate  = p ? formatRate(p) : null;
 const loc   = p ? locationLabel(p) : null;
-const href  = p ? `/profile/${profileSlug(p.id, p.title)}/` : undefined;
+const name  = p ? profileName(p) : '';
+const headline = p ? profileHeadline(p) : '';
+const href  = p ? `/profile/${profileSlug(p)}/` : undefined;
 ---
 
 <article
@@ -35,11 +36,12 @@ const href  = p ? `/profile/${profileSlug(p.id, p.title)}/` : undefined;
       <div class="p-avatar avatar-inner text-[1rem]">
         {p && (p.image_url
           ? <img src={p.image_url} alt="" loading="lazy" width="56" height="56" class="w-full h-full object-cover" />
-          : initials(p.title))}
+          : initials(name))}
       </div>
     </div>
     <div class="min-w-0">
-      <h3 class="p-title font-semibold text-[1.05rem] leading-snug text-snow line-clamp-2 group-hover:text-acid transition-colors">{p?.title}</h3>
+      <h3 class="p-name font-semibold text-[1.1rem] leading-snug text-snow truncate group-hover:text-acid transition-colors">{name}</h3>
+      <p class:list={['p-title text-[0.85rem] text-fog leading-snug line-clamp-2 mt-0.5', p && !headline && 'hidden']}>{headline}</p>
       <span class="p-want chip chip-acid mt-2">{want && `${want.emoji} ${want.label}`}</span>
     </div>
   </div>
@@ -49,7 +51,6 @@ const href  = p ? `/profile/${profileSlug(p.id, p.title)}/` : undefined;
   <div class="p-tags flex flex-wrap gap-1.5 mt-4">
     {p?.is_remote === true && <span class="chip">🌍 Open to remote</span>}
     {loc && <span class="chip">📍 {loc}</span>}
-    {rate && <span class="chip chip-violet">{rate}</span>}
   </div>
 
   <div class="flex items-center justify-between mt-auto pt-5">
@@ -61,5 +62,5 @@ const href  = p ? `/profile/${profileSlug(p.id, p.title)}/` : undefined;
   </div>
 
   <!-- Full-card tap target -->
-  <a href={href} class="p-card-link absolute inset-0 z-0 rounded-[1.25rem]" aria-label={p ? `View ${p.title}` : undefined}></a>
+  <a href={href} class="p-card-link absolute inset-0 z-0 rounded-[1.25rem]" aria-label={p ? `View ${name}'s profile` : undefined}></a>
 </article>

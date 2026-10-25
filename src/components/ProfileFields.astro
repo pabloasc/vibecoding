@@ -13,10 +13,16 @@ import { LOOKING_FOR } from '../lib/profile';
   <p class="eyebrow">01 · The basics</p>
 
   <div class="space-y-2">
+    <label for="name" class="field-label">Your name <span class="text-pink">*</span></label>
+    <input type="text" id="name" name="name" required maxlength="60" autocomplete="name"
+      placeholder="Maya Chen" class="field !text-[1.05rem] font-medium" />
+  </div>
+
+  <div class="space-y-2">
     <label for="title" class="field-label">Headline <span class="text-pink">*</span></label>
-    <input type="text" id="title" name="title" required maxlength="90"
-      placeholder="Maya · AI-native frontend builder" class="field !text-[1.05rem] font-medium" />
-    <p class="field-hint">Your name + what you build. This is how you show up on the board.</p>
+    <input type="text" id="title" name="title" required maxlength="80"
+      placeholder="AI-native frontend builder" class="field" />
+    <p class="field-hint">What you build, in a few words. Shown under your name on the board.</p>
   </div>
 
   <div class="space-y-2">
@@ -66,36 +72,9 @@ import { LOOKING_FOR } from '../lib/profile';
     <input type="text" id="locations" name="locations" placeholder="Lisbon, Portugal" class="field" />
     <p class="field-hint">City and/or country. Separate several with commas.</p>
   </div>
-</fieldset>
-
-<!-- ── 03 · Optional extras ──────────────────────────────── -->
-<fieldset class="card p-5 sm:p-7 space-y-6">
-  <legend class="sr-only">Optional extras</legend>
-  <p class="eyebrow">03 · Optional extras</p>
 
   <div class="space-y-2">
-    <span class="field-label">Rate expectation</span>
-    <div class="grid grid-cols-2 gap-3">
-      <input type="number" id="salary-min" name="salary_min" placeholder="Min (e.g. 20)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Minimum rate" />
-      <input type="number" id="salary-max" name="salary_max" placeholder="Max (e.g. 40)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Maximum rate" />
-      <select id="salary-currency" name="salary_currency" class="field font-mono !text-[0.9rem]" aria-label="Currency">
-        <option value="USD">USD</option>
-        <option value="EUR">EUR</option>
-        <option value="GBP">GBP</option>
-        <option value="CAD">CAD</option>
-        <option value="AUD">AUD</option>
-      </select>
-      <select id="salary-period" name="salary_period" class="field font-mono !text-[0.9rem]" aria-label="Rate period">
-        <option value="HOUR">Per hour</option>
-        <option value="MONTH">Per month</option>
-        <option value="YEAR">Per year</option>
-      </select>
-    </div>
-    <p class="field-hint">Skip it if you're after mentorship or just want the experience.</p>
-  </div>
-
-  <div class="space-y-2">
-    <label for="valid-through" class="field-label">Open to offers until</label>
+    <label for="valid-through" class="field-label">Open to offers until <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></label>
     <input type="date" id="valid-through" name="valid_through" class="field font-mono !text-[0.9rem]" />
   </div>
 </fieldset>

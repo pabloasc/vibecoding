@@ -160,11 +160,6 @@
     background: rgba(198, 255, 61, 0.08);
     border-color: rgba(198, 255, 61, 0.25);
   }
-  .chip-violet {
-    color: #C7B5FF;
-    background: rgba(157, 123, 255, 0.1);
-    border-color: rgba(157, 123, 255, 0.3);
-  }
   .chip-new {
     color: var(--color-void);
     background: var(--color-acid);

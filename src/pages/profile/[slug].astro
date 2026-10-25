@@ -5,7 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { profileSlug } from '../../lib/slug';
-import { type Profile, lookingFor, formatRate, displayName, initials, formatDate } from '../../lib/profile';
+import { type Profile, lookingFor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
 import { createClient } from '@supabase/supabase-js';
 
 // Extract the 8-char ID prefix appended to every slug
@@ -33,15 +33,15 @@ try {
 if (!profile) return Astro.redirect('/');
 
 // 301-redirect non-canonical slugs (e.g. headline changed since the link was shared)
-const canonicalSlug = profileSlug(profile.id, profile.title);
+const canonicalSlug = profileSlug(profile);
 if (slug !== canonicalSlug) {
   return Astro.redirect(`/profile/${canonicalSlug}/`, 301);
 }
 
 const canonicalUrl = `https://vibecoding.work/profile/${canonicalSlug}/`;
-const name = displayName(profile.title);
+const name = profileName(profile);
+const headline = profileHeadline(profile);
 const want = lookingFor(profile.employment_type);
-const rate = formatRate(profile);
 const locations = (profile.locations ?? []).filter(l => profile.is_remote !== true || l !== 'Worldwide');
 const openUntil = profile.valid_through ? formatDate(profile.valid_through) : null;
 
@@ -55,7 +55,7 @@ const schemaProfilePage = {
     '@type': 'Person',
     name,
     description: profile.description,
-    disambiguatingDescription: profile.title,
+    ...(headline ? { jobTitle: headline } : {}),
     url: profile.link,
     sameAs: [profile.link],
     ...(profile.image_url ? { image: profile.image_url } : {}),
@@ -65,7 +65,7 @@ const schemaProfilePage = {
 ---
 
 <Layout
-  title={`${profile.title} — vibecoding.work`}
+  title={headline ? `${name} — ${headline} · vibecoding.work` : `${name} · vibecoding.work`}
   description={profile.description.substring(0, 160)}
   ogImage={profile.image_url ?? '/og.svg'}
   type="profile"
@@ -83,34 +83,35 @@ const schemaProfilePage = {
 
     <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-8">
 
-      <!-- Back + admin -->
+      <!-- Back + owner/admin actions -->
       <div class="flex items-center justify-between gap-4 mb-10">
         <a href="/#builders" class="text-fog hover:text-snow transition-colors text-[0.9rem]">← All builders</a>
-        <div id="admin-bar" class="hidden items-center gap-3 font-mono text-[0.72rem]">
-          <span class="text-fog">admin</span>
-          <a href={`/edit?id=${profile.id}`} class="text-acid hover:underline">Edit</a>
-          <button id="delete-btn" data-profile-id={profile.id} class="text-pink hover:underline">Delete</button>
+        <div id="owner-bar" data-owner-id={profile.user_id ?? ''}
+             class="hidden items-center gap-3 rounded-full border border-line bg-surface/80 pl-4 pr-1.5 py-1.5 font-mono text-[0.72rem]">
+          <span id="owner-label" class="text-fog">your profile</span>
+          <button id="delete-btn" data-profile-id={profile.id} class="text-pink hover:underline px-1">Delete</button>
+          <a href={`/edit?id=${profile.id}`} class="btn-primary !py-1.5 !px-3.5 !text-[0.78rem]">Edit profile</a>
         </div>
       </div>
 
       <!-- Profile header -->
       <section class="fade-in flex flex-col sm:flex-row gap-6 sm:gap-8 sm:items-center">
         <div class="avatar-ring w-24 h-24 sm:w-32 sm:h-32 !rounded-[1.6rem] shrink-0">
-          <div id="avatar" class="avatar-inner !rounded-[calc(1.6rem-2px)] text-[2rem] sm:text-[2.5rem]" data-initials={initials(profile.title)}>
+          <div id="avatar" class="avatar-inner !rounded-[calc(1.6rem-2px)] text-[2rem] sm:text-[2.5rem]" data-initials={initials(name)}>
             {profile.image_url
               ? <img src={profile.image_url} alt={name} class="w-full h-full object-cover" />
-              : initials(profile.title)}
+              : initials(name)}
           </div>
         </div>
 
         <div class="min-w-0">
           <span class="eyebrow">// builder profile</span>
-          <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2rem,5vw,3.2rem)] mt-2">{profile.title}</h1>
+          <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-2">{name}</h1>
+          {headline && <p class="text-[1.15rem] sm:text-[1.35rem] text-fog leading-snug mt-2">{headline}</p>}
           <div class="flex flex-wrap gap-2 mt-4">
             <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} Looking for: {want.label}</span>
             {profile.is_remote === true && <span class="chip !text-[0.75rem] !py-1.5 !px-3">🌍 Open to remote</span>}
             {locations.map(loc => <span class="chip !text-[0.75rem] !py-1.5 !px-3">📍 {loc}</span>)}
-            {rate && <span class="chip chip-violet !text-[0.75rem] !py-1.5 !px-3">{rate}</span>}
           </div>
         </div>
       </section>
@@ -176,7 +177,8 @@ const schemaProfilePage = {
 </Layout>
 
 <script>
-  import { supabase, ADMIN_EMAIL } from '../../lib/supabase';
+  import { supabase } from '../../lib/supabase';
+  import { canEdit } from '../../lib/profile';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -199,17 +201,19 @@ const schemaProfilePage = {
     setTimeout(() => { shareBtn.textContent = 'Copy link'; }, 1800);
   });
 
-  // ── Admin check ───────────────────────────────────────────────
-  async function checkAdmin() {
+  // ── Owner / admin check ───────────────────────────────────────
+  async function checkOwner() {
+    const bar = document.getElementById('owner-bar')!;
+    const ownerId = bar.dataset.ownerId || null;
     const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user?.email === ADMIN_EMAIL) {
-      const bar = document.getElementById('admin-bar')!;
-      bar.classList.remove('hidden');
-      bar.classList.add('flex');
-    }
+    const user = session?.user;
+    if (!user || !canEdit(user, { user_id: ownerId })) return;
+    if (ownerId !== user.id) document.getElementById('owner-label')!.textContent = 'admin';
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
   }
 
-  checkAdmin();
+  checkOwner();
 
   // ── Delete profile ────────────────────────────────────────────
   document.getElementById('delete-btn')?.addEventListener('click', async () => {
@@ -230,12 +234,14 @@ const schemaProfilePage = {
         headers: {
           apikey: SUPABASE_KEY,
           Authorization: `Bearer ${token}`,
-          Prefer: 'return=minimal',
+          Prefer: 'return=representation',
         },
       }
     );
 
-    if (res.ok) {
+    // RLS filters out rows you can't delete, so a blocked delete comes back as an empty list
+    const deleted = res.ok ? await res.json().catch(() => []) : [];
+    if (deleted.length) {
       window.location.href = '/';
     } else {
       alert('Failed to delete profile.');

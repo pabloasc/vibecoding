@@ -5,12 +5,12 @@ export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-  let profiles: { id: string; title: string; created_at: string }[] = [];
+  let profiles: { id: string; name: string | null; title: string; created_at: string }[] = [];
 
   if (url && key) {
     try {
       const res = await fetch(
-        `${url}/rest/v1/jobs?select=id,title,created_at&order=created_at.desc`,
+        `${url}/rest/v1/jobs?select=id,name,title,created_at&order=created_at.desc`,
         { headers: { apikey: key, Authorization: `Bearer ${key}` } }
       );
       if (res.ok) profiles = await res.json();
@@ -20,7 +20,7 @@ export const GET: APIRoute = async () => {
   const today = new Date().toISOString().split('T')[0];
 
   const profileUrls = profiles.map(p => {
-    const slug = profileSlug(p.id, p.title);
+    const slug = profileSlug(p);
     const date = p.created_at.split('T')[0];
     return `  <url>
     <loc>https://vibecoding.work/profile/${slug}/</loc>
