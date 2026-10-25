@@ -4,8 +4,9 @@ export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import ProjectList from '../../components/ProjectList.astro';
 import { profileSlug } from '../../lib/slug';
-import { type Profile, lookingFor, isMentor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
+import { type Profile, type Project, PROJECTS_SELECT, lookingFor, isMentor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
 import { createClient } from '@supabase/supabase-js';
 
 // Extract the 8-char ID prefix appended to every slug
@@ -37,6 +38,18 @@ const canonicalSlug = profileSlug(profile);
 if (slug !== canonicalSlug) {
   return Astro.redirect(`/profile/${canonicalSlug}/`, 301);
 }
+
+// Projects with their upvoters (empty if projects.sql hasn't been run yet)
+let projects: Project[] = [];
+try {
+  const db = createClient(supabaseUrl, supabaseKey);
+  const { data, error } = await db
+    .from('projects')
+    .select(PROJECTS_SELECT)
+    .eq('profile_id', profile.id)
+    .order('position');
+  if (!error && data) projects = data as unknown as Project[];
+} catch { /* no projects */ }
 
 const canonicalUrl = `https://vibecoding.work/profile/${canonicalSlug}/`;
 const name = profileName(profile);
@@ -118,6 +131,7 @@ const schemaProfilePage = {
 
       <div class="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6 mt-12 items-start">
 
+        <div class="space-y-6 min-w-0">
         <!-- About -->
         <article class="card p-6 sm:p-9">
           <p class="eyebrow mb-5">// about {name.toLowerCase()}</p>
@@ -130,6 +144,9 @@ const schemaProfilePage = {
             <button id="share-btn" class="btn-ghost">Copy link</button>
           </div>
         </article>
+
+        <ProjectList projects={projects} ownerId={profile.user_id} />
+        </div>
 
         <!-- Mentor sidebar -->
         <aside class="lg:sticky lg:top-24 space-y-4">

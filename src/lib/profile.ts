@@ -31,6 +31,29 @@ export type Profile = {
   created_at: string;
 };
 
+/** A project showcased on a profile — see projects.sql */
+export type Project = {
+  id: string;
+  profile_id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  link: string | null;
+  position: number;
+  created_at: string;
+  project_upvotes?: ProjectUpvote[];
+};
+
+/** One upvote, with the voter's profile embedded (for the "upvoted by" list) */
+export type ProjectUpvote = {
+  user_id: string;
+  voter: Pick<Profile, 'id' | 'name' | 'title'> | null;
+};
+
+/** PostgREST select for a profile's projects, including who upvoted each one */
+export const PROJECTS_SELECT =
+  '*,project_upvotes(user_id,voter:jobs!project_upvotes_voter_profile_id_fkey(id,name,title))';
+
 /** Owners can edit their own profile; the admin can edit any. Mirrors the RLS policies in schema.sql. */
 export function canEdit(user: { id: string; email?: string } | null | undefined, p: Pick<Profile, 'user_id'>) {
   if (!user) return false;

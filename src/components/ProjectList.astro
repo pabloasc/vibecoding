@@ -1,0 +1,214 @@
+---
+/**
+ * Projects on a profile page, with upvotes.
+ * Hovering (or focusing) the upvote button shows who upvoted.
+ */
+import { profileSlug } from '../lib/slug';
+import { type Project, profileName, initials } from '../lib/profile';
+
+export interface Props {
+  projects: Project[];
+  /** user_id of the profile owner — they can't upvote their own projects */
+  ownerId: string | null;
+}
+
+const { projects, ownerId } = Astro.props;
+
+function hostname(url: string) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+---
+
+{projects.length > 0 && (
+  <section id="projects" class="card p-6 sm:p-9" data-owner-id={ownerId ?? ''}>
+    <p class="eyebrow mb-6">// projects · {projects.length}</p>
+
+    <ul class="space-y-3">
+      {projects.map(project => {
+        const votes = (project.project_upvotes ?? []).filter(v => v.voter);
+        return (
+          <li class="flex gap-4 rounded-2xl border border-line bg-raised/40 p-4 sm:p-5">
+            <div class="w-14 h-14 shrink-0 rounded-xl border border-line bg-raised overflow-hidden flex items-center justify-center font-mono font-bold text-[1.1rem]">
+              {project.image_url
+                ? <img src={project.image_url} alt="" loading="lazy" width="56" height="56" class="w-full h-full object-cover" />
+                : project.title.trim()[0]?.toUpperCase()}
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold text-[1.02rem] leading-snug">
+                {project.link
+                  ? <a href={project.link} target="_blank" rel="noopener noreferrer" class="hover:text-acid transition-colors">{project.title} <span class="text-fog">↗</span></a>
+                  : project.title}
+              </h3>
+              {project.description && (
+                <p class="text-[0.9rem] text-fog leading-relaxed mt-1 whitespace-pre-wrap break-words">{project.description}</p>
+              )}
+              {project.link && (
+                <p class="font-mono text-[0.7rem] text-[#5A5A6E] mt-2 truncate">{hostname(project.link)}</p>
+              )}
+            </div>
+
+            <!-- Upvote + who upvoted -->
+            <div class="upvote group/upvote relative shrink-0 self-start" data-project-id={project.id}>
+              <button type="button"
+                class="upvote-btn flex flex-col items-center justify-center gap-0.5 w-14 h-16 rounded-xl border border-line bg-raised text-snow
+                       hover:border-acid/60 aria-pressed:border-acid aria-pressed:bg-acid/10 aria-pressed:text-acid
+                       disabled:cursor-default disabled:hover:border-line transition-colors"
+                aria-pressed="false" aria-label={`Upvote ${project.title}`}>
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 2 11 9H1z" /></svg>
+                <span class="upvote-count font-mono text-[0.85rem] font-semibold leading-none">{votes.length}</span>
+              </button>
+
+              <div class="hidden group-hover/upvote:block group-focus-within/upvote:block absolute right-0 top-full z-30 pt-2 w-64">
+                <div class="rounded-xl border border-line bg-surface shadow-2xl p-3">
+                  <p class="font-mono text-[0.62rem] tracking-[0.14em] uppercase text-fog mb-2 px-1.5">Upvoted by</p>
+                  <ul class="upvote-voters space-y-0.5 max-h-56 overflow-y-auto">
+                    {votes.map(v => (
+                      <li data-user-id={v.user_id}>
+                        <a href={`/profile/${profileSlug(v.voter!)}/`} class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 hover:bg-raised transition-colors">
+                          <span class="w-6 h-6 shrink-0 rounded-md bg-raised border border-line flex items-center justify-center font-mono text-[0.6rem] font-bold">{initials(profileName(v.voter!))}</span>
+                          <span class="text-[0.85rem] truncate">{profileName(v.voter!)}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <p class:list={['upvote-empty text-[0.85rem] text-fog px-1.5 py-1', votes.length > 0 && 'hidden']}>No upvotes yet — be the first.</p>
+                </div>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+)}
+
+<!-- Toast for upvote prompts / errors -->
+<div id="upvote-toast" role="status"
+  class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 items-center gap-3 rounded-full border border-line bg-surface/95 backdrop-blur px-5 py-3 shadow-2xl text-[0.9rem]">
+  <span id="upvote-toast-text"></span>
+  <a id="upvote-toast-link" href="/submit" class="hidden text-acid font-medium hover:underline whitespace-nowrap"></a>
+</div>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { profileSlug } from '../lib/slug';
+  import { profileName, initials, type Profile } from '../lib/profile';
+  import { fetchOwnProfile } from '../lib/profileForm';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  const root = document.getElementById('projects');
+
+  // ── Toast ─────────────────────────────────────────────────────
+  const toastEl     = document.getElementById('upvote-toast')!;
+  const toastText   = document.getElementById('upvote-toast-text')!;
+  const toastLink   = document.getElementById('upvote-toast-link') as HTMLAnchorElement;
+  let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function toast(message: string, link?: { label: string; href: string }) {
+    toastText.textContent = message;
+    toastLink.classList.toggle('hidden', !link);
+    if (link) { toastLink.textContent = link.label; toastLink.href = link.href; }
+    toastEl.classList.remove('hidden');
+    toastEl.classList.add('flex');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.classList.add('hidden');
+      toastEl.classList.remove('flex');
+    }, 4000);
+  }
+
+  // ── Voter list items ──────────────────────────────────────────
+  function voterItem(userId: string, voter: Profile) {
+    const li = document.createElement('li');
+    li.dataset.userId = userId;
+    const a = document.createElement('a');
+    a.href = `/profile/${profileSlug(voter)}/`;
+    a.className = 'flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 hover:bg-raised transition-colors';
+    const badge = document.createElement('span');
+    badge.className = 'w-6 h-6 shrink-0 rounded-md bg-raised border border-line flex items-center justify-center font-mono text-[0.6rem] font-bold';
+    badge.textContent = initials(profileName(voter));
+    const name = document.createElement('span');
+    name.className = 'text-[0.85rem] truncate';
+    name.textContent = profileName(voter);
+    a.append(badge, name);
+    li.appendChild(a);
+    return li;
+  }
+
+  // ── Upvoting ──────────────────────────────────────────────────
+  async function initUpvotes(root: HTMLElement) {
+    const ownerId = root.dataset.ownerId || null;
+    const { data: { session } } = await supabase.auth.getSession();
+    const user  = session?.user ?? null;
+    const token = session?.access_token ?? null;
+    const me    = user ? await fetchOwnProfile(user.id, SUPABASE_URL, SUPABASE_KEY) : null;
+
+    root.querySelectorAll<HTMLElement>('.upvote').forEach(wrap => {
+      const projectId = wrap.dataset.projectId!;
+      const btn     = wrap.querySelector<HTMLButtonElement>('.upvote-btn')!;
+      const countEl = wrap.querySelector<HTMLElement>('.upvote-count')!;
+      const list    = wrap.querySelector<HTMLElement>('.upvote-voters')!;
+      const empty   = wrap.querySelector<HTMLElement>('.upvote-empty')!;
+
+      const myItem = () => user ? list.querySelector<HTMLElement>(`[data-user-id="${CSS.escape(user.id)}"]`) : null;
+      let voted = !!myItem();
+
+      function render() {
+        btn.setAttribute('aria-pressed', String(voted));
+        const n = list.children.length;
+        countEl.textContent = String(n);
+        empty.classList.toggle('hidden', n > 0);
+      }
+      render();
+
+      if (user && ownerId === user.id) {
+        btn.disabled = true;
+        btn.title = "You can't upvote your own project";
+        return;
+      }
+
+      let busy = false;
+      btn.addEventListener('click', async () => {
+        if (!user || !token) { toast('Sign in to upvote projects.', { label: 'Sign in →', href: '/submit' }); return; }
+        if (!me) { toast('Create your profile to upvote projects.', { label: 'Drop your profile →', href: '/submit' }); return; }
+        if (busy) return;
+        busy = true;
+
+        // Optimistic update, rolled back if the request fails
+        const wasVoted = voted;
+        voted = !wasVoted;
+        if (voted) list.prepend(voterItem(user.id, me));
+        else myItem()?.remove();
+        render();
+
+        const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+        try {
+          const res = voted
+            ? await fetch(`${SUPABASE_URL}/rest/v1/project_upvotes`, {
+                method: 'POST', headers, body: JSON.stringify({ project_id: projectId }),
+              })
+            : await fetch(`${SUPABASE_URL}/rest/v1/project_upvotes?project_id=eq.${encodeURIComponent(projectId)}&user_id=eq.${encodeURIComponent(user.id)}`, {
+                method: 'DELETE', headers,
+              });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err?.message || 'Upvote failed.');
+          }
+        } catch (err: unknown) {
+          voted = wasVoted;
+          if (voted) list.prepend(voterItem(user.id, me));
+          else myItem()?.remove();
+          render();
+          toast(err instanceof Error ? err.message : 'Upvote failed.');
+        } finally {
+          busy = false;
+        }
+      });
+    });
+  }
+
+  if (root) initUpvotes(root);
+</script>

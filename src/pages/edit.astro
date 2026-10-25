@@ -120,7 +120,10 @@ import ProfileFields from '../components/ProfileFields.astro';
   import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
   import { initials, canEdit, profileName, type Profile } from '../lib/profile';
-  import { readProfileFields, validateProfileFields, fillProfileFields, uploadAvatar } from '../lib/profileForm';
+  import {
+    readProfileFields, validateProfileFields, fillProfileFields, uploadAvatar,
+    initProjectEditor, readProjects, validateProjects, saveProjects, fetchProjects,
+  } from '../lib/profileForm';
 
   const SUPABASE_URL      = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -190,6 +193,8 @@ import ProfileFields from '../components/ProfileFields.astro';
     document.getElementById('edit-eyebrow')!.textContent =
       rows[0].user_id === user.id ? '// your profile' : '// admin';
 
+    const projects = await fetchProjects(rows[0].id, SUPABASE_URL, SUPABASE_ANON_KEY);
+    initProjectEditor(projects);
     populateForm(rows[0]);
   }
 
@@ -274,7 +279,8 @@ import ProfileFields from '../components/ProfileFields.astro';
     errorBannerEl.classList.add('hidden');
 
     const values = readProfileFields();
-    const invalid = validateProfileFields(values);
+    const projects = readProjects();
+    const invalid = validateProfileFields(values) ?? validateProjects(projects);
     if (invalid) { showError(invalid); return; }
 
     saveBtn.disabled = true;
@@ -312,6 +318,8 @@ import ProfileFields from '../components/ProfileFields.astro';
       // RLS filters out rows you can't edit, so a blocked update comes back as an empty list
       const updated = await patchRes.json().catch(() => []);
       if (!updated.length) throw new Error("You don't have permission to edit this profile.");
+
+      await saveProjects(profileId!, projects, SUPABASE_URL, SUPABASE_ANON_KEY, sessionToken);
 
       (document.getElementById('success-back-link') as HTMLAnchorElement).href =
         `/profile/${profileSlug({ id: profileId!, name: values.name, title: values.title })}/`;

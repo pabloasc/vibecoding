@@ -74,6 +74,42 @@ import { LOOKING_FOR } from '../lib/profile';
   </div>
 </fieldset>
 
+<!-- ── 03 · Projects ─────────────────────────────────────── -->
+<fieldset class="card p-5 sm:p-7 space-y-5">
+  <legend class="sr-only">Projects</legend>
+  <div>
+    <p class="eyebrow">03 · Projects</p>
+    <p class="field-hint mt-2">Show what you've shipped — apps, sites, experiments. Add one or as many as you like; other builders can upvote them.</p>
+  </div>
+
+  <div id="projects-list" class="space-y-4"></div>
+
+  <button type="button" id="add-project"
+    class="w-full rounded-xl border border-dashed border-line hover:border-acid/60 hover:text-acid text-fog py-3.5 text-[0.9rem] transition-colors">
+    + Add a project
+  </button>
+</fieldset>
+
+<!-- One project editor — cloned by src/lib/profileForm.ts -->
+<template id="tpl-project">
+  <div class="project-item rounded-2xl border border-line bg-raised/40 p-4 sm:p-5 space-y-3">
+    <div class="flex items-start gap-3 sm:gap-4">
+      <label class="relative w-16 h-16 shrink-0 rounded-xl border border-dashed border-line hover:border-acid/60 bg-raised flex items-center justify-center cursor-pointer overflow-hidden transition-colors"
+             title="Upload a logo">
+        <input type="file" accept="image/jpeg,image/png,image/webp" class="project-file absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Project logo" />
+        <span class="project-logo pointer-events-none w-full h-full flex items-center justify-center font-mono text-[0.62rem] text-fog text-center leading-tight">+ logo</span>
+      </label>
+      <div class="flex-1 min-w-0 space-y-3">
+        <input type="text" class="project-title field font-medium" maxlength="80" placeholder="Project name" aria-label="Project name" />
+        <input type="url" class="project-link field font-mono !text-[0.85rem]" placeholder="https://myproject.app" aria-label="Project link" />
+      </div>
+      <button type="button" class="project-remove w-8 h-8 shrink-0 rounded-full text-fog hover:text-pink hover:bg-pink/10 transition-colors" aria-label="Remove project">✕</button>
+    </div>
+    <textarea class="project-description field leading-relaxed resize-y min-h-[4.5rem]" rows="2" maxlength="500"
+      placeholder="What does it do? What did you build it with?" aria-label="Project description"></textarea>
+  </div>
+</template>
+
 <style is:global>
   .toggle {
     appearance: none;

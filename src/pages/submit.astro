@@ -122,6 +122,7 @@ const webPage = JSON.stringify({
         <p class="relative text-[3rem]">🚀</p>
         <p class="relative font-bold text-[2rem] tracking-tight mt-2">You're live!</p>
         <p class="relative text-fog mt-2 max-w-sm mx-auto">Your profile is on the board. Share it around — the more eyes, the faster that first gig shows up.</p>
+        <p id="success-warning" class="hidden relative banner-error mt-5 max-w-md mx-auto"></p>
         <div class="relative flex flex-wrap justify-center gap-3 mt-8">
           <a id="success-profile-link" href="/" class="btn-primary">See your profile →</a>
           <a id="success-edit-link" href="/" class="btn-ghost">Edit it anytime</a>
@@ -201,7 +202,10 @@ const webPage = JSON.stringify({
   import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
   import { ADMIN_EMAIL, profileName, type Profile } from '../lib/profile';
-  import { readProfileFields, validateProfileFields, uploadAvatar, fillCard, fetchOwnProfile } from '../lib/profileForm';
+  import {
+    readProfileFields, validateProfileFields, uploadAvatar, fillCard, fetchOwnProfile,
+    initProjectEditor, readProjects, validateProjects, saveProjects,
+  } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -410,6 +414,7 @@ const webPage = JSON.stringify({
     if (mentorOption) mentorOption.checked = true;
   }
   updatePreview();
+  initProjectEditor();
 
   // ── Form submission ───────────────────────────────────────
   const submitBtn    = document.getElementById('submit-btn') as HTMLButtonElement;
@@ -427,7 +432,8 @@ const webPage = JSON.stringify({
     errorBanner.classList.add('hidden');
 
     const values = readProfileFields();
-    const invalid = validateProfileFields(values);
+    const projects = readProjects();
+    const invalid = validateProfileFields(values) ?? validateProjects(projects);
     if (invalid) { showError(invalid); return; }
 
     const imageFile = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
@@ -460,6 +466,15 @@ const webPage = JSON.stringify({
         (document.getElementById('success-profile-link') as HTMLAnchorElement).href =
           `/profile/${profileSlug(created)}/`;
         (document.getElementById('success-edit-link') as HTMLAnchorElement).href = `/edit?id=${created.id}`;
+
+        // The profile is already live at this point, so a project failure shouldn't send them back to the form
+        try {
+          await saveProjects(created.id, projects, SUPABASE_URL, SUPABASE_ANON_KEY, currentToken);
+        } catch (err: unknown) {
+          const warning = document.getElementById('success-warning')!;
+          warning.textContent = `Your projects couldn't be saved (${err instanceof Error ? err.message : 'unknown error'}). Add them from "Edit it anytime".`;
+          warning.classList.remove('hidden');
+        }
       }
 
       formWrapEl.classList.add('hidden');
