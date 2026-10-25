@@ -14,8 +14,8 @@ export interface Props {
 }
 
 const {
-  title = 'vibecoding.work — AI Developer Jobs & Remote Opportunities',
-  description = 'The job board for vibecoders. Find the best remote AI developer jobs and opportunities for AI-assisted engineers who build fast and ship faster.',
+  title = 'vibecoding.work — Where junior devs & vibecoders land their first gig',
+  description = 'Junior developers and vibecoders post their profile. Mentors, founders and teams find them. Get mentorship and land your first professional assignment.',
   ogImage = '/og.svg',
   noindex = false,
   type = 'website',
@@ -31,7 +31,7 @@ const schemaWebsite = {
   '@type': 'WebSite',
   name: 'vibecoding.work',
   url: siteURL.href,
-  description: 'The job board for AI-native builders and vibecoders.',
+  description: 'Profiles of junior developers and vibecoders looking for mentors and their first professional gig.',
   potentialAction: {
     '@type': 'SearchAction',
     target: {
@@ -49,7 +49,7 @@ const schemaOrg = {
   name: 'vibecoding.work',
   url: siteURL.href,
   logo: new URL('/images/logo.png', siteURL).href,
-  description: 'The job board for AI-native builders and vibecoders.',
+  description: 'The launchpad for junior developers and vibecoders.',
   sameAs: [
     'https://vibecoding.work',
   ],
@@ -80,7 +80,7 @@ const schemaOrg = {
     <meta property="og:image"       content={ogImageAbs} />
     <meta property="og:image:width"  content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"   content="vibecoding.work — AI Developer Jobs" />
+    <meta property="og:image:alt"   content="vibecoding.work — the launchpad for junior devs and vibecoders" />
     <meta property="og:site_name"   content="vibecoding.work" />
     <meta property="og:locale"      content="en_US" />
 
@@ -93,11 +93,11 @@ const schemaOrg = {
     <!-- ── Icons ─────────────────────────────────────────────── -->
     <link rel="icon"             type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
-    <meta name="theme-color" content="#1A1A1A" />
+    <meta name="theme-color" content="#08080C" />
 
     <!-- ── Sitemap discovery ─────────────────────────────────── -->
     <link rel="sitemap" href="/sitemap.xml" />
-    <link rel="alternate" type="text/plain" title="LLMs.txt — plain-text job listing" href="/llms.txt" />
+    <link rel="alternate" type="text/plain" title="LLMs.txt — plain-text builder directory" href="/llms.txt" />
 
     <!-- ── Fonts ─────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -120,7 +120,7 @@ const schemaOrg = {
     <!-- ── Vercel Web Analytics ──────────────────────────────── -->
     <Analytics />
   </head>
-  <body class="bg-white text-[#1A1A1A] min-h-screen">
+  <body class="bg-void text-snow min-h-screen overflow-x-hidden">
     <slot />
   </body>
 </html>

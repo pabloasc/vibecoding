@@ -11,11 +11,4 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export interface Job {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string | null;
-  link: string;
-  created_at: string;
-}
+export const ADMIN_EMAIL = 'hi@vibecoders.co';

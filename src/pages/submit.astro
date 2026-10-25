@@ -2,391 +2,182 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import ProfileFields from '../components/ProfileFields.astro';
 
 const webPage = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'Post an AI Developer Job — vibecoding.work',
+  name: 'Drop your profile — vibecoding.work',
   url: 'https://vibecoding.work/submit',
   breadcrumb: {
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home',               item: 'https://vibecoding.work/'       },
-      { '@type': 'ListItem', position: 2, name: 'Submit a Position',  item: 'https://vibecoding.work/submit' },
+      { '@type': 'ListItem', position: 1, name: 'Home',              item: 'https://vibecoding.work/'       },
+      { '@type': 'ListItem', position: 2, name: 'Drop your profile', item: 'https://vibecoding.work/submit' },
     ],
   },
 });
 ---
 
 <Layout
-  title="Post an AI Developer Job — vibecoding.work"
-  description="Post a remote job opening on vibecoding.work. Reach the best vibecoders and AI-native software engineers who build fast and ship faster."
+  title="Drop your profile — vibecoding.work"
+  description="Junior developer or vibecoder? Post your profile in two minutes and get discovered by mentors, founders and teams offering first professional gigs."
 >
   <script slot="head" type="application/ld+json" set:html={webPage} />
   <Header />
 
-  <main class="px-5 md:px-12 py-12 max-w-2xl">
+  <main class="relative">
+    <div class="absolute inset-x-0 top-0 h-[420px] grid-bg pointer-events-none"></div>
+    <div class="orb w-[420px] h-[420px] bg-violet -top-48 right-0 !opacity-30"></div>
 
-    <!-- Section header -->
-    <div class="border-b-2 border-[#1A1A1A] pb-5 mb-10">
-      <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Contribute</p>
-      <h2 class="font-serif text-[2rem] md:text-[2.5rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">Submit a Position</h2>
-    </div>
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-14 sm:pt-20">
 
-    <!-- Auth checking state -->
-    <div id="auth-checking" class="py-12 text-center">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">Checking session…</p>
-    </div>
+      <!-- Page header -->
+      <div class="max-w-2xl mb-10 fade-in">
+        <span class="eyebrow">// join the launchpad</span>
+        <h1 class="font-bold tracking-[-0.035em] leading-[1] text-[clamp(2.4rem,6vw,3.8rem)] mt-3">
+          Drop your <span class="gradient-text">profile.</span>
+        </h1>
+        <p class="text-fog text-[1.08rem] leading-relaxed mt-4">
+          Two minutes. No CV. Just what you've built and what you're looking for — mentors and teams take it from there.
+        </p>
+      </div>
 
-    <!-- Auth wall -->
-    <div id="auth-wall" class="hidden">
-      <div class="border border-[#D0CEC8] bg-[#F2F0EC] mb-10">
+      <!-- Auth checking state -->
+      <div id="auth-checking" class="py-16 text-center">
+        <p class="font-mono text-[0.8rem] text-fog"><span class="caret inline-block w-2 h-3.5 bg-acid align-middle mr-2"></span>Checking session…</p>
+      </div>
 
-        <!-- Tabs -->
-        <div class="flex border-b border-[#D0CEC8]">
-          <button id="tab-signin"
-            class="flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5
-                   border-b-2 border-[#1A1A1A] text-[#1A1A1A] transition-colors duration-150">
-            Sign in
-          </button>
-          <button id="tab-signup"
-            class="flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5
-                   border-b-2 border-transparent text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
-            Sign up
-          </button>
-        </div>
-
-        <div class="p-8">
-
-          <!-- Auth error -->
-          <div id="auth-error" class="hidden bg-[#CC0000] text-white px-5 py-3 mb-4">
-            <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="auth-error-msg">An error occurred.</p>
+      <!-- Auth wall -->
+      <div id="auth-wall" class="hidden">
+      <div class="grid lg:grid-cols-[1fr_1fr] gap-6 items-start">
+        <div class="card p-6 sm:p-8">
+          <div class="seg mb-6" role="tablist">
+            <button id="tab-signup" class="seg-btn" role="tab" aria-selected="true">Create account</button>
+            <button id="tab-signin" class="seg-btn" role="tab" aria-selected="false">Sign in</button>
           </div>
 
-          <!-- Sign-up success -->
-          <div id="signup-success" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-6 mb-4">
-            <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#CC0000] mb-2">Almost there</p>
-            <p class="font-serif text-[1.2rem] font-black leading-tight">Check your email.</p>
-            <p class="font-sans text-sm text-[#888] mt-2">Click the confirmation link to activate your account, then sign in.</p>
+          <div id="auth-error" class="hidden banner-error mb-4">
+            <p id="auth-error-msg">An error occurred.</p>
           </div>
+
+          <div id="signup-success" class="hidden rounded-xl border border-acid/30 bg-acid/5 p-5 mb-4">
+            <p class="eyebrow mb-2">Almost there</p>
+            <p class="font-semibold text-[1.2rem]">Check your inbox 📬</p>
+            <p class="text-fog text-[0.9rem] mt-1">Click the confirmation link to activate your account, then sign in.</p>
+          </div>
+
+          <!-- Sign up form -->
+          <form id="signup-form" class="space-y-3">
+            <input type="email" id="signup-email" required placeholder="you@email.com" autocomplete="email" class="field" aria-label="Email" />
+            <input type="password" id="signup-password" required placeholder="Password" autocomplete="new-password" class="field" aria-label="Password" />
+            <input type="password" id="signup-confirm" required placeholder="Confirm password" autocomplete="new-password" class="field" aria-label="Confirm password" />
+            <button type="submit" id="signup-btn" class="btn-primary w-full !mt-5">Create account →</button>
+          </form>
 
           <!-- Sign in form -->
-          <form id="login-form" class="space-y-3">
-            <input
-              type="email"
-              id="login-email"
-              required
-              placeholder="Email"
-              autocomplete="email"
-              class="w-full border border-[#ccc] bg-white px-4 py-3
-                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                     focus:outline-none focus:border-[#1A1A1A]
-                     transition-colors duration-200"
-            />
-            <input
-              type="password"
-              id="login-password"
-              required
-              placeholder="Password"
-              autocomplete="current-password"
-              class="w-full border border-[#ccc] bg-white px-4 py-3
-                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                     focus:outline-none focus:border-[#1A1A1A]
-                     transition-colors duration-200"
-            />
-            <button
-              type="submit"
-              id="login-btn"
-              class="font-mono text-[11px] tracking-[0.25em] uppercase
-                     bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3 w-full
-                     hover:bg-[#CC0000] transition-colors duration-200
-                     disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Sign in →
-            </button>
+          <form id="login-form" class="hidden space-y-3">
+            <input type="email" id="login-email" required placeholder="you@email.com" autocomplete="email" class="field" aria-label="Email" />
+            <input type="password" id="login-password" required placeholder="Password" autocomplete="current-password" class="field" aria-label="Password" />
+            <button type="submit" id="login-btn" class="btn-primary w-full !mt-5">Sign in →</button>
           </form>
-
-          <!-- Sign up form (hidden by default) -->
-          <form id="signup-form" class="hidden space-y-3">
-            <input
-              type="email"
-              id="signup-email"
-              required
-              placeholder="Email"
-              autocomplete="email"
-              class="w-full border border-[#ccc] bg-white px-4 py-3
-                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                     focus:outline-none focus:border-[#1A1A1A]
-                     transition-colors duration-200"
-            />
-            <input
-              type="password"
-              id="signup-password"
-              required
-              placeholder="Password"
-              autocomplete="new-password"
-              class="w-full border border-[#ccc] bg-white px-4 py-3
-                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                     focus:outline-none focus:border-[#1A1A1A]
-                     transition-colors duration-200"
-            />
-            <input
-              type="password"
-              id="signup-confirm"
-              required
-              placeholder="Confirm password"
-              autocomplete="new-password"
-              class="w-full border border-[#ccc] bg-white px-4 py-3
-                     font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                     focus:outline-none focus:border-[#1A1A1A]
-                     transition-colors duration-200"
-            />
-            <button
-              type="submit"
-              id="signup-btn"
-              class="font-mono text-[11px] tracking-[0.25em] uppercase
-                     bg-[#1A1A1A] text-[#F8F7F4] px-6 py-3 w-full
-                     hover:bg-[#CC0000] transition-colors duration-200
-                     disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Create account →
-            </button>
-          </form>
-
         </div>
+
+        <ul class="space-y-3 lg:pt-2">
+          {[
+            { icon: '👀', t: 'Get seen by people who hire juniors', d: 'Mentors, founders and small teams browse new builders every week.' },
+            { icon: '🧭', t: 'Find a mentor',                       d: 'Code reviews, pairing sessions and honest feedback on what to learn next.' },
+            { icon: '⚡', t: 'Land your first paid assignment',     d: 'Freelance projects, internships and first roles — no 5-years-required.' },
+          ].map(x => (
+            <li class="flex gap-4 rounded-2xl border border-line bg-surface/60 p-5">
+              <span class="text-[1.5rem] leading-none">{x.icon}</span>
+              <div>
+                <p class="font-semibold">{x.t}</p>
+                <p class="text-fog text-[0.9rem] mt-1">{x.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
-    </div>
-
-    <!-- Success state -->
-    <div id="success-state" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-10 mb-8">
-      <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Position Submitted</p>
-      <p class="font-serif text-[2rem] font-black mb-6 leading-none">Your listing is live.</p>
-      <a href="/" class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888] hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
-        ← Back to listings
-      </a>
-    </div>
-
-    <!-- Error banner -->
-    <div id="error-banner" class="hidden bg-[#CC0000] text-white px-5 py-3.5 mb-6">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
-    </div>
-
-    <!-- Form (hidden until authenticated) -->
-    <form id="submit-form" class="hidden space-y-8" novalidate>
-
-      <!-- Title -->
-      <div class="space-y-2.5">
-        <label for="title" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Job Title <span class="text-[#CC0000]">*</span>
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          required
-          placeholder="e.g. Senior AI Engineer"
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-serif text-lg text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200"
-        />
       </div>
 
-      <!-- Description -->
-      <div class="space-y-2.5">
-        <label for="description" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Description <span class="text-[#CC0000]">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          rows="5"
-          placeholder="Describe the role, requirements, and what makes it special for a vibecoder…"
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-sans text-sm leading-relaxed text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200 resize-none"
-        ></textarea>
-      </div>
-
-      <!-- Link -->
-      <div class="space-y-2.5">
-        <label for="link" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Application URL <span class="text-[#CC0000]">*</span>
-        </label>
-        <input
-          type="url"
-          id="link"
-          name="link"
-          required
-          placeholder="https://jobs.example.com/position"
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200"
-        />
-      </div>
-
-      <!-- Salary -->
-      <div class="space-y-2.5">
-        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Salary Range <span class="text-[#999]">(optional — shown to Google)</span>
-        </label>
-        <div class="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            id="salary-min"
-            name="salary_min"
-            placeholder="Min (e.g. 80000)"
-            min="0"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          />
-          <input
-            type="number"
-            id="salary-max"
-            name="salary_max"
-            placeholder="Max (e.g. 150000)"
-            min="0"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <select
-            id="salary-currency"
-            name="salary_currency"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          >
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-            <option value="CAD">CAD</option>
-            <option value="AUD">AUD</option>
-          </select>
-          <select
-            id="salary-period"
-            name="salary_period"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          >
-            <option value="YEAR">Per year</option>
-            <option value="MONTH">Per month</option>
-            <option value="HOUR">Per hour</option>
-          </select>
+      <!-- Success state -->
+      <div id="success-state" class="hidden card relative overflow-hidden p-8 sm:p-12 text-center max-w-2xl mx-auto">
+        <div class="orb w-[300px] h-[300px] bg-acid -top-40 left-1/2 -translate-x-1/2 !opacity-25"></div>
+        <p class="relative text-[3rem]">🚀</p>
+        <p class="relative font-bold text-[2rem] tracking-tight mt-2">You're live!</p>
+        <p class="relative text-fog mt-2 max-w-sm mx-auto">Your profile is on the board. Share it around — the more eyes, the faster that first gig shows up.</p>
+        <div class="relative flex flex-wrap justify-center gap-3 mt-8">
+          <a id="success-profile-link" href="/" class="btn-primary">See your profile →</a>
+          <a href="/#builders" class="btn-ghost">Browse builders</a>
         </div>
       </div>
 
-      <!-- Expires -->
-      <div class="space-y-2.5">
-        <label for="valid-through" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Listing expires on <span class="text-[#999]">(optional — shown to Google)</span>
-        </label>
-        <input
-          type="date"
-          id="valid-through"
-          name="valid_through"
-          class="w-full border border-[#ccc] bg-white px-4 py-3
-                 font-mono text-sm text-[#1A1A1A]
-                 focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-        />
-      </div>
+      <!-- Form (hidden until authenticated) -->
+      <div id="form-wrap" class="hidden">
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
+        <form id="submit-form" class="space-y-5" novalidate>
 
-      <!-- Image -->
-      <div class="space-y-2.5">
-        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Cover Image <span class="text-[#999]">(optional)</span>
-        </label>
-
-        <!-- Source tabs -->
-        <div class="flex border border-[#D0CEC8]">
-          <button type="button" id="img-tab-upload"
-            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
-                   bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150">
-            Upload file
-          </button>
-          <button type="button" id="img-tab-url"
-            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
-                   bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
-            External URL
-          </button>
-        </div>
-
-        <!-- Upload pane -->
-        <div id="img-pane-upload">
-          <div id="drop-zone"
-            class="border border-dashed border-[#ccc] bg-white p-12 text-center cursor-pointer
-                   hover:border-[#1A1A1A] transition-colors duration-200 relative"
-          >
-            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            <div id="drop-prompt">
-              <p class="font-serif text-[1.4rem] font-black mb-2 text-[#1A1A1A]">Drop image here</p>
-              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
-                or click to browse &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
-              </p>
-            </div>
-            <div id="image-preview-wrap" class="hidden">
-              <img id="image-preview" src="" alt="Preview"
-                class="max-h-52 mx-auto border border-[#1A1A1A] grayscale" />
-              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase mt-3" id="image-name"></p>
-              <button type="button" id="remove-image"
-                class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                       border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity">
-                Remove
-              </button>
-            </div>
+          <div id="error-banner" class="hidden banner-error">
+            <p id="error-message">An error occurred.</p>
           </div>
-        </div>
 
-        <!-- URL pane (hidden by default) -->
-        <div id="img-pane-url" class="hidden space-y-3">
-          <input
-            type="url"
-            id="image-url"
-            placeholder="https://example.com/image.jpg"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A]
-                   transition-colors duration-200"
-          />
-          <div id="url-preview-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
-            <img id="url-preview" src="" alt="URL preview"
-              class="max-h-40 border border-[#1A1A1A] grayscale" />
-            <button type="button" id="clear-url"
-              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                     border-b border-[#CC0000] pb-px mt-3 block hover:opacity-70 transition-opacity">
-              Clear
-            </button>
+          <ProfileFields>
+            <!-- Avatar -->
+            <div slot="avatar" class="space-y-3">
+              <span class="field-label">Avatar <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></span>
+
+              <div class="seg max-w-xs" role="tablist">
+                <button type="button" id="img-tab-upload" class="seg-btn" role="tab" aria-selected="true">Upload</button>
+                <button type="button" id="img-tab-url" class="seg-btn" role="tab" aria-selected="false">From URL</button>
+              </div>
+
+              <div id="img-pane-upload">
+                <div class="relative flex items-center gap-4 rounded-xl border border-dashed border-line hover:border-acid/60 bg-raised/50 p-4 transition-colors cursor-pointer">
+                  <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <div class="avatar-ring w-14 h-14 shrink-0">
+                    <div id="upload-thumb" class="avatar-inner text-[1.2rem]">🙂</div>
+                  </div>
+                  <div class="min-w-0">
+                    <p id="image-name" class="font-medium text-[0.92rem] truncate">Drop a photo or click to browse</p>
+                    <p class="field-hint">JPG, PNG or WebP · max 5 MB</p>
+                  </div>
+                  <button type="button" id="remove-image" class="hidden relative z-10 ml-auto font-mono text-[0.7rem] text-pink hover:underline">Remove</button>
+                </div>
+              </div>
+
+              <div id="img-pane-url" class="hidden">
+                <input type="url" id="image-url" placeholder="https://avatars.githubusercontent.com/u/…" class="field font-mono !text-[0.9rem]" aria-label="Avatar URL" />
+                <p class="field-hint mt-2">Tip: your GitHub avatar works great.</p>
+              </div>
+            </div>
+          </ProfileFields>
+
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <button type="submit" id="submit-btn" class="btn-primary !px-7 !py-4 !text-[1rem]">Publish my profile →</button>
+            <a href="/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">Cancel</a>
           </div>
-        </div>
+        </form>
+
+        <!-- Live preview -->
+        <aside class="lg:sticky lg:top-24 space-y-4">
+          <p class="eyebrow">// live preview</p>
+          <div id="preview" class="pointer-events-none"><ProfileCard /></div>
+          <div class="rounded-2xl border border-line bg-surface/60 p-5 text-[0.88rem] text-fog leading-relaxed">
+            <p class="font-semibold text-snow mb-2">💡 Profiles that get replies…</p>
+            <ul class="space-y-1.5">
+              <li>· link to something you actually shipped</li>
+              <li>· name the tools you build with</li>
+              <li>· say what you want to learn next</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
       </div>
 
-      <!-- Submit row -->
-      <div class="flex items-center gap-6 pt-6 border-t border-[#1A1A1A]">
-        <button
-          type="submit"
-          id="submit-btn"
-          class="font-mono text-[11px] tracking-[0.3em] uppercase
-                 bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
-                 hover:bg-[#CC0000] transition-colors duration-200
-                 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Publish Position →
-        </button>
-        <a href="/"
-          class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777] hover:text-[#1A1A1A] transition-colors duration-200">
-          Cancel
-        </a>
-      </div>
-
-    </form>
+    </div>
   </main>
 
   <Footer />
@@ -394,6 +185,8 @@ const webPage = JSON.stringify({
 
 <script>
   import { supabase } from '../lib/supabase';
+  import { profileSlug } from '../lib/slug';
+  import { readProfileFields, validateProfileFields, uploadAvatar, fillCard } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -401,19 +194,21 @@ const webPage = JSON.stringify({
   // ── Auth state ────────────────────────────────────────────
   const authCheckingEl = document.getElementById('auth-checking')!;
   const authWallEl     = document.getElementById('auth-wall')!;
+  const formWrapEl     = document.getElementById('form-wrap')!;
   const submitFormEl   = document.getElementById('submit-form') as HTMLFormElement;
+  const successEl      = document.getElementById('success-state')!;
   let currentToken: string = SUPABASE_ANON_KEY;
 
   function showAuthWall() {
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.remove('hidden');
-    submitFormEl.classList.add('hidden');
+    formWrapEl.classList.add('hidden');
   }
 
   function showForm() {
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.add('hidden');
-    submitFormEl.classList.remove('hidden');
+    if (successEl.classList.contains('hidden')) formWrapEl.classList.remove('hidden');
   }
 
   supabase.auth.onAuthStateChange((_event, session) => {
@@ -426,37 +221,30 @@ const webPage = JSON.stringify({
   });
 
   // ── Tab switching ─────────────────────────────────────────
-  const tabSignin  = document.getElementById('tab-signin')!;
-  const tabSignup  = document.getElementById('tab-signup')!;
-  const loginFormEl  = document.getElementById('login-form') as HTMLFormElement;
-  const signupFormEl = document.getElementById('signup-form') as HTMLFormElement;
-  const authErrorEl  = document.getElementById('auth-error')!;
-  const authErrorMsg = document.getElementById('auth-error-msg')!;
+  const tabSignin       = document.getElementById('tab-signin')!;
+  const tabSignup       = document.getElementById('tab-signup')!;
+  const loginFormEl     = document.getElementById('login-form') as HTMLFormElement;
+  const signupFormEl    = document.getElementById('signup-form') as HTMLFormElement;
+  const authErrorEl     = document.getElementById('auth-error')!;
+  const authErrorMsg    = document.getElementById('auth-error-msg')!;
   const signupSuccessEl = document.getElementById('signup-success')!;
 
-  const activeTab   = 'border-b-2 border-[#1A1A1A] text-[#1A1A1A]';
-  const inactiveTab = 'border-b-2 border-transparent text-[#888] hover:text-[#1A1A1A]';
-
-  function switchToSignin() {
-    tabSignin.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${activeTab}`;
-    tabSignup.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${inactiveTab}`;
-    loginFormEl.classList.remove('hidden');
-    signupFormEl.classList.add('hidden');
+  function switchAuthTab(tab: 'signin' | 'signup') {
+    tabSignin.setAttribute('aria-selected', String(tab === 'signin'));
+    tabSignup.setAttribute('aria-selected', String(tab === 'signup'));
+    loginFormEl.classList.toggle('hidden', tab !== 'signin');
+    signupFormEl.classList.toggle('hidden', tab !== 'signup');
     authErrorEl.classList.add('hidden');
     signupSuccessEl.classList.add('hidden');
   }
 
-  function switchToSignup() {
-    tabSignup.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${activeTab}`;
-    tabSignin.className = `flex-1 font-mono text-[11px] tracking-[0.25em] uppercase py-3.5 transition-colors duration-150 ${inactiveTab}`;
-    signupFormEl.classList.remove('hidden');
-    loginFormEl.classList.add('hidden');
-    authErrorEl.classList.add('hidden');
-    signupSuccessEl.classList.add('hidden');
-  }
+  tabSignin.addEventListener('click', () => switchAuthTab('signin'));
+  tabSignup.addEventListener('click', () => switchAuthTab('signup'));
 
-  tabSignin.addEventListener('click', switchToSignin);
-  tabSignup.addEventListener('click', switchToSignup);
+  function showAuthError(msg: string) {
+    authErrorMsg.textContent = msg;
+    authErrorEl.classList.remove('hidden');
+  }
 
   // ── Sign in ───────────────────────────────────────────────
   const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
@@ -476,10 +264,7 @@ const webPage = JSON.stringify({
     loginBtn.disabled = false;
     loginBtn.textContent = 'Sign in →';
 
-    if (error) {
-      authErrorMsg.textContent = error.message;
-      authErrorEl.classList.remove('hidden');
-    }
+    if (error) showAuthError(error.message);
     // On success, onAuthStateChange fires and calls showForm()
   });
 
@@ -493,11 +278,7 @@ const webPage = JSON.stringify({
     const confirm  = (document.getElementById('signup-confirm') as HTMLInputElement).value;
 
     if (!email || !password) return;
-    if (password !== confirm) {
-      authErrorMsg.textContent = 'Passwords do not match.';
-      authErrorEl.classList.remove('hidden');
-      return;
-    }
+    if (password !== confirm) { showAuthError('Passwords do not match.'); return; }
 
     signupBtn.disabled = true;
     signupBtn.textContent = 'Creating account…';
@@ -509,8 +290,7 @@ const webPage = JSON.stringify({
     signupBtn.textContent = 'Create account →';
 
     if (error) {
-      authErrorMsg.textContent = error.message;
-      authErrorEl.classList.remove('hidden');
+      showAuthError(error.message);
     } else {
       signupFormEl.classList.add('hidden');
       signupSuccessEl.classList.remove('hidden');
@@ -518,156 +298,109 @@ const webPage = JSON.stringify({
     // If email confirmation is disabled in Supabase, onAuthStateChange fires immediately
   });
 
-  // ── Image source tabs ─────────────────────────────────────
+  // ── Avatar source tabs ────────────────────────────────────
   let imageSource: 'file' | 'url' = 'file';
-  const imgTabUpload  = document.getElementById('img-tab-upload') as HTMLButtonElement;
-  const imgTabUrl     = document.getElementById('img-tab-url') as HTMLButtonElement;
+  const imgTabUpload  = document.getElementById('img-tab-upload')!;
+  const imgTabUrl     = document.getElementById('img-tab-url')!;
   const imgPaneUpload = document.getElementById('img-pane-upload')!;
   const imgPaneUrl    = document.getElementById('img-pane-url')!;
 
-  imgTabUpload.addEventListener('click', () => {
-    imageSource = 'file';
-    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
-    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
-    imgPaneUpload.classList.remove('hidden');
-    imgPaneUrl.classList.add('hidden');
-  });
+  function switchImageTab(source: 'file' | 'url') {
+    imageSource = source;
+    imgTabUpload.setAttribute('aria-selected', String(source === 'file'));
+    imgTabUrl.setAttribute('aria-selected', String(source === 'url'));
+    imgPaneUpload.classList.toggle('hidden', source !== 'file');
+    imgPaneUrl.classList.toggle('hidden', source !== 'url');
+    updatePreview();
+  }
 
-  imgTabUrl.addEventListener('click', () => {
-    imageSource = 'url';
-    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
-    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
-    imgPaneUrl.classList.remove('hidden');
-    imgPaneUpload.classList.add('hidden');
-  });
+  imgTabUpload.addEventListener('click', () => switchImageTab('file'));
+  imgTabUrl.addEventListener('click', () => switchImageTab('url'));
 
-  // ── File upload preview ────────────────────────────────────
-  const imageInput = document.getElementById('image') as HTMLInputElement;
-  const dropPrompt = document.getElementById('drop-prompt')!;
-  const previewWrap = document.getElementById('image-preview-wrap')!;
-  const previewImg = document.getElementById('image-preview') as HTMLImageElement;
-  const imageName = document.getElementById('image-name')!;
-  const removeBtn = document.getElementById('remove-image')!;
+  // ── File upload preview ───────────────────────────────────
+  const imageInput    = document.getElementById('image') as HTMLInputElement;
+  const uploadThumb   = document.getElementById('upload-thumb')!;
+  const imageName     = document.getElementById('image-name')!;
+  const removeBtn     = document.getElementById('remove-image')!;
+  const imageUrlInput = document.getElementById('image-url') as HTMLInputElement;
+  let fileDataUrl: string | null = null;
 
   imageInput.addEventListener('change', () => {
     const file = imageInput.files?.[0];
     if (!file) return;
-    showPreview(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      fileDataUrl = e.target?.result as string;
+      const img = document.createElement('img');
+      img.src = fileDataUrl;
+      img.className = 'w-full h-full object-cover';
+      uploadThumb.replaceChildren(img);
+      imageName.textContent = file.name;
+      removeBtn.classList.remove('hidden');
+      updatePreview();
+    };
+    reader.readAsDataURL(file);
   });
 
   removeBtn.addEventListener('click', () => {
     imageInput.value = '';
-    previewWrap.classList.add('hidden');
-    dropPrompt.classList.remove('hidden');
+    fileDataUrl = null;
+    uploadThumb.textContent = '🙂';
+    imageName.textContent = 'Drop a photo or click to browse';
+    removeBtn.classList.add('hidden');
+    updatePreview();
   });
 
-  function showPreview(file: File) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImg.src = e.target?.result as string;
-      imageName.textContent = file.name;
-      dropPrompt.classList.add('hidden');
-      previewWrap.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
+  // ── Live preview ──────────────────────────────────────────
+  const previewCard = document.querySelector<HTMLElement>('#preview .p-card')!;
+  let previewDebounce: ReturnType<typeof setTimeout> | null = null;
+
+  function updatePreview() {
+    const v = readProfileFields();
+    fillCard(previewCard, {
+      ...v,
+      id: 'preview',
+      title: v.title || 'Your name · what you build',
+      description: v.description || "What you've shipped, the tools you vibe with, and what you want to learn next.",
+      link: v.link || '#',
+      image_url: imageSource === 'file' ? fileDataUrl : (imageUrlInput.value.trim() || null),
+      created_at: new Date().toISOString(),
+    });
   }
 
-  // ── URL preview ───────────────────────────────────────────
-  const imageUrlInput  = document.getElementById('image-url') as HTMLInputElement;
-  const urlPreviewWrap = document.getElementById('url-preview-wrap')!;
-  const urlPreviewImg  = document.getElementById('url-preview') as HTMLImageElement;
-  let urlDebounce: ReturnType<typeof setTimeout> | null = null;
-
-  imageUrlInput.addEventListener('input', () => {
-    if (urlDebounce) clearTimeout(urlDebounce);
-    urlDebounce = setTimeout(() => {
-      const url = imageUrlInput.value.trim();
-      if (!url) { urlPreviewWrap.classList.add('hidden'); return; }
-      urlPreviewImg.onload  = () => urlPreviewWrap.classList.remove('hidden');
-      urlPreviewImg.onerror = () => urlPreviewWrap.classList.add('hidden');
-      urlPreviewImg.src = url;
-    }, 500);
+  submitFormEl.addEventListener('input', () => {
+    if (previewDebounce) clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(updatePreview, 120);
   });
-
-  document.getElementById('clear-url')!.addEventListener('click', () => {
-    imageUrlInput.value = '';
-    urlPreviewImg.src = '';
-    urlPreviewWrap.classList.add('hidden');
-  });
+  updatePreview();
 
   // ── Form submission ───────────────────────────────────────
-  const submitBtn  = document.getElementById('submit-btn') as HTMLButtonElement;
-  const successEl  = document.getElementById('success-state')!;
+  const submitBtn    = document.getElementById('submit-btn') as HTMLButtonElement;
   const errorBanner  = document.getElementById('error-banner')!;
   const errorMessage = document.getElementById('error-message')!;
 
   function showError(msg: string) {
     errorMessage.textContent = msg;
     errorBanner.classList.remove('hidden');
-    errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  function hideError() {
-    errorBanner.classList.add('hidden');
+    errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   submitFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
-    hideError();
+    errorBanner.classList.add('hidden');
 
-    const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
-    const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
-    const link         = (document.getElementById('link') as HTMLInputElement).value.trim();
-    const salaryMinRaw = (document.getElementById('salary-min') as HTMLInputElement).value.trim();
-    const salaryMaxRaw = (document.getElementById('salary-max') as HTMLInputElement).value.trim();
-    const salaryCurrency = (document.getElementById('salary-currency') as HTMLSelectElement).value;
-    const salaryPeriod   = (document.getElementById('salary-period') as HTMLSelectElement).value;
-    const validThrough   = (document.getElementById('valid-through') as HTMLInputElement).value;
-    const salary_min   = salaryMinRaw ? parseInt(salaryMinRaw, 10) : null;
-    const salary_max   = salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : null;
-    const imageFile    = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
-    const imageExtUrl  = imageSource === 'url'  ? imageUrlInput.value.trim() : null;
+    const values = readProfileFields();
+    const invalid = validateProfileFields(values);
+    if (invalid) { showError(invalid); return; }
 
-    if (!title)       { showError('Job title is required.'); return; }
-    if (!description) { showError('Description is required.'); return; }
-    if (!link)        { showError('Application URL is required.'); return; }
+    const imageFile = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Publishing…';
 
     try {
-      let image_url: string | null = imageExtUrl || null;
-
-      if (imageFile) {
-        if (imageFile.size > 5 * 1024 * 1024) {
-          showError('Image must be smaller than 5 MB.');
-          return;
-        }
-
-        const ext = imageFile.name.split('.').pop();
-        const filename = `${crypto.randomUUID()}.${ext}`;
-
-        const uploadRes = await fetch(
-          `${SUPABASE_URL}/storage/v1/object/job-images/${filename}`,
-          {
-            method: 'POST',
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${currentToken}`,
-              'Content-Type': imageFile.type,
-              'x-upsert': 'false',
-            },
-            body: imageFile,
-          }
-        );
-
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err?.message || 'Image upload failed.');
-        }
-
-        image_url = `${SUPABASE_URL}/storage/v1/object/public/job-images/${filename}`;
-      }
+      let image_url: string | null = imageSource === 'url' ? (imageUrlInput.value.trim() || null) : null;
+      if (imageFile) image_url = await uploadAvatar(imageFile, SUPABASE_URL, SUPABASE_ANON_KEY, currentToken);
 
       const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/jobs`, {
         method: 'POST',
@@ -675,32 +408,31 @@ const webPage = JSON.stringify({
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${currentToken}`,
           'Content-Type': 'application/json',
-          Prefer: 'return=minimal',
+          Prefer: 'return=representation',
         },
-        body: JSON.stringify({
-          title, description, link, image_url,
-          salary_min,
-          salary_max,
-          salary_currency: salary_min != null || salary_max != null ? salaryCurrency : null,
-          salary_period:   salary_min != null || salary_max != null ? salaryPeriod   : null,
-          valid_through:   validThrough || null,
-        }),
+        body: JSON.stringify({ ...values, image_url }),
       });
 
       if (!insertRes.ok) {
         const err = await insertRes.json().catch(() => ({}));
-        throw new Error(err?.message || 'Failed to save the position.');
+        throw new Error(err?.message || 'Failed to save your profile.');
       }
 
-      submitFormEl.classList.add('hidden');
+      const [created] = await insertRes.json().catch(() => []);
+      if (created?.id) {
+        (document.getElementById('success-profile-link') as HTMLAnchorElement).href =
+          `/profile/${profileSlug(created.id, created.title)}/`;
+      }
+
+      formWrapEl.classList.add('hidden');
       successEl.classList.remove('hidden');
-      successEl.scrollIntoView({ behavior: 'smooth' });
+      successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     } catch (err: unknown) {
       showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Publish Position →';
+      submitBtn.textContent = 'Publish my profile →';
     }
   });
 </script>

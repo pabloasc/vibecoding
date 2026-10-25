@@ -1,0 +1,133 @@
+---
+/**
+ * Shared profile form fields for /submit and /edit.
+ * Read and populate them with src/lib/profileForm.ts.
+ * The avatar picker lives in each page since edit also manages the current image.
+ */
+import { LOOKING_FOR } from '../lib/profile';
+---
+
+<!-- ── 01 · The basics ───────────────────────────────────── -->
+<fieldset class="card p-5 sm:p-7 space-y-6">
+  <legend class="sr-only">The basics</legend>
+  <p class="eyebrow">01 · The basics</p>
+
+  <div class="space-y-2">
+    <label for="title" class="field-label">Headline <span class="text-pink">*</span></label>
+    <input type="text" id="title" name="title" required maxlength="90"
+      placeholder="Maya · AI-native frontend builder" class="field !text-[1.05rem] font-medium" />
+    <p class="field-hint">Your name + what you build. This is how you show up on the board.</p>
+  </div>
+
+  <div class="space-y-2">
+    <label for="description" class="field-label">About you <span class="text-pink">*</span></label>
+    <textarea id="description" name="description" required rows="6"
+      placeholder="What have you shipped? Which tools do you vibe with (Cursor, Claude Code, Lovable…)? What do you want to learn next?"
+      class="field leading-relaxed resize-y min-h-[9rem]"></textarea>
+  </div>
+
+  <div class="space-y-2">
+    <label for="link" class="field-label">Profile URL <span class="text-pink">*</span></label>
+    <input type="url" id="link" name="link" required
+      placeholder="https://github.com/you" class="field font-mono !text-[0.9rem]" />
+    <p class="field-hint">GitHub, portfolio, LinkedIn — wherever your work lives. Mentors will reach you here.</p>
+  </div>
+
+  <slot name="avatar" />
+</fieldset>
+
+<!-- ── 02 · What you're after ────────────────────────────── -->
+<fieldset class="card p-5 sm:p-7 space-y-6">
+  <legend class="sr-only">What you're looking for</legend>
+  <p class="eyebrow">02 · What you're after</p>
+
+  <div class="space-y-3">
+    <span class="field-label">Looking for</span>
+    <div class="flex flex-wrap gap-2">
+      {Object.entries(LOOKING_FOR).map(([value, { label, emoji }], i) => (
+        <label class="pill-option">
+          <input type="radio" name="employment_type" value={value} checked={i === 0} />
+          <span>{emoji} {label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+
+  <label class="flex items-center justify-between gap-4 rounded-xl border border-line bg-raised px-4 py-3.5 cursor-pointer">
+    <span>
+      <span class="block font-medium text-[0.95rem]">🌍 Open to remote work</span>
+      <span class="field-hint">Most first gigs are remote — keeping this on helps.</span>
+    </span>
+    <input type="checkbox" id="is-remote" name="is_remote" checked class="toggle" />
+  </label>
+
+  <div class="space-y-2">
+    <label for="locations" class="field-label">Based in <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></label>
+    <input type="text" id="locations" name="locations" placeholder="Lisbon, Portugal" class="field" />
+    <p class="field-hint">City and/or country. Separate several with commas.</p>
+  </div>
+</fieldset>
+
+<!-- ── 03 · Optional extras ──────────────────────────────── -->
+<fieldset class="card p-5 sm:p-7 space-y-6">
+  <legend class="sr-only">Optional extras</legend>
+  <p class="eyebrow">03 · Optional extras</p>
+
+  <div class="space-y-2">
+    <span class="field-label">Rate expectation</span>
+    <div class="grid grid-cols-2 gap-3">
+      <input type="number" id="salary-min" name="salary_min" placeholder="Min (e.g. 20)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Minimum rate" />
+      <input type="number" id="salary-max" name="salary_max" placeholder="Max (e.g. 40)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Maximum rate" />
+      <select id="salary-currency" name="salary_currency" class="field font-mono !text-[0.9rem]" aria-label="Currency">
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+        <option value="GBP">GBP</option>
+        <option value="CAD">CAD</option>
+        <option value="AUD">AUD</option>
+      </select>
+      <select id="salary-period" name="salary_period" class="field font-mono !text-[0.9rem]" aria-label="Rate period">
+        <option value="HOUR">Per hour</option>
+        <option value="MONTH">Per month</option>
+        <option value="YEAR">Per year</option>
+      </select>
+    </div>
+    <p class="field-hint">Skip it if you're after mentorship or just want the experience.</p>
+  </div>
+
+  <div class="space-y-2">
+    <label for="valid-through" class="field-label">Open to offers until</label>
+    <input type="date" id="valid-through" name="valid_through" class="field font-mono !text-[0.9rem]" />
+  </div>
+</fieldset>
+
+<style is:global>
+  .toggle {
+    appearance: none;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 1.6rem;
+    border-radius: 999px;
+    background: var(--color-line);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    background: var(--color-snow);
+    transition: transform 0.2s ease;
+  }
+  .toggle:checked {
+    background: var(--color-acid);
+  }
+  .toggle:checked::after {
+    transform: translateX(1.15rem);
+    background: var(--color-void);
+  }
+</style>

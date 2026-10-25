@@ -1,0 +1,65 @@
+---
+/**
+ * Builder profile card.
+ * Rendered with a `profile` on the server, and without one inside a
+ * <template> so client-side pagination can clone and fill the same markup
+ * (see the `.p-*` hooks).
+ */
+import { profileSlug } from '../lib/slug';
+import { type Profile, lookingFor, formatRate, locationLabel, initials, isNew, formatDate } from '../lib/profile';
+
+export interface Props {
+  profile?: Profile;
+  index?: number;
+}
+
+const { profile: p, index = 0 } = Astro.props;
+
+const want  = p ? lookingFor(p.employment_type) : null;
+const rate  = p ? formatRate(p) : null;
+const loc   = p ? locationLabel(p) : null;
+const href  = p ? `/profile/${profileSlug(p.id, p.title)}/` : undefined;
+---
+
+<article
+  class="p-card card card-hover fade-in group flex flex-col p-5 sm:p-6"
+  style={p ? `animation-delay:${Math.min(index, 12) * 40}ms` : undefined}
+  data-created-at={p?.created_at}
+>
+  <span class:list={['p-new chip chip-new absolute top-4 right-4', !(p && isNew(p.created_at)) && 'hidden']}>
+    <span class="w-1.5 h-1.5 rounded-full bg-void/70 vc-pulse"></span>New
+  </span>
+
+  <div class="flex items-start gap-4 pr-14">
+    <div class="avatar-ring w-14 h-14 shrink-0">
+      <div class="p-avatar avatar-inner text-[1rem]">
+        {p && (p.image_url
+          ? <img src={p.image_url} alt="" loading="lazy" width="56" height="56" class="w-full h-full object-cover" />
+          : initials(p.title))}
+      </div>
+    </div>
+    <div class="min-w-0">
+      <h3 class="p-title font-semibold text-[1.05rem] leading-snug text-snow line-clamp-2 group-hover:text-acid transition-colors">{p?.title}</h3>
+      <span class="p-want chip chip-acid mt-2">{want && `${want.emoji} ${want.label}`}</span>
+    </div>
+  </div>
+
+  <p class="p-desc text-[0.9rem] text-fog leading-relaxed line-clamp-3 mt-4">{p?.description}</p>
+
+  <div class="p-tags flex flex-wrap gap-1.5 mt-4">
+    {p?.is_remote === true && <span class="chip">🌍 Open to remote</span>}
+    {loc && <span class="chip">📍 {loc}</span>}
+    {rate && <span class="chip chip-violet">{rate}</span>}
+  </div>
+
+  <div class="flex items-center justify-between mt-auto pt-5">
+    <span class="p-date font-mono text-[0.68rem] text-[#5A5A6E]">{p && `Joined ${formatDate(p.created_at)}`}</span>
+    <a href={p?.link} target="_blank" rel="noopener noreferrer"
+       class="p-link relative z-10 font-mono text-[0.72rem] text-snow/80 hover:text-acid border-b border-line hover:border-acid pb-px transition-colors">
+      Profile ↗
+    </a>
+  </div>
+
+  <!-- Full-card tap target -->
+  <a href={href} class="p-card-link absolute inset-0 z-0 rounded-[1.25rem]" aria-label={p ? `View ${p.title}` : undefined}></a>
+</article>

@@ -1,6 +1,6 @@
 /**
  * Convert any string into a URL-safe slug.
- * e.g. "Staff Engineer – AI Productivity" → "staff-engineer-ai-productivity"
+ * e.g. "Maya · AI-native frontend builder" → "maya-ainative-frontend-builder"
  */
 export function slugify(text: string): string {
   return text
@@ -14,11 +14,11 @@ export function slugify(text: string): string {
 }
 
 /**
- * Build the canonical URL slug for a job.
+ * Build the canonical URL slug for a profile.
  * Uses the first 8 chars of the UUID to guarantee uniqueness
- * even if two jobs share the same title.
- * e.g. "staff-engineer-ai-productivity-a6b7c8d9"
+ * even if two profiles share the same headline.
+ * e.g. "maya-ainative-frontend-builder-a6b7c8d9"
  */
-export function jobSlug(id: string, title: string): string {
+export function profileSlug(id: string, title: string): string {
   return `${slugify(title)}-${id.slice(0, 8)}`;
 }

@@ -2,312 +2,103 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ProfileFields from '../components/ProfileFields.astro';
 ---
 
 <Layout
-  title="Edit Position — vibecoding.work"
-  description="Edit a job listing."
+  title="Edit Profile — vibecoding.work"
+  description="Edit a builder profile."
   noindex={true}
 >
   <Header />
 
-  <main class="px-5 md:px-12 py-12 max-w-2xl">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pt-14">
 
-    <!-- Section header -->
-    <div class="border-b-2 border-[#1A1A1A] pb-5 mb-10 flex items-baseline justify-between">
+    <!-- Page header -->
+    <div class="flex items-end justify-between gap-4 mb-10">
       <div>
-        <p class="font-mono text-[11px] tracking-[0.35em] uppercase text-[#CC0000] mb-1.5">Admin</p>
-        <h2 class="font-serif text-[2rem] md:text-[2.5rem] font-black uppercase tracking-tight leading-none text-[#1A1A1A]">Edit Position</h2>
+        <span class="eyebrow">// admin</span>
+        <h1 class="font-bold tracking-[-0.03em] text-[clamp(2rem,5vw,2.8rem)] leading-none mt-2">Edit profile</h1>
       </div>
-      <a id="back-link" href="/"
-         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#777]
-                hover:text-[#1A1A1A] transition-colors duration-150">
-        ← Back
-      </a>
+      <a id="back-link" href="/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">← Back</a>
     </div>
 
     <!-- Auth checking -->
-    <div id="auth-checking" class="py-12 text-center">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">Verifying access…</p>
+    <div id="auth-checking" class="py-16 text-center">
+      <p class="font-mono text-[0.8rem] text-fog"><span class="caret inline-block w-2 h-3.5 bg-acid align-middle mr-2"></span>Verifying access…</p>
     </div>
 
     <!-- Access denied -->
-    <div id="access-denied" class="hidden py-12 text-center">
-      <p class="font-serif text-[2rem] font-black text-[#888] mb-4 leading-none">Access denied.</p>
-      <a href="/" class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666]
-                         hover:text-[#CC0000] transition-colors underline underline-offset-4">
-        ← Back to listings
-      </a>
+    <div id="access-denied" class="hidden card py-14 text-center">
+      <p class="text-[2.2rem]">🔒</p>
+      <p class="font-semibold text-[1.5rem] mt-2 mb-6">Access denied.</p>
+      <a href="/" class="btn-ghost">← Back to builders</a>
     </div>
 
-    <!-- Job not found -->
-    <div id="not-found" class="hidden py-12 text-center">
-      <p class="font-serif text-[2rem] font-black text-[#888] mb-4 leading-none">Position not found.</p>
-      <a href="/" class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#666]
-                         hover:text-[#CC0000] transition-colors underline underline-offset-4">
-        ← Back to listings
-      </a>
+    <!-- Profile not found -->
+    <div id="not-found" class="hidden card py-14 text-center">
+      <p class="text-[2.2rem]">🫥</p>
+      <p class="font-semibold text-[1.5rem] mt-2 mb-6">Profile not found.</p>
+      <a href="/" class="btn-ghost">← Back to builders</a>
     </div>
 
     <!-- Success state -->
-    <div id="success-state" class="hidden bg-[#1A1A1A] text-[#F8F7F4] p-10 mb-8">
-      <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-[#CC0000] mb-3">Saved</p>
-      <p class="font-serif text-[2rem] font-black mb-6 leading-none">Position updated.</p>
-      <a id="success-back-link" href="/"
-         class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]
-                hover:text-[#CC0000] transition-colors duration-200 border-b border-[#444] pb-px">
-        ← View position
-      </a>
-    </div>
-
-    <!-- Error banner -->
-    <div id="error-banner" class="hidden bg-[#CC0000] text-white px-5 py-3.5 mb-6">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase" id="error-message">An error occurred.</p>
+    <div id="success-state" class="hidden card p-10 text-center">
+      <p class="text-[2.5rem]">✅</p>
+      <p class="font-bold text-[1.8rem] tracking-tight mt-2 mb-6">Profile updated.</p>
+      <a id="success-back-link" href="/" class="btn-primary">View profile →</a>
     </div>
 
     <!-- Edit form -->
-    <form id="edit-form" class="hidden space-y-8" novalidate>
+    <form id="edit-form" class="hidden space-y-5" novalidate>
 
-      <!-- Title -->
-      <div class="space-y-2.5">
-        <label for="title" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Job Title <span class="text-[#CC0000]">*</span>
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          required
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-serif text-lg text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200"
-        />
+      <div id="error-banner" class="hidden banner-error">
+        <p id="error-message">An error occurred.</p>
       </div>
 
-      <!-- Description -->
-      <div class="space-y-2.5">
-        <label for="description" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Description <span class="text-[#CC0000]">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          rows="7"
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-sans text-sm leading-relaxed text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200 resize-none"
-        ></textarea>
-      </div>
+      <ProfileFields>
+        <!-- Avatar -->
+        <div slot="avatar" class="space-y-3">
+          <span class="field-label">Avatar</span>
 
-      <!-- Link -->
-      <div class="space-y-2.5">
-        <label for="link" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Application URL <span class="text-[#CC0000]">*</span>
-        </label>
-        <input
-          type="url"
-          id="link"
-          name="link"
-          required
-          class="w-full border border-[#ccc] bg-white px-4 py-4
-                 font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                 focus:outline-none focus:border-[#1A1A1A]
-                 transition-colors duration-200"
-        />
-      </div>
-
-      <!-- Salary -->
-      <div class="space-y-2.5">
-        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Salary Range <span class="text-[#999]">(optional — shown to Google)</span>
-        </label>
-        <div class="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            id="salary-min"
-            name="salary_min"
-            placeholder="Min (e.g. 80000)"
-            min="0"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          />
-          <input
-            type="number"
-            id="salary-max"
-            name="salary_max"
-            placeholder="Max (e.g. 150000)"
-            min="0"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <select
-            id="salary-currency"
-            name="salary_currency"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          >
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-            <option value="CAD">CAD</option>
-            <option value="AUD">AUD</option>
-          </select>
-          <select
-            id="salary-period"
-            name="salary_period"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A]
-                   focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-          >
-            <option value="YEAR">Per year</option>
-            <option value="MONTH">Per month</option>
-            <option value="HOUR">Per hour</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Expires -->
-      <div class="space-y-2.5">
-        <label for="valid-through" class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Listing expires on <span class="text-[#999]">(optional — shown to Google)</span>
-        </label>
-        <input
-          type="date"
-          id="valid-through"
-          name="valid_through"
-          class="w-full border border-[#ccc] bg-white px-4 py-3
-                 font-mono text-sm text-[#1A1A1A]
-                 focus:outline-none focus:border-[#1A1A1A] transition-colors duration-200"
-        />
-      </div>
-
-      <!-- Image -->
-      <div class="space-y-2.5">
-        <label class="block font-mono text-[11px] tracking-[0.3em] uppercase text-[#888]">
-          Cover Image <span class="text-[#999]">(optional)</span>
-        </label>
-
-        <!-- Current image preview -->
-        <div id="current-image-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
-          <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-[#888] mb-3">Current image</p>
-          <img id="current-image" src="" alt="Current cover"
-               class="max-h-40 border border-[#1A1A1A] grayscale mb-3" />
-          <button
-            type="button"
-            id="remove-current-image"
-            class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                   border-b border-[#CC0000] pb-px hover:opacity-70 transition-opacity"
-          >Remove image</button>
-        </div>
-
-        <!-- No image placeholder -->
-        <div id="no-image-notice" class="hidden border border-dashed border-[#D0CEC8] px-5 py-4">
-          <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#888]">No image set</p>
-        </div>
-
-        <!-- New image source tabs -->
-        <div class="flex border border-[#D0CEC8]">
-          <button type="button" id="img-tab-upload"
-            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
-                   bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150">
-            Upload file
-          </button>
-          <button type="button" id="img-tab-url"
-            class="flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5
-                   bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150">
-            External URL
-          </button>
-        </div>
-
-        <!-- Upload pane -->
-        <div id="img-pane-upload">
-          <div id="drop-zone"
-            class="border border-dashed border-[#ccc] bg-white p-10 text-center cursor-pointer
-                   hover:border-[#1A1A1A] transition-colors duration-200 relative"
-          >
-            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            <div id="drop-prompt">
-              <p class="font-serif text-[1.2rem] font-black mb-1 text-[#1A1A1A]">Upload new image</p>
-              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase">
-                JPG, PNG, WebP &nbsp;·&nbsp; max 5 MB
-              </p>
+          <div class="flex items-center gap-4 rounded-xl border border-line bg-raised/50 p-4">
+            <div class="avatar-ring w-14 h-14 shrink-0">
+              <div id="current-avatar" class="avatar-inner text-[1.2rem]">🙂</div>
             </div>
-            <div id="image-preview-wrap" class="hidden">
-              <img id="image-preview" src="" alt="New preview"
-                class="max-h-40 mx-auto border border-[#1A1A1A] grayscale mb-3" />
-              <p class="font-mono text-[11px] tracking-[0.2em] text-[#777] uppercase" id="image-name"></p>
-              <button type="button" id="remove-new-image"
-                class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                       border-b border-[#CC0000] pb-px mt-2 hover:opacity-70 transition-opacity">
-                Cancel new image
-              </button>
+            <p id="avatar-status" class="text-[0.9rem] text-fog flex-1">No image set</p>
+            <button type="button" id="remove-current-image" class="hidden font-mono text-[0.7rem] text-pink hover:underline">Remove</button>
+          </div>
+
+          <div class="seg max-w-xs" role="tablist">
+            <button type="button" id="img-tab-upload" class="seg-btn" role="tab" aria-selected="true">Upload new</button>
+            <button type="button" id="img-tab-url" class="seg-btn" role="tab" aria-selected="false">From URL</button>
+          </div>
+
+          <div id="img-pane-upload">
+            <div class="relative rounded-xl border border-dashed border-line hover:border-acid/60 bg-raised/50 p-4 transition-colors cursor-pointer">
+              <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+              <p id="image-name" class="font-medium text-[0.92rem] truncate">Drop a photo or click to browse</p>
+              <p class="field-hint">JPG, PNG or WebP · max 5 MB</p>
             </div>
           </div>
-        </div>
 
-        <!-- URL pane (hidden by default) -->
-        <div id="img-pane-url" class="hidden space-y-3">
-          <input
-            type="url"
-            id="image-url"
-            placeholder="https://example.com/image.jpg"
-            class="w-full border border-[#ccc] bg-white px-4 py-3
-                   font-mono text-sm text-[#1A1A1A] placeholder:text-[#ccc]
-                   focus:outline-none focus:border-[#1A1A1A]
-                   transition-colors duration-200"
-          />
-          <div id="url-preview-wrap" class="hidden border border-[#D0CEC8] p-4 bg-[#F8F7F4]">
-            <img id="url-preview" src="" alt="URL preview"
-              class="max-h-40 border border-[#1A1A1A] grayscale" />
-            <button type="button" id="clear-url"
-              class="font-mono text-[11px] tracking-[0.2em] uppercase text-[#CC0000]
-                     border-b border-[#CC0000] pb-px mt-3 block hover:opacity-70 transition-opacity">
-              Clear
-            </button>
+          <div id="img-pane-url" class="hidden">
+            <input type="url" id="image-url" placeholder="https://avatars.githubusercontent.com/u/…" class="field font-mono !text-[0.9rem]" aria-label="Avatar URL" />
           </div>
         </div>
-      </div>
+      </ProfileFields>
 
-      <!-- Action row -->
-      <div class="flex items-center gap-6 pt-6 border-t border-[#1A1A1A]">
-        <button
-          type="submit"
-          id="save-btn"
-          class="font-mono text-[11px] tracking-[0.3em] uppercase
-                 bg-[#1A1A1A] text-[#F8F7F4] px-8 py-4
-                 hover:bg-[#CC0000] transition-colors duration-200
-                 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Save changes →
-        </button>
-        <a id="cancel-link" href="/"
-           class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#777]
-                  hover:text-[#1A1A1A] transition-colors duration-200">
-          Cancel
-        </a>
+      <div class="flex flex-wrap items-center gap-4 pt-2">
+        <button type="submit" id="save-btn" class="btn-primary !px-7 !py-4">Save changes →</button>
+        <a id="cancel-link" href="/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">Cancel</a>
       </div>
 
       <!-- Danger zone -->
-      <div class="border-t border-[#D0CEC8] pt-8 mt-4">
-        <p class="font-mono text-[11px] tracking-[0.25em] uppercase text-[#888] mb-4">Danger zone</p>
-        <button
-          type="button"
-          id="delete-btn"
-          class="font-mono text-[11px] tracking-[0.25em] uppercase
-                 border border-[#CC0000] text-[#CC0000] px-6 py-3
-                 hover:bg-[#CC0000] hover:text-white transition-colors duration-200"
-        >
-          Delete position
-        </button>
+      <div class="rounded-2xl border border-pink/25 p-5 sm:p-6 !mt-12">
+        <p class="font-mono text-[0.7rem] tracking-[0.14em] uppercase text-pink mb-1">Danger zone</p>
+        <p class="text-fog text-[0.9rem] mb-4">Deleting removes the profile from the board for good.</p>
+        <button type="button" id="delete-btn" class="btn-danger">Delete profile</button>
       </div>
 
     </form>
@@ -317,22 +108,22 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <script>
-  import { supabase } from '../lib/supabase';
+  import { supabase, ADMIN_EMAIL } from '../lib/supabase';
+  import { profileSlug } from '../lib/slug';
+  import { initials, type Profile } from '../lib/profile';
+  import { readProfileFields, validateProfileFields, fillProfileFields, uploadAvatar } from '../lib/profileForm';
 
-  const SUPABASE_URL    = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_URL      = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  const ADMIN_EMAIL     = 'hi@vibecoders.co';
-
-  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; salary_min: number | null; salary_max: number | null; salary_currency: string | null; salary_period: string | null; valid_through: string | null; created_at: string; };
 
   // ── Elements ──────────────────────────────────────────────
-  const authCheckingEl  = document.getElementById('auth-checking')!;
-  const accessDeniedEl  = document.getElementById('access-denied')!;
-  const notFoundEl      = document.getElementById('not-found')!;
-  const editFormEl      = document.getElementById('edit-form') as HTMLFormElement;
-  const successEl       = document.getElementById('success-state')!;
-  const errorBannerEl   = document.getElementById('error-banner')!;
-  const errorMessageEl  = document.getElementById('error-message')!;
+  const authCheckingEl = document.getElementById('auth-checking')!;
+  const accessDeniedEl = document.getElementById('access-denied')!;
+  const notFoundEl     = document.getElementById('not-found')!;
+  const editFormEl     = document.getElementById('edit-form') as HTMLFormElement;
+  const successEl      = document.getElementById('success-state')!;
+  const errorBannerEl  = document.getElementById('error-banner')!;
+  const errorMessageEl = document.getElementById('error-message')!;
 
   function showAccessDenied() {
     authCheckingEl.classList.add('hidden');
@@ -347,22 +138,19 @@ import Footer from '../components/Footer.astro';
   function showError(msg: string) {
     errorMessageEl.textContent = msg;
     errorBannerEl.classList.remove('hidden');
-    errorBannerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    errorBannerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  function hideError() {
-    errorBannerEl.classList.add('hidden');
-  }
-
-  // ── Auth & job load ───────────────────────────────────────
+  // ── Auth & profile load ───────────────────────────────────
   let sessionToken = SUPABASE_ANON_KEY;
   let currentImageUrl: string | null = null;
+  let currentTitle = '';
   let imageAction: 'keep' | 'remove' | File = 'keep';
 
-  const jobId = new URLSearchParams(window.location.search).get('id');
+  const profileId = new URLSearchParams(window.location.search).get('id');
 
   async function init() {
-    if (!jobId) { showNotFound(); return; }
+    if (!profileId) { showNotFound(); return; }
 
     // Validate JWT server-side — getUser() re-checks with Supabase auth server
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -375,137 +163,88 @@ import Footer from '../components/Footer.astro';
     const { data: { session } } = await supabase.auth.getSession();
     sessionToken = session?.access_token ?? SUPABASE_ANON_KEY;
 
-    // Load the job
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId)}&select=*&limit=1`,
+      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(profileId)}&select=*&limit=1`,
       { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${sessionToken}` } }
     );
 
     if (!res.ok) { showNotFound(); return; }
-    const jobs: Job[] = await res.json();
-    if (!jobs.length) { showNotFound(); return; }
+    const rows: Profile[] = await res.json();
+    if (!rows.length) { showNotFound(); return; }
 
-    populateForm(jobs[0]);
+    populateForm(rows[0]);
   }
 
-  function populateForm(job: Job) {
-    currentImageUrl = job.image_url;
+  // ── Current avatar display ────────────────────────────────
+  const currentAvatarEl = document.getElementById('current-avatar')!;
+  const avatarStatusEl  = document.getElementById('avatar-status')!;
+  const removeCurrentBtn = document.getElementById('remove-current-image')!;
 
-    (document.getElementById('title') as HTMLInputElement).value = job.title;
-    (document.getElementById('description') as HTMLTextAreaElement).value = job.description;
-    (document.getElementById('link') as HTMLInputElement).value = job.link;
-
-    // Salary + expiry
-    if (job.salary_min != null) (document.getElementById('salary-min') as HTMLInputElement).value = String(job.salary_min);
-    if (job.salary_max != null) (document.getElementById('salary-max') as HTMLInputElement).value = String(job.salary_max);
-    if (job.salary_currency) (document.getElementById('salary-currency') as HTMLSelectElement).value = job.salary_currency;
-    if (job.salary_period)   (document.getElementById('salary-period')   as HTMLSelectElement).value = job.salary_period;
-    if (job.valid_through)   (document.getElementById('valid-through')   as HTMLInputElement).value  = job.valid_through;
-
-    // Image state
-    const currentWrap   = document.getElementById('current-image-wrap')!;
-    const noImageNotice = document.getElementById('no-image-notice')!;
-    const currentImg    = document.getElementById('current-image') as HTMLImageElement;
-
-    if (job.image_url) {
-      currentImg.src = job.image_url;
-      currentWrap.classList.remove('hidden');
+  function renderCurrentAvatar(url: string | null, status: string) {
+    if (url) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.className = 'w-full h-full object-cover';
+      img.onerror = () => { currentAvatarEl.textContent = initials(currentTitle); };
+      currentAvatarEl.replaceChildren(img);
     } else {
-      noImageNotice.classList.remove('hidden');
+      currentAvatarEl.textContent = currentTitle ? initials(currentTitle) : '🙂';
     }
+    avatarStatusEl.textContent = status;
+    removeCurrentBtn.classList.toggle('hidden', !url);
+  }
 
-    // Back/cancel links
-    const jobUrl = `/job?id=${job.id}`;
-    (document.getElementById('back-link') as HTMLAnchorElement).href = jobUrl;
-    (document.getElementById('cancel-link') as HTMLAnchorElement).href = jobUrl;
-    (document.getElementById('success-back-link') as HTMLAnchorElement).href = jobUrl;
+  function populateForm(p: Profile) {
+    currentImageUrl = p.image_url;
+    currentTitle = p.title;
+    fillProfileFields(p);
+    renderCurrentAvatar(p.image_url, p.image_url ? 'Current avatar' : 'No image set');
+
+    const profileUrl = `/profile/${profileSlug(p.id, p.title)}/`;
+    (document.getElementById('back-link') as HTMLAnchorElement).href = profileUrl;
+    (document.getElementById('cancel-link') as HTMLAnchorElement).href = profileUrl;
 
     authCheckingEl.classList.add('hidden');
     editFormEl.classList.remove('hidden');
   }
 
-  // ── Image source tabs ─────────────────────────────────────
+  // ── Avatar source tabs ────────────────────────────────────
   let imageSource: 'file' | 'url' = 'file';
-  const imgTabUpload  = document.getElementById('img-tab-upload') as HTMLButtonElement;
-  const imgTabUrl     = document.getElementById('img-tab-url') as HTMLButtonElement;
+  const imgTabUpload  = document.getElementById('img-tab-upload')!;
+  const imgTabUrl     = document.getElementById('img-tab-url')!;
   const imgPaneUpload = document.getElementById('img-pane-upload')!;
   const imgPaneUrl    = document.getElementById('img-pane-url')!;
 
-  imgTabUpload.addEventListener('click', () => {
-    imageSource = 'file';
-    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
-    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
-    imgPaneUpload.classList.remove('hidden');
-    imgPaneUrl.classList.add('hidden');
-  });
+  function switchImageTab(source: 'file' | 'url') {
+    imageSource = source;
+    imgTabUpload.setAttribute('aria-selected', String(source === 'file'));
+    imgTabUrl.setAttribute('aria-selected', String(source === 'url'));
+    imgPaneUpload.classList.toggle('hidden', source !== 'file');
+    imgPaneUrl.classList.toggle('hidden', source !== 'url');
+  }
 
-  imgTabUrl.addEventListener('click', () => {
-    imageSource = 'url';
-    imgTabUrl.className    = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-[#1A1A1A] text-[#F8F7F4] transition-colors duration-150';
-    imgTabUpload.className = 'flex-1 font-mono text-[11px] tracking-[0.2em] uppercase py-2.5 bg-white text-[#888] hover:text-[#1A1A1A] transition-colors duration-150';
-    imgPaneUrl.classList.remove('hidden');
-    imgPaneUpload.classList.add('hidden');
-  });
+  imgTabUpload.addEventListener('click', () => switchImageTab('file'));
+  imgTabUrl.addEventListener('click', () => switchImageTab('url'));
 
-  // ── Image handling ────────────────────────────────────────
-  const imageInput      = document.getElementById('image') as HTMLInputElement;
-  const dropPromptEl    = document.getElementById('drop-prompt')!;
-  const previewWrapEl   = document.getElementById('image-preview-wrap')!;
-  const previewImgEl    = document.getElementById('image-preview') as HTMLImageElement;
-  const imageNameEl     = document.getElementById('image-name')!;
+  // ── Avatar handling ───────────────────────────────────────
+  const imageInput    = document.getElementById('image') as HTMLInputElement;
+  const imageNameEl   = document.getElementById('image-name')!;
+  const imageUrlInput = document.getElementById('image-url') as HTMLInputElement;
 
-  document.getElementById('remove-current-image')!.addEventListener('click', () => {
+  removeCurrentBtn.addEventListener('click', () => {
     imageAction = 'remove';
-    document.getElementById('current-image-wrap')!.classList.add('hidden');
-    document.getElementById('no-image-notice')!.classList.remove('hidden');
-  });
-
-  document.getElementById('remove-new-image')!.addEventListener('click', () => {
     imageInput.value = '';
-    imageAction = 'keep';
-    previewWrapEl.classList.add('hidden');
-    dropPromptEl.classList.remove('hidden');
-    // Restore current image display if it wasn't removed
-    if (currentImageUrl) {
-      document.getElementById('current-image-wrap')!.classList.remove('hidden');
-      document.getElementById('no-image-notice')!.classList.add('hidden');
-    }
-  });
-
-  // ── URL preview ───────────────────────────────────────────
-  const imageUrlInput  = document.getElementById('image-url') as HTMLInputElement;
-  const urlPreviewWrap = document.getElementById('url-preview-wrap')!;
-  const urlPreviewImg  = document.getElementById('url-preview') as HTMLImageElement;
-  let urlDebounce: ReturnType<typeof setTimeout> | null = null;
-
-  imageUrlInput.addEventListener('input', () => {
-    if (urlDebounce) clearTimeout(urlDebounce);
-    urlDebounce = setTimeout(() => {
-      const url = imageUrlInput.value.trim();
-      if (!url) { urlPreviewWrap.classList.add('hidden'); return; }
-      urlPreviewImg.onload  = () => urlPreviewWrap.classList.remove('hidden');
-      urlPreviewImg.onerror = () => urlPreviewWrap.classList.add('hidden');
-      urlPreviewImg.src = url;
-    }, 500);
-  });
-
-  document.getElementById('clear-url')!.addEventListener('click', () => {
-    imageUrlInput.value = '';
-    urlPreviewImg.src = '';
-    urlPreviewWrap.classList.add('hidden');
+    imageNameEl.textContent = 'Drop a photo or click to browse';
+    renderCurrentAvatar(null, 'Avatar will be removed on save');
   });
 
   imageInput.addEventListener('change', () => {
     const file = imageInput.files?.[0];
     if (!file) return;
     imageAction = file;
+    imageNameEl.textContent = file.name;
     const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImgEl.src = e.target?.result as string;
-      imageNameEl.textContent = file.name;
-      dropPromptEl.classList.add('hidden');
-      previewWrapEl.classList.remove('hidden');
-    };
+    reader.onload = (e) => renderCurrentAvatar(e.target?.result as string, 'New avatar — saved on submit');
     reader.readAsDataURL(file);
   });
 
@@ -514,15 +253,11 @@ import Footer from '../components/Footer.astro';
 
   editFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
-    hideError();
+    errorBannerEl.classList.add('hidden');
 
-    const title       = (document.getElementById('title') as HTMLInputElement).value.trim();
-    const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
-    const link        = (document.getElementById('link') as HTMLInputElement).value.trim();
-
-    if (!title)       { showError('Job title is required.'); return; }
-    if (!description) { showError('Description is required.'); return; }
-    if (!link)        { showError('Application URL is required.'); return; }
+    const values = readProfileFields();
+    const invalid = validateProfileFields(values);
+    if (invalid) { showError(invalid); return; }
 
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving…';
@@ -532,39 +267,14 @@ import Footer from '../components/Footer.astro';
 
       if (imageAction === 'remove') {
         image_url = null;
-      } else if (imageSource === 'url') {
-        const extUrl = imageUrlInput.value.trim();
-        image_url = extUrl || null;
+      } else if (imageSource === 'url' && imageUrlInput.value.trim()) {
+        image_url = imageUrlInput.value.trim();
       } else if (imageAction instanceof File) {
-        const file = imageAction;
-        if (file.size > 5 * 1024 * 1024) {
-          showError('Image must be smaller than 5 MB.');
-          return;
-        }
-        const ext = file.name.split('.').pop();
-        const filename = `${crypto.randomUUID()}.${ext}`;
-        const uploadRes = await fetch(
-          `${SUPABASE_URL}/storage/v1/object/job-images/${filename}`,
-          {
-            method: 'POST',
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${sessionToken}`,
-              'Content-Type': file.type,
-              'x-upsert': 'false',
-            },
-            body: file,
-          }
-        );
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err?.message || 'Image upload failed.');
-        }
-        image_url = `${SUPABASE_URL}/storage/v1/object/public/job-images/${filename}`;
+        image_url = await uploadAvatar(imageAction, SUPABASE_URL, SUPABASE_ANON_KEY, sessionToken);
       }
 
       const patchRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId!)}`,
+        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(profileId!)}`,
         {
           method: 'PATCH',
           headers: {
@@ -573,22 +283,17 @@ import Footer from '../components/Footer.astro';
             'Content-Type': 'application/json',
             Prefer: 'return=minimal',
           },
-          body: JSON.stringify({
-            title, description, link, image_url,
-            salary_min:      (document.getElementById('salary-min')  as HTMLInputElement).value  ? Number((document.getElementById('salary-min')  as HTMLInputElement).value)  : null,
-            salary_max:      (document.getElementById('salary-max')  as HTMLInputElement).value  ? Number((document.getElementById('salary-max')  as HTMLInputElement).value)  : null,
-            salary_currency: (document.getElementById('salary-currency') as HTMLSelectElement).value || null,
-            salary_period:   (document.getElementById('salary-period')   as HTMLSelectElement).value || null,
-            valid_through:   (document.getElementById('valid-through')   as HTMLInputElement).value  || null,
-          }),
+          body: JSON.stringify({ ...values, image_url }),
         }
       );
 
       if (!patchRes.ok) {
         const err = await patchRes.json().catch(() => ({}));
-        throw new Error(err?.message || 'Failed to update the position.');
+        throw new Error(err?.message || 'Failed to update the profile.');
       }
 
+      (document.getElementById('success-back-link') as HTMLAnchorElement).href =
+        `/profile/${profileSlug(profileId!, values.title)}/`;
       editFormEl.classList.add('hidden');
       successEl.classList.remove('hidden');
       successEl.scrollIntoView({ behavior: 'smooth' });
@@ -603,16 +308,16 @@ import Footer from '../components/Footer.astro';
 
   // ── Delete ────────────────────────────────────────────────
   document.getElementById('delete-btn')!.addEventListener('click', async () => {
-    if (!confirm('Permanently delete this position? This cannot be undone.')) return;
+    if (!confirm('Permanently delete this profile? This cannot be undone.')) return;
 
     const deleteBtn = document.getElementById('delete-btn') as HTMLButtonElement;
     deleteBtn.disabled = true;
     deleteBtn.textContent = 'Deleting…';
-    hideError();
+    errorBannerEl.classList.add('hidden');
 
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(jobId!)}`,
+        `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(profileId!)}`,
         {
           method: 'DELETE',
           headers: {
@@ -624,7 +329,7 @@ import Footer from '../components/Footer.astro';
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.message || 'Failed to delete the position.');
+        throw new Error(err?.message || 'Failed to delete the profile.');
       }
 
       window.location.href = '/';
@@ -632,7 +337,7 @@ import Footer from '../components/Footer.astro';
     } catch (err: unknown) {
       showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
       deleteBtn.disabled = false;
-      deleteBtn.textContent = 'Delete position';
+      deleteBtn.textContent = 'Delete profile';
     }
   });
 

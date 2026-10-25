@@ -1,10 +1,23 @@
 -- ============================================================
--- VibeCoding Jobs — Supabase Schema
+-- vibecoding.work — Supabase Schema
+-- The launchpad for junior developers and vibecoders: builders post profiles,
+-- mentors and teams browse them. Profiles live in the original `jobs` table.
 -- Run this in the Supabase SQL Editor to set up your database
 -- ============================================================
 
 
--- ── 1. Jobs table ────────────────────────────────────────────
+-- ── 1. Profiles (stored in the `jobs` table) ─────────────────
+-- Column → meaning on the site (form label in quotes):
+--   title           → "Headline"             e.g. 'Maya · AI-native frontend builder'
+--   description     → "About you"
+--   image_url       → "Avatar"
+--   link            → "Profile URL"          GitHub, portfolio, LinkedIn…
+--   employment_type → "Looking for"          MENTORSHIP | INTERN | CONTRACTOR (freelance)
+--                                            | TEMPORARY (short project) | PART_TIME | FULL_TIME
+--   is_remote       → "Open to remote work"
+--   locations       → "Based in"
+--   salary_*        → "Rate expectation"
+--   valid_through   → "Open to offers until"
 CREATE TABLE IF NOT EXISTS jobs (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     title            TEXT        NOT NULL,
@@ -18,11 +31,11 @@ CREATE TABLE IF NOT EXISTS jobs (
     valid_through    DATE,                    -- job expiry date (ISO 8601)
     is_remote        BOOLEAN     DEFAULT true,
     locations        TEXT[],                  -- e.g. '{"USA","Germany","Worldwide"}' — empty/null means unspecified
-    employment_type  TEXT        DEFAULT 'FULL_TIME', -- FULL_TIME | PART_TIME | CONTRACTOR | INTERN | TEMPORARY
+    employment_type  TEXT        DEFAULT 'FULL_TIME', -- MENTORSHIP | INTERN | CONTRACTOR | TEMPORARY | PART_TIME | FULL_TIME
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
--- NOTE: URL slugs are derived at build time as slugify(title) + '-' + id[0:8]
--- e.g. /job/staff-engineer-ai-productivity-a6b7c8d9/
+-- NOTE: URL slugs are derived at request time as slugify(title) + '-' + id[0:8]
+-- e.g. /profile/maya-ainative-frontend-builder-a6b7c8d9/  (legacy /job/… URLs 301-redirect here)
 -- No slug column is needed — the first 8 chars of the UUID guarantee uniqueness.
 
 -- ── Migration: add Google JobPosting structured-data fields ──
@@ -45,7 +58,7 @@ ALTER TABLE jobs
 -- Enable Row Level Security
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 
--- Anyone can read jobs
+-- Anyone can read profiles
 CREATE POLICY "Public read" ON jobs
     FOR SELECT USING (true);
 
@@ -63,7 +76,7 @@ CREATE POLICY "Admin delete" ON jobs
 
 
 -- ── 2. Storage bucket ────────────────────────────────────────
--- Creates a public bucket called "job-images" for job cover images
+-- Creates a public bucket called "job-images" for profile avatars
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('job-images', 'job-images', true)
 ON CONFLICT (id) DO NOTHING;

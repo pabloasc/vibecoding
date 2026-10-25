@@ -1,0 +1,246 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { profileSlug } from '../../lib/slug';
+import { type Profile, lookingFor, formatRate, displayName, initials, formatDate } from '../../lib/profile';
+import { createClient } from '@supabase/supabase-js';
+
+// Extract the 8-char ID prefix appended to every slug
+const { slug } = Astro.params;
+const idMatch = slug?.match(/([0-9a-f]{8})$/i);
+if (!idMatch) return Astro.redirect('/');
+const idPrefix = idMatch[1].toLowerCase();
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+let profile: Profile | null = null;
+try {
+  const db = createClient(supabaseUrl, supabaseKey);
+  const { data } = await db
+    .from('jobs')
+    .select('*')
+    .gte('id', `${idPrefix}-0000-0000-0000-000000000000`)
+    .lte('id', `${idPrefix}-ffff-ffff-ffff-ffffffffffff`)
+    .limit(1)
+    .maybeSingle();
+  profile = (data as Profile) ?? null;
+} catch { /* fall through */ }
+
+if (!profile) return Astro.redirect('/');
+
+// 301-redirect non-canonical slugs (e.g. headline changed since the link was shared)
+const canonicalSlug = profileSlug(profile.id, profile.title);
+if (slug !== canonicalSlug) {
+  return Astro.redirect(`/profile/${canonicalSlug}/`, 301);
+}
+
+const canonicalUrl = `https://vibecoding.work/profile/${canonicalSlug}/`;
+const name = displayName(profile.title);
+const want = lookingFor(profile.employment_type);
+const rate = formatRate(profile);
+const locations = (profile.locations ?? []).filter(l => profile.is_remote !== true || l !== 'Worldwide');
+const openUntil = profile.valid_through ? formatDate(profile.valid_through) : null;
+
+const schemaProfilePage = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': canonicalUrl,
+  url: canonicalUrl,
+  dateCreated: profile.created_at,
+  mainEntity: {
+    '@type': 'Person',
+    name,
+    description: profile.description,
+    disambiguatingDescription: profile.title,
+    url: profile.link,
+    sameAs: [profile.link],
+    ...(profile.image_url ? { image: profile.image_url } : {}),
+    ...(locations.length > 0 ? { homeLocation: { '@type': 'Place', name: locations.join(', ') } } : {}),
+  },
+};
+---
+
+<Layout
+  title={`${profile.title} — vibecoding.work`}
+  description={profile.description.substring(0, 160)}
+  ogImage={profile.image_url ?? '/og.svg'}
+  type="profile"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(schemaProfilePage)} />
+  </Fragment>
+
+  <Header />
+
+  <main class="relative">
+    <div class="absolute inset-x-0 top-0 h-[380px] grid-bg pointer-events-none"></div>
+    <div class="orb w-[460px] h-[460px] bg-violet -top-56 -left-32 !opacity-35"></div>
+    <div class="orb w-[320px] h-[320px] bg-acid -top-24 right-0 !opacity-15"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-8">
+
+      <!-- Back + admin -->
+      <div class="flex items-center justify-between gap-4 mb-10">
+        <a href="/#builders" class="text-fog hover:text-snow transition-colors text-[0.9rem]">← All builders</a>
+        <div id="admin-bar" class="hidden items-center gap-3 font-mono text-[0.72rem]">
+          <span class="text-fog">admin</span>
+          <a href={`/edit?id=${profile.id}`} class="text-acid hover:underline">Edit</a>
+          <button id="delete-btn" data-profile-id={profile.id} class="text-pink hover:underline">Delete</button>
+        </div>
+      </div>
+
+      <!-- Profile header -->
+      <section class="fade-in flex flex-col sm:flex-row gap-6 sm:gap-8 sm:items-center">
+        <div class="avatar-ring w-24 h-24 sm:w-32 sm:h-32 !rounded-[1.6rem] shrink-0">
+          <div id="avatar" class="avatar-inner !rounded-[calc(1.6rem-2px)] text-[2rem] sm:text-[2.5rem]" data-initials={initials(profile.title)}>
+            {profile.image_url
+              ? <img src={profile.image_url} alt={name} class="w-full h-full object-cover" />
+              : initials(profile.title)}
+          </div>
+        </div>
+
+        <div class="min-w-0">
+          <span class="eyebrow">// builder profile</span>
+          <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2rem,5vw,3.2rem)] mt-2">{profile.title}</h1>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} Looking for: {want.label}</span>
+            {profile.is_remote === true && <span class="chip !text-[0.75rem] !py-1.5 !px-3">🌍 Open to remote</span>}
+            {locations.map(loc => <span class="chip !text-[0.75rem] !py-1.5 !px-3">📍 {loc}</span>)}
+            {rate && <span class="chip chip-violet !text-[0.75rem] !py-1.5 !px-3">{rate}</span>}
+          </div>
+        </div>
+      </section>
+
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6 mt-12 items-start">
+
+        <!-- About -->
+        <article class="card p-6 sm:p-9">
+          <p class="eyebrow mb-5">// about {name.toLowerCase()}</p>
+          <p class="text-[1rem] sm:text-[1.05rem] leading-[1.8] text-snow/85 whitespace-pre-wrap break-words">{profile.description}</p>
+
+          <div class="flex flex-wrap items-center gap-3 mt-10 pt-6 border-t border-line">
+            <a href={profile.link} target="_blank" rel="noopener noreferrer" class="btn-primary">
+              Visit {name}'s profile ↗
+            </a>
+            <button id="share-btn" class="btn-ghost">Copy link</button>
+          </div>
+        </article>
+
+        <!-- Mentor sidebar -->
+        <aside class="lg:sticky lg:top-24 space-y-4">
+          <div class="card relative overflow-hidden p-6">
+            <div class="orb w-[220px] h-[220px] bg-violet -top-24 -right-16 !opacity-30"></div>
+            <p class="relative text-[1.6rem]">🧭</p>
+            <p class="relative font-semibold text-[1.15rem] mt-3">Want to help {name} level up?</p>
+            <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
+              A 30-minute code review, a pairing session or a small paid project can be the first line on their résumé.
+            </p>
+            <a href={profile.link} target="_blank" rel="noopener noreferrer"
+               class="relative inline-flex items-center gap-1.5 mt-5 text-acid font-medium text-[0.92rem] hover:underline underline-offset-4">
+              Reach out ↗
+            </a>
+          </div>
+
+          <dl class="card p-6 space-y-4 text-[0.9rem]">
+            <div class="flex justify-between gap-4">
+              <dt class="text-fog">Joined</dt>
+              <dd class="font-mono text-[0.82rem]">{formatDate(profile.created_at)}</dd>
+            </div>
+            {openUntil && (
+              <div class="flex justify-between gap-4">
+                <dt class="text-fog">Open to offers until</dt>
+                <dd class="font-mono text-[0.82rem]">{openUntil}</dd>
+              </div>
+            )}
+            <div class="flex justify-between gap-4">
+              <dt class="text-fog">Looking for</dt>
+              <dd class="font-mono text-[0.82rem]">{want.label}</dd>
+            </div>
+          </dl>
+
+          <a href="/submit" class="block rounded-2xl border border-dashed border-line hover:border-acid/50 p-5 text-center transition-colors">
+            <p class="text-[0.9rem] text-fog">Junior dev or vibecoder?</p>
+            <p class="font-semibold mt-1">Drop your profile too <span class="text-acid">→</span></p>
+          </a>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { supabase, ADMIN_EMAIL } from '../../lib/supabase';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  // ── Avatar fallback ───────────────────────────────────────────
+  const avatarEl = document.getElementById('avatar')!;
+  avatarEl.querySelector('img')?.addEventListener('error', () => {
+    avatarEl.textContent = avatarEl.dataset.initials ?? '?';
+  });
+
+  // ── Share ─────────────────────────────────────────────────────
+  const shareBtn = document.getElementById('share-btn') as HTMLButtonElement;
+  shareBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      shareBtn.textContent = 'Copied ✓';
+    } catch {
+      shareBtn.textContent = 'Copy failed';
+    }
+    setTimeout(() => { shareBtn.textContent = 'Copy link'; }, 1800);
+  });
+
+  // ── Admin check ───────────────────────────────────────────────
+  async function checkAdmin() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.email === ADMIN_EMAIL) {
+      const bar = document.getElementById('admin-bar')!;
+      bar.classList.remove('hidden');
+      bar.classList.add('flex');
+    }
+  }
+
+  checkAdmin();
+
+  // ── Delete profile ────────────────────────────────────────────
+  document.getElementById('delete-btn')?.addEventListener('click', async () => {
+    if (!confirm('Permanently delete this profile? This cannot be undone.')) return;
+
+    const btn = document.getElementById('delete-btn') as HTMLButtonElement;
+    btn.textContent = 'Deleting…';
+    btn.disabled = true;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) { alert('Not authenticated.'); btn.textContent = 'Delete'; btn.disabled = false; return; }
+
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/jobs?id=eq.${encodeURIComponent(btn.dataset.profileId!)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+        },
+      }
+    );
+
+    if (res.ok) {
+      window.location.href = '/';
+    } else {
+      alert('Failed to delete profile.');
+      btn.textContent = 'Delete';
+      btn.disabled = false;
+    }
+  });
+</script>

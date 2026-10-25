@@ -4,27 +4,15 @@ export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { jobSlug } from '../lib/slug';
-
-type Job = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string | null;
-  link: string;
-  created_at: string;
-  is_remote: boolean | null;
-  locations: string[] | null;
-  salary_min: number | null;
-  salary_max: number | null;
-  employment_type: string | null;
-};
+import ProfileCard from '../components/ProfileCard.astro';
+import { profileSlug } from '../lib/slug';
+import { type Profile, displayName } from '../lib/profile';
 
 const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 12;
 
-let ssrJobs: Job[] = [];
+let ssrProfiles: Profile[] = [];
 let ssrTotal = 0;
 
 if (SUPABASE_URL && SUPABASE_KEY) {
@@ -41,7 +29,7 @@ if (SUPABASE_URL && SUPABASE_KEY) {
       }
     );
     if (res.ok) {
-      ssrJobs = await res.json();
+      ssrProfiles = await res.json();
       const range = res.headers.get('Content-Range');
       if (range) {
         const m = range.match(/\/(\d+)$/);
@@ -51,60 +39,39 @@ if (SUPABASE_URL && SUPABASE_KEY) {
   } catch { /* fall through — JS will load client-side */ }
 }
 
-// Server-side JSON-LD for Google
+// Server-side JSON-LD for search engines
 const schemaItemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'Open AI Developer Positions — vibecoding.work',
-  description: 'Jobs for vibecoders and AI-native software engineers.',
+  name: 'Junior developers & vibecoders — vibecoding.work',
+  description: 'Profiles of junior developers and vibecoders looking for mentors and their first professional assignment.',
   url: 'https://vibecoding.work/',
   numberOfItems: ssrTotal,
-  itemListElement: ssrJobs.map((job, i) => ({
+  itemListElement: ssrProfiles.map((p, i) => ({
     '@type': 'ListItem',
     position: i + 1,
-    item: {
-      '@type': 'JobPosting',
-      '@id': `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
-      title: job.title,
-      description: job.description,
-      datePosted: job.created_at.split('T')[0],
-      url: `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
-      directApply: false,
-      ...(job.is_remote === true ? {
-        jobLocationType: 'TELECOMMUTE',
-        applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
-      } : {}),
-      employmentType: job.employment_type ?? 'FULL_TIME',
-      occupationalCategory: '15-1252',
-      hiringOrganization: {
-        '@type': 'Organization',
-        name: 'vibecoding.work',
-        sameAs: 'https://vibecoding.work',
-        logo: 'https://vibecoding.work/images/logo.png',
-      },
-      ...(job.image_url ? { image: job.image_url } : {}),
-    },
+    url: `https://vibecoding.work/profile/${profileSlug(p.id, p.title)}/`,
+    name: displayName(p.title),
   })),
 };
 
-const TAG_CLS = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase bg-[#F5F5F5] border border-[#E8E8E8] text-[#555] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
+const MS_7D = 7 * 24 * 60 * 60 * 1000;
+const newThisWeek = ssrProfiles.filter(p => (Date.now() - new Date(p.created_at).getTime()) < MS_7D).length;
 
-const now = Date.now();
-const MS_72H = 72 * 60 * 60 * 1000;
-const MS_7D  =  7 * 24 * 60 * 60 * 1000;
-const isNew72h = (iso: string) => (now - new Date(iso).getTime()) < MS_72H;
-const newThisWeek = ssrJobs.filter(j => (now - new Date(j.created_at).getTime()) < MS_7D).length;
+const FILTERS = [
+  { key: 'all',        label: 'Everyone',     query: '' },
+  { key: 'mentorship', label: '🧭 Mentorship', query: 'employment_type=eq.MENTORSHIP' },
+  { key: 'intern',     label: '🎓 Internship', query: 'employment_type=eq.INTERN' },
+  { key: 'freelance',  label: '⚡ Freelance',  query: 'employment_type=in.(CONTRACTOR,TEMPORARY)' },
+  { key: 'jobs',       label: '🚀 Jobs',       query: 'employment_type=in.(FULL_TIME,PART_TIME)' },
+];
 
-function formatDate(iso: string) {
-  return new Date(iso)
-    .toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
-    .toUpperCase();
-}
+const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Windsurf', 'Copilot', 'Supabase', 'Vercel', 'Next.js', 'Python'];
 ---
 
 <Layout
-  title="vibecoding.work — AI Developer Jobs & Remote Opportunities"
-  description="Browse open positions for vibecoders and AI-native developers. Find jobs that embrace AI-assisted development and ship at the speed of thought."
+  title="vibecoding.work — Where junior devs & vibecoders land their first gig"
+  description="Junior developers and vibecoders post their profile. Mentors, founders and teams find them. Get mentorship and land your first professional assignment."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
@@ -113,277 +80,304 @@ function formatDate(iso: string) {
   <Header />
 
   <main class="w-full">
-  <div class="max-w-6xl mx-auto">
 
-    <!-- ─── Section header ─────────────────────────────────── -->
-    <div class="px-6 md:px-8 py-4 border-b border-[#EBEBEB] flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <h1 class="font-sans font-semibold text-[0.75rem] tracking-[0.18em] uppercase text-[#0A0A0A] shrink-0">
-          Vibe Coder Jobs &amp; AI Developer Positions
-        </h1>
-        {newThisWeek > 0 && (
-          <span class="hidden sm:inline-flex items-center gap-1.5 font-mono text-[0.5rem] tracking-[0.08em] uppercase text-white bg-[#CC0000] px-2 py-[3px] rounded-full whitespace-nowrap shrink-0">
-            <span class="w-1.5 h-1.5 rounded-full bg-white/80 vc-pulse"></span>
-            {newThisWeek} new this week
+    <!-- ═══════════ HERO ═══════════════════════════════════════ -->
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 grid-bg"></div>
+      <div class="orb w-[520px] h-[520px] bg-violet -top-56 -left-40"></div>
+      <div class="orb w-[420px] h-[420px] bg-acid !opacity-20 top-10 -right-40"></div>
+      <div class="orb w-[300px] h-[300px] bg-pink !opacity-25 bottom-0 left-1/3"></div>
+
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-16 sm:pt-24 pb-20 sm:pb-28 grid lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
+
+        <div class="fade-in">
+          <span class="chip chip-acid !text-[0.72rem] !py-1.5 !px-3">
+            <span class="w-1.5 h-1.5 rounded-full bg-acid vc-pulse"></span>
+            {ssrTotal > 0 ? `${ssrTotal} builders looking for their first break` : 'For junior devs & vibecoders'}
           </span>
-        )}
-      </div>
-      <span id="job-count" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888] shrink-0">
-        {ssrTotal > 0 ? `${ssrTotal} position${ssrTotal !== 1 ? 's' : ''}` : 'Open positions'}
-      </span>
-    </div>
 
-    <!-- ─── "New since last visit" banner (shown by JS) ──────── -->
-    <div id="new-visit-banner" class="hidden items-center justify-between px-6 md:px-8 py-2.5 bg-[#FFF5F5] border-b border-[#FFE0E0]">
-      <span class="flex items-center gap-2 font-mono text-[0.58rem] tracking-[0.1em] uppercase text-[#CC0000]">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#CC0000] shrink-0 vc-pulse"></span>
-        <span id="new-visit-text"></span>
-      </span>
-      <button id="dismiss-visit-banner" class="font-mono text-[0.65rem] text-[#CCC] hover:text-[#999] transition-colors leading-none ml-4 shrink-0">✕</button>
-    </div>
+          <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)] mt-6">
+            <span class="lg:whitespace-nowrap">From side projects</span><br />
+            to your <span class="gradient-text">first<br />real gig.</span>
+          </h1>
 
-    <!-- ─── Loading skeleton (hidden when SSR succeeds) ──────── -->
-    <div id="loading-state" class={`${ssrJobs.length > 0 ? 'hidden ' : ''}divide-y divide-[#F4F4F4]`}>
-      {[...Array(6)].map(() => (
-        <div class="flex items-start gap-5 px-6 md:px-8 py-5 animate-pulse">
-          <div class="w-[52px] h-[52px] md:w-[80px] md:h-[80px] bg-[#F4F4F4] shrink-0 mt-0.5"></div>
-          <div class="flex-1 min-w-0 space-y-2">
-            <div class="h-3.5 bg-[#F4F4F4] rounded-sm w-2/5"></div>
-            <div class="h-2.5 bg-[#F4F4F4] rounded-sm w-full"></div>
-            <div class="h-2.5 bg-[#F4F4F4] rounded-sm w-3/4"></div>
-            <div class="flex gap-2 mt-1">
-              <div class="h-4 w-14 bg-[#F4F4F4] rounded-full"></div>
-              <div class="h-4 w-16 bg-[#F4F4F4] rounded-full"></div>
-              <div class="h-4 w-12 bg-[#F4F4F4] rounded-full ml-auto"></div>
+          <p class="text-[1.08rem] sm:text-[1.15rem] text-fog leading-relaxed mt-6 max-w-[34rem]">
+            We help <strong class="text-snow font-semibold">junior developers</strong> and <strong class="text-snow font-semibold">vibecoders</strong> find mentors and land their first professional assignments.
+            Drop your profile, show what you've shipped — mentors, founders and teams come to you.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 mt-9">
+            <a href="/submit" class="btn-primary">Drop your profile <span aria-hidden="true">→</span></a>
+            <a href="#builders" class="btn-ghost">Browse builders</a>
+          </div>
+
+          <ul class="flex flex-wrap gap-x-5 gap-y-2 mt-7 font-mono text-[0.72rem] text-fog">
+            <li><span class="text-acid">✓</span> Free forever</li>
+            <li><span class="text-acid">✓</span> No CV needed</li>
+            <li><span class="text-acid">✓</span> Takes 2 minutes</li>
+          </ul>
+        </div>
+
+        <!-- Terminal mock -->
+        <div class="relative fade-in hidden sm:block" style="animation-delay:120ms">
+          <div class="absolute -inset-4 rounded-[1.75rem] bg-gradient-to-br from-acid/20 via-violet/20 to-pink/20 blur-2xl"></div>
+          <div class="relative card !rounded-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-line bg-raised/60">
+              <span class="w-3 h-3 rounded-full bg-[#FF5F57]"></span>
+              <span class="w-3 h-3 rounded-full bg-[#FEBC2E]"></span>
+              <span class="w-3 h-3 rounded-full bg-[#28C840]"></span>
+              <span class="ml-3 font-mono text-[0.7rem] text-fog">~/my-first-gig — zsh</span>
+            </div>
+            <div class="p-5 sm:p-6 pb-12 sm:pb-14 font-mono text-[0.82rem] leading-[1.9]">
+              <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> npx vibecoding drop-profile</p>
+              <p class="term-line text-fog">  ↳ github.com/you · 4 shipped projects</p>
+              <p class="term-line"><span class="text-acid">✓</span> profile live on vibecoding.work</p>
+              <p class="term-line"><span class="text-acid">✓</span> 3 mentors viewed your work</p>
+              <p class="term-line"><span class="text-acid">✓</span> code review scheduled — <span class="text-pink">Thu 4pm</span></p>
+              <p class="term-line"><span class="text-acid">✓</span> first freelance offer received 🎉</p>
+              <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> <span class="caret inline-block w-2 h-4 bg-acid align-middle"></span></p>
             </div>
           </div>
-          <div class="h-2.5 w-10 bg-[#F4F4F4] rounded-sm hidden sm:block shrink-0 mt-1"></div>
-        </div>
-      ))}
-    </div>
 
-    <!-- ─── Empty state ─────────────────────────────────────── -->
-    <div id="empty-state" class="hidden px-6 md:px-8 py-24 text-center border-b border-[#EBEBEB]">
-      <p class="font-sans font-semibold text-[1.5rem] text-[#888] mb-4 leading-none">No positions yet.</p>
-      <a href="/submit"
-        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666] hover:text-[#CC0000] transition-colors underline-offset-4 underline">
-        Be the first to submit one ↗
-      </a>
-    </div>
-
-    <!-- ─── Error state ──────────────────────────────────────── -->
-    <div id="error-state" class="hidden px-6 md:px-8 py-12 text-center">
-      <p class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#CC0000]">
-        Failed to load positions.
-      </p>
-    </div>
-
-    <!-- ─── Job list — SSR-populated for page 0 ─────────────── -->
-    <div id="job-list" data-ssr-total={ssrTotal} class={ssrJobs.length === 0 ? 'hidden' : ''}>
-      {ssrJobs.map((job, i) => {
-        const slug = jobSlug(job.id, job.title);
-        const locs = (job.locations ?? []).filter(l => job.is_remote !== true || l !== 'Worldwide');
-        const locLabel = locs.length > 2 ? `${locs[0]}, ${locs[1]} +${locs.length - 2}` : locs.join(', ');
-        return (
-          <article class="job-card group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2] hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer" style={`animation-delay:${i * 45}ms`} data-created-at={job.created_at}>
-
-            <div class="w-[52px] h-[52px] md:w-[80px] md:h-[80px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center mt-0.5 job-image-wrap">
-              {job.image_url
-                ? <img src={job.image_url} alt={job.title} loading="lazy" width="80" height="80" class="w-full h-full object-contain p-1" />
-                : <span style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;font-weight:600;color:#1A1A1A;line-height:1;">{(job.title.trim()[0] ?? '?').toUpperCase()}</span>
-              }
+          <!-- Floating badge -->
+          <div class="absolute -bottom-8 -left-6 card !rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl rotate-[-3deg]">
+            <span class="text-[1.4rem]">🧭</span>
+            <div>
+              <p class="text-[0.82rem] font-semibold leading-tight">New mentor match</p>
+              <p class="font-mono text-[0.66rem] text-fog">Senior eng · 30-min pairing</p>
             </div>
+          </div>
+        </div>
 
-            <div class="flex-1 min-w-0">
-              <h2 class="job-title font-sans font-semibold text-[0.92rem] md:text-[1rem] leading-snug truncate text-[#0A0A0A] group-hover:text-[#CC0000] transition-colors duration-100">{job.title}</h2>
-              <p class="job-description font-sans text-[0.82rem] text-[#777] mt-1.5 leading-relaxed line-clamp-2 md:line-clamp-3">{job.description}</p>
-              <div class="flex items-center gap-2 mt-2 flex-wrap">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  {isNew72h(job.created_at) && (
-                    <span class="inline-flex items-center gap-1 font-mono text-[0.5rem] tracking-[0.1em] uppercase text-white bg-[#CC0000] px-1.5 py-[2px] rounded-full whitespace-nowrap leading-none">
-                      <span class="w-1 h-1 rounded-full bg-white/70 vc-pulse inline-block shrink-0"></span>New
-                    </span>
-                  )}
-                  {job.is_remote === true  && <span class={TAG_CLS}>Remote</span>}
-                  {job.is_remote === false && <span class={TAG_CLS}>On-site</span>}
-                  {locs.length > 0         && <span class={TAG_CLS}>{locLabel}</span>}
-                  {(job.salary_min != null || job.salary_max != null) && <span class={TAG_CLS}>Salary listed</span>}
-                </div>
-                <span class="font-mono text-[0.52rem] tracking-[0.08em] text-[#B0B0B0] uppercase whitespace-nowrap">{formatDate(job.created_at)}</span>
+      </div>
+    </section>
+
+    <!-- ═══════════ TOOL MARQUEE ═══════════════════════════════ -->
+    <section class="border-y border-line/70 bg-surface/40 overflow-hidden" aria-label="Tools our builders ship with">
+      <div class="marquee-track flex w-max gap-10 py-4" style="animation: marquee 40s linear infinite;">
+        {[...TOOLS, ...TOOLS].map(t => (
+          <span class="font-mono text-[0.8rem] text-fog whitespace-nowrap flex items-center gap-10">
+            {t}<span class="text-acid/60">✦</span>
+          </span>
+        ))}
+      </div>
+    </section>
+
+    <!-- ═══════════ BUILDERS ═══════════════════════════════════ -->
+    <section id="builders" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-20">
+
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div>
+          <span class="eyebrow">// fresh builders</span>
+          <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2">
+            Talent that ships. <span class="text-fog">Ready for a first shot.</span>
+          </h2>
+          <p class="text-fog mt-2 flex items-center gap-3 flex-wrap">
+            <span id="profile-count">{ssrTotal > 0 ? `${ssrTotal} builder${ssrTotal !== 1 ? 's' : ''}` : 'Builders'}</span>
+            {newThisWeek > 0 && (
+              <span class="chip chip-new">
+                <span class="w-1.5 h-1.5 rounded-full bg-void/70 vc-pulse"></span>
+                {newThisWeek} new this week
+              </span>
+            )}
+          </p>
+        </div>
+
+        <!-- Filters -->
+        <div id="filters" class="flex flex-wrap gap-2" role="radiogroup" aria-label="Filter by what builders are looking for">
+          {FILTERS.map((f, i) => (
+            <label class="pill-option">
+              <input type="radio" name="looking-for" value={f.key} data-query={f.query} checked={i === 0} autocomplete="off" />
+              <span>{f.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <!-- "New since last visit" banner (shown by JS) -->
+      <div id="new-visit-banner" class="hidden items-center justify-between gap-4 mb-6 px-4 py-3 rounded-xl border border-acid/30 bg-acid/5">
+        <span class="flex items-center gap-2 text-[0.9rem] text-acid">
+          <span class="w-1.5 h-1.5 rounded-full bg-acid shrink-0 vc-pulse"></span>
+          <span id="new-visit-text"></span>
+        </span>
+        <button id="dismiss-visit-banner" class="text-fog hover:text-snow transition-colors" aria-label="Dismiss">✕</button>
+      </div>
+
+      <!-- Loading skeleton (hidden when SSR succeeds) -->
+      <div id="loading-state" class={ssrProfiles.length > 0 ? 'hidden' : ''}>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(6)].map(() => (
+          <div class="card p-6 animate-pulse">
+            <div class="flex gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-raised"></div>
+              <div class="flex-1 space-y-2 pt-1">
+                <div class="h-3.5 bg-raised rounded w-3/4"></div>
+                <div class="h-5 bg-raised rounded-full w-28"></div>
               </div>
             </div>
+            <div class="space-y-2 mt-5">
+              <div class="h-2.5 bg-raised rounded"></div>
+              <div class="h-2.5 bg-raised rounded w-5/6"></div>
+              <div class="h-2.5 bg-raised rounded w-2/3"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      </div>
 
-            <a href={job.link}
-               class="relative z-10 font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#CC0000] shrink-0 whitespace-nowrap hidden sm:block mt-0.5 hover:underline underline-offset-2"
-               target="_blank" rel="noopener noreferrer">Apply ↗</a>
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden card text-center px-6 py-16">
+        <p class="text-[2.5rem] mb-3">🌱</p>
+        <p class="font-semibold text-[1.4rem] mb-2">Nobody here yet.</p>
+        <p class="text-fog mb-6">Be the first builder in this lane — it takes two minutes.</p>
+        <a href="/submit" class="btn-primary">Drop your profile →</a>
+      </div>
 
-            <a href={`/job/${slug}/`} class="absolute inset-0 z-0" aria-hidden="true" tabindex="-1"></a>
-          </article>
-        );
-      })}
-    </div>
+      <!-- Error state -->
+      <div id="error-state" class="hidden banner-error text-center">
+        Couldn't load builders. Refresh to try again.
+      </div>
 
-    <!-- ─── Pagination ───────────────────────────────────────── -->
-    <div id="pagination" class="hidden px-6 md:px-8 py-5 border-t border-[#EBEBEB] flex items-center justify-between gap-4">
-      <button id="page-prev"
-        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666]
-               hover:text-[#0A0A0A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
-        ← Prev
-      </button>
-      <span id="page-indicator" class="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-[#888]"></span>
-      <button id="page-next"
-        class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#666]
-               hover:text-[#0A0A0A] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
-        Next →
-      </button>
-    </div>
+      <!-- Profile grid — SSR-populated for page 0 -->
+      <div id="profile-list" data-ssr-total={ssrTotal}
+           class={`${ssrProfiles.length === 0 ? 'hidden ' : ''}grid-cards`}>
+        {ssrProfiles.map((profile, i) => <ProfileCard profile={profile} index={i} />)}
+      </div>
 
-  </div>
+      <!-- Pagination -->
+      <div id="pagination" class="hidden mt-10 items-center justify-center gap-3">
+        <button id="page-prev" class="btn-ghost !py-2 !px-4 !text-[0.85rem] disabled:opacity-30 disabled:cursor-not-allowed">← Prev</button>
+        <span id="page-indicator" class="font-mono text-[0.75rem] text-fog px-2"></span>
+        <button id="page-next" class="btn-ghost !py-2 !px-4 !text-[0.85rem] disabled:opacity-30 disabled:cursor-not-allowed">Next →</button>
+      </div>
+    </section>
+
+    <!-- ═══════════ HOW IT WORKS ═══════════════════════════════ -->
+    <section id="how" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
+      <span class="eyebrow">// how it works</span>
+      <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2 max-w-2xl">
+        No 5-years-of-experience gatekeeping. <span class="gradient-text">Just show your work.</span>
+      </h2>
+
+      <div class="grid md:grid-cols-3 gap-4 mt-10">
+        {[
+          { n: '01', icon: '📦', title: 'Drop your profile', body: "Link your GitHub, portfolio or LinkedIn. Tell us what you've shipped, the stack you vibe with, and what you want to learn next." },
+          { n: '02', icon: '👀', title: 'Get discovered',    body: 'Mentors, founders and teams browse fresh builders every week — looking for exactly the hunger and curiosity juniors bring.' },
+          { n: '03', icon: '🤝', title: 'Land the gig',      body: 'Code reviews, pairing sessions, internships, freelance projects. Your first professional assignment starts with one intro.' },
+        ].map((s, i) => (
+          <div class="card card-hover p-6 sm:p-7 fade-in" style={`animation-delay:${i * 80}ms`}>
+            <div class="flex items-center justify-between">
+              <span class="text-[1.8rem]">{s.icon}</span>
+              <span class="font-mono text-[0.75rem] text-fog">{s.n}</span>
+            </div>
+            <h3 class="font-semibold text-[1.25rem] mt-6">{s.title}</h3>
+            <p class="text-fog text-[0.93rem] leading-relaxed mt-2">{s.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ═══════════ FOR MENTORS ════════════════════════════════ -->
+    <section id="mentors" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
+      <div class="relative card !rounded-[1.75rem] overflow-hidden p-7 sm:p-12">
+        <div class="orb w-[380px] h-[380px] bg-violet -top-40 -right-20 !opacity-35"></div>
+        <div class="orb w-[260px] h-[260px] bg-acid -bottom-32 left-10 !opacity-15"></div>
+
+        <div class="relative grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+          <div>
+            <span class="eyebrow">// for mentors &amp; teams</span>
+            <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.6rem)] leading-tight mt-2">
+              Remember who gave you your first break?
+            </h2>
+            <p class="text-fog text-[1.02rem] leading-relaxed mt-4 max-w-lg">
+              Pay it forward. Every builder here is learning fast with AI tools and needs one person to say
+              <em class="text-snow not-italic font-medium">"let's ship something together."</em>
+              Browse profiles, reach out directly — no recruiters, no fees.
+            </p>
+            <div class="flex flex-wrap gap-3 mt-8">
+              <a href="#builders" class="btn-primary">Find a builder →</a>
+              <a href="mailto:hi@vibecoders.co?subject=I%20want%20to%20mentor" class="btn-ghost">Become a mentor</a>
+            </div>
+          </div>
+
+          <ul class="grid grid-cols-2 gap-3">
+            {[
+              { icon: '🔍', t: '30-min code review' },
+              { icon: '🧑‍💻', t: 'Pair on a feature' },
+              { icon: '💸', t: 'Offer a paid side project' },
+              { icon: '📣', t: 'Refer them to your team' },
+            ].map(x => (
+              <li class="rounded-2xl border border-line bg-raised/70 p-4 sm:p-5">
+                <span class="text-[1.4rem]">{x.icon}</span>
+                <p class="font-medium text-[0.95rem] mt-3 leading-snug">{x.t}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ FINAL CTA ══════════════════════════════════ -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28 text-center">
+      <h2 class="font-bold tracking-[-0.035em] text-[clamp(2.2rem,6vw,4rem)] leading-[1.02]">
+        Stop lurking.<br /><span class="gradient-text">Start getting noticed.</span>
+      </h2>
+      <p class="text-fog text-[1.05rem] mt-5 max-w-md mx-auto">Your next mentor might be scrolling this page right now.</p>
+      <a href="/submit" class="btn-primary mt-8 !text-[1.05rem] !px-7 !py-4">Drop your profile — it's free →</a>
+    </section>
+
   </main>
 
   <Footer />
 </Layout>
 
-<style>
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes vcPulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.25; }
-  }
-  .job-card { animation: fadeSlideIn 0.32s ease both; }
-  .vc-pulse  { animation: vcPulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
-</style>
-
-<!-- ═══════ ROW TEMPLATE — used by JS for pages 1+ ══════════════ -->
-<template id="tpl-row">
-  <article class="job-card group relative flex items-start gap-5 px-6 md:px-8 py-5 border-b border-[#F2F2F2]
-                  hover:bg-[#FAFAFA] transition-colors duration-100 cursor-pointer" data-created-at="">
-
-    <!-- Thumbnail — clean square -->
-    <div class="job-image-wrap w-[52px] h-[52px] md:w-[80px] md:h-[80px] shrink-0 overflow-hidden bg-[#F4F4F4] flex items-center justify-center mt-0.5"></div>
-
-    <!-- Title + description + meta -->
-    <div class="flex-1 min-w-0">
-      <h2 class="job-title font-sans font-semibold text-[0.92rem] md:text-[1rem] leading-snug truncate text-[#0A0A0A]
-                 group-hover:text-[#CC0000] transition-colors duration-100"></h2>
-      <p class="job-description font-sans text-[0.82rem] text-[#777] mt-1.5 leading-relaxed line-clamp-2 md:line-clamp-3"></p>
-      <div class="flex items-center gap-2 mt-2 flex-wrap">
-        <div class="job-tags flex items-center gap-1.5 flex-wrap"></div>
-        <span class="job-date font-mono text-[0.52rem] tracking-[0.08em] text-[#B0B0B0] uppercase whitespace-nowrap"></span>
-      </div>
-    </div>
-
-    <!-- Apply link -->
-    <a class="job-link relative z-10 font-mono text-[0.6rem] tracking-[0.18em] uppercase
-              text-[#CC0000] shrink-0 whitespace-nowrap hidden sm:block mt-0.5
-              hover:underline underline-offset-2"
-       target="_blank" rel="noopener noreferrer">Apply ↗</a>
-
-    <!-- Full-row tap target -->
-    <a class="job-card-link absolute inset-0 z-0"
-       aria-hidden="true" tabindex="-1"></a>
-  </article>
-</template>
+<!-- ═══════ CARD TEMPLATE — cloned by JS for filters / pages 1+ ═══════ -->
+<template id="tpl-card"><ProfileCard /></template>
 
 <script>
-  import { jobSlug } from '../lib/slug';
+  import type { Profile } from '../lib/profile';
+  import { fillCard } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  const PAGE_SIZE = 15;
+  const PAGE_SIZE = 12;
 
-  type Job = { id: string; title: string; description: string; image_url: string | null; link: string; created_at: string; is_remote: boolean | null; locations: string[] | null; salary_min: number | null; salary_max: number | null; };
-
-  let currentPage = 0;
+  let currentPage  = 0;
   let totalCount   = 0;
+  let currentQuery = '';
 
-  const loadingEl   = document.getElementById('loading-state')!;
-  const emptyEl     = document.getElementById('empty-state')!;
-  const errorEl     = document.getElementById('error-state')!;
-  const countEl     = document.getElementById('job-count')!;
-  const listEl      = document.getElementById('job-list')!;
+  const loadingEl    = document.getElementById('loading-state')!;
+  const emptyEl      = document.getElementById('empty-state')!;
+  const errorEl      = document.getElementById('error-state')!;
+  const countEl      = document.getElementById('profile-count')!;
+  const listEl       = document.getElementById('profile-list')!;
   const paginationEl = document.getElementById('pagination')!;
-  const prevBtn     = document.getElementById('page-prev') as HTMLButtonElement;
-  const nextBtn     = document.getElementById('page-next') as HTMLButtonElement;
-  const indicatorEl = document.getElementById('page-indicator')!;
+  const prevBtn      = document.getElementById('page-prev') as HTMLButtonElement;
+  const nextBtn      = document.getElementById('page-next') as HTMLButtonElement;
+  const indicatorEl  = document.getElementById('page-indicator')!;
 
   // Detect SSR-rendered content
   const ssrTotal = parseInt(listEl.dataset.ssrTotal ?? '', 10);
   const hasSSR   = !isNaN(ssrTotal) && ssrTotal > 0;
 
-  function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  function countLabel(n: number) {
+    return `${n} builder${n !== 1 ? 's' : ''}`;
   }
 
-  function showInitialAvatar(wrap: Element, title: string) {
-    const letter = title.trim()[0]?.toUpperCase() ?? '?';
-    wrap.innerHTML = `<span style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;font-weight:600;color:#1A1A1A;line-height:1;">${letter}</span>`;
-  }
-
-  function injectImage(wrap: Element, job: Job) {
-    if (job.image_url) {
-      const img = document.createElement('img');
-      img.src = job.image_url;
-      img.alt = job.title;
-      img.loading = 'lazy';
-      img.className = 'w-full h-full object-contain p-1';
-      img.onerror = () => { img.remove(); showInitialAvatar(wrap, job.title); };
-      wrap.appendChild(img);
-    } else {
-      showInitialAvatar(wrap, job.title);
-    }
-  }
-
-  const IC_GLOBE = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="5"/><path d="M1 6h10"/><path d="M6 1c-1.5 2-2 3.5-2 5s.5 3 2 5"/><path d="M6 1c1.5 2 2 3.5 2 5s-.5 3-2 5"/></svg>`;
-  const IC_PIN   = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5S2.5 7 2.5 5a3.5 3.5 0 0 1 7 0C9.5 7 6 10.5 6 10.5z"/><circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/></svg>`;
-  const IC_DOLLAR = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1.5v9M4.5 3.5h2a1.5 1.5 0 0 1 0 3H5a1.5 1.5 0 0 0 0 3h2.5"/></svg>`;
-  const TAG_CLS  = 'inline-flex items-center gap-1 font-mono text-[0.55rem] tracking-[0.08em] uppercase bg-[#F5F5F5] border border-[#E8E8E8] text-[#555] px-2 py-[2px] rounded-full whitespace-nowrap leading-none';
-
-  const NEW_BADGE = `<span style="display:inline-flex;align-items:center;gap:3px;font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:#CC0000;padding:2px 6px;border-radius:999px;white-space:nowrap;line-height:1;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.7);display:inline-block;animation:vcPulse 2s cubic-bezier(0.4,0,0.6,1) infinite;flex-shrink:0;"></span>New</span>`;
-
-  function buildTags(el: Element, job: Job) {
-    const parts: string[] = [];
-
-    if ((Date.now() - new Date(job.created_at).getTime()) < 72 * 60 * 60 * 1000)
-      parts.push(NEW_BADGE);
-
-    if (job.is_remote === true)  parts.push(`<span class="${TAG_CLS}">${IC_GLOBE}Remote</span>`);
-    if (job.is_remote === false) parts.push(`<span class="${TAG_CLS}">${IC_PIN}On-site</span>`);
-
-    const locs = (job.locations ?? []).filter(l => job.is_remote !== true || l !== 'Worldwide');
-    if (locs.length > 0) {
-      const label = locs.length > 2 ? `${locs[0]}, ${locs[1]} +${locs.length - 2}` : locs.join(', ');
-      parts.push(`<span class="${TAG_CLS}">${IC_PIN}${label}</span>`);
-    }
-
-    if (job.salary_min != null || job.salary_max != null)
-      parts.push(`<span class="${TAG_CLS}">${IC_DOLLAR}Salary listed</span>`);
-
-    el.innerHTML = parts.join('');
-  }
-
-  function buildRow(job: Job): DocumentFragment {
-    const frag = (document.getElementById('tpl-row') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
-    const article = frag.querySelector('article')!;
-    article.dataset.createdAt = job.created_at;
-    (article.querySelector('.job-title') as HTMLElement).textContent = job.title;
-    (article.querySelector('.job-description') as HTMLElement).textContent = job.description;
-    (article.querySelector('.job-date') as HTMLElement).textContent = formatDate(job.created_at);
-    (article.querySelector('.job-link') as HTMLAnchorElement).href = job.link;
-    (article.querySelector('.job-card-link') as HTMLAnchorElement).href = `/job/${jobSlug(job.id, job.title)}/`;
-    injectImage(article.querySelector('.job-image-wrap')!, job);
-    buildTags(article.querySelector('.job-tags')!, job);
+  function buildCard(p: Profile, i: number): DocumentFragment {
+    const frag = (document.getElementById('tpl-card') as HTMLTemplateElement).content.cloneNode(true) as DocumentFragment;
+    const card = frag.querySelector<HTMLElement>('.p-card')!;
+    card.style.animationDelay = `${Math.min(i, 12) * 40}ms`;
+    fillCard(card, p);
     return frag;
   }
 
-  async function fetchPage(page: number): Promise<Job[]> {
+  async function fetchPage(page: number): Promise<Profile[]> {
     const from = page * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
+    const filter = currentQuery ? `&${currentQuery}` : '';
     const res  = await fetch(
-      `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc${filter}`,
       {
         headers: {
           apikey: SUPABASE_ANON_KEY,
@@ -394,6 +388,7 @@ function formatDate(iso: string) {
       }
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    totalCount = 0;
     const range = res.headers.get('Content-Range');
     if (range) {
       const match = range.match(/\/(\d+)$/);
@@ -404,54 +399,16 @@ function formatDate(iso: string) {
 
   function renderPagination() {
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-    if (totalPages <= 1) { paginationEl.classList.add('hidden'); return; }
-
+    if (totalPages <= 1) {
+      paginationEl.classList.add('hidden');
+      paginationEl.classList.remove('flex');
+      return;
+    }
     paginationEl.classList.remove('hidden');
-    indicatorEl.textContent = `Page ${currentPage + 1} of ${totalPages}`;
-    (prevBtn as HTMLButtonElement).disabled = currentPage === 0;
-    (nextBtn as HTMLButtonElement).disabled = currentPage >= totalPages - 1;
-  }
-
-  function injectJobPostingSchema(jobs: Job[]) {
-    document.getElementById('ld-jobs')?.remove();
-    const itemList = {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: 'Open AI Developer Positions — vibecoding.work',
-      description: 'Jobs for vibecoders and AI-native software engineers.',
-      url: 'https://vibecoding.work/',
-      numberOfItems: totalCount,
-      itemListElement: jobs.map((job, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: {
-          '@type': 'JobPosting',
-          '@id': `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
-          title: job.title,
-          description: job.description,
-          datePosted: job.created_at.split('T')[0],
-          url: `https://vibecoding.work/job/${jobSlug(job.id, job.title)}/`,
-          directApply: false,
-          ...(job.is_remote === true ? {
-            jobLocationType: 'TELECOMMUTE',
-            applicantLocationRequirements: { '@type': 'Country', name: 'Worldwide' },
-          } : {}),
-          occupationalCategory: '15-1252',
-          hiringOrganization: {
-            '@type': 'Organization',
-            name: 'vibecoding.work',
-            sameAs: 'https://vibecoding.work',
-            logo: 'https://vibecoding.work/images/logo.png',
-          },
-          ...(job.image_url ? { image: job.image_url } : {}),
-        },
-      })),
-    };
-    const script = document.createElement('script');
-    script.id = 'ld-jobs';
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(itemList);
-    document.head.appendChild(script);
+    paginationEl.classList.add('flex');
+    indicatorEl.textContent = `${currentPage + 1} / ${totalPages}`;
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = currentPage >= totalPages - 1;
   }
 
   // ── Count-up animation ────────────────────────────────────
@@ -461,8 +418,7 @@ function formatDate(iso: string) {
     const tick = (now: number) => {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
-      const val = Math.round(eased * target);
-      el.textContent = `${val} position${val !== 1 ? 's' : ''}`;
+      el.textContent = countLabel(Math.round(eased * target));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -472,17 +428,20 @@ function formatDate(iso: string) {
   const VISIT_KEY = 'vc_last_visit';
   let visitBannerShown = false;
 
-  function showNewSinceVisit(jobs: Job[]) {
+  function showNewSinceVisit(createdAts: string[]) {
     if (visitBannerShown) return;
-    const lastVisit = parseInt(localStorage.getItem(VISIT_KEY) ?? '0', 10);
-    localStorage.setItem(VISIT_KEY, Date.now().toString());
+    let lastVisit = 0;
+    try {
+      lastVisit = parseInt(localStorage.getItem(VISIT_KEY) ?? '0', 10);
+      localStorage.setItem(VISIT_KEY, Date.now().toString());
+    } catch { return; }
     if (lastVisit <= 0) return;
-    const n = jobs.filter(j => new Date(j.created_at).getTime() > lastVisit).length;
+    const n = createdAts.filter(d => new Date(d).getTime() > lastVisit).length;
     if (n <= 0) return;
     visitBannerShown = true;
     const banner = document.getElementById('new-visit-banner')!;
     document.getElementById('new-visit-text')!.textContent =
-      `${n} new position${n !== 1 ? 's' : ''} since your last visit`;
+      `${n} new builder${n !== 1 ? 's' : ''} since your last visit`;
     banner.classList.remove('hidden');
     banner.classList.add('flex');
   }
@@ -496,43 +455,44 @@ function formatDate(iso: string) {
   async function loadPage(page: number) {
     listEl.classList.add('hidden');
     paginationEl.classList.add('hidden');
+    paginationEl.classList.remove('flex');
+    emptyEl.classList.add('hidden');
+    errorEl.classList.add('hidden');
     loadingEl.classList.remove('hidden');
 
     try {
-      const jobs = await fetchPage(page);
+      const profiles = await fetchPage(page);
 
       loadingEl.classList.add('hidden');
 
-      if (page === 0 && jobs.length === 0) {
+      if (page === 0 && profiles.length === 0) {
         emptyEl.classList.remove('hidden');
-        countEl.textContent = '0 positions';
+        countEl.textContent = countLabel(0);
         return;
       }
 
       animateCount(countEl, totalCount);
       listEl.innerHTML = '';
-      jobs.forEach((job, i) => {
-        const frag = buildRow(job);
-        const article = frag.querySelector('article') as HTMLElement;
-        if (article) article.style.animationDelay = `${i * 45}ms`;
-        listEl.appendChild(frag);
-      });
+      profiles.forEach((p, i) => listEl.appendChild(buildCard(p, i)));
       listEl.classList.remove('hidden');
-      showNewSinceVisit(jobs);
+      if (!currentQuery) showNewSinceVisit(profiles.map(p => p.created_at));
       renderPagination();
-      injectJobPostingSchema(jobs);
 
     } catch {
       loadingEl.classList.add('hidden');
       errorEl.classList.remove('hidden');
-      countEl.textContent = 'Error';
+      countEl.textContent = 'Builders';
     }
+  }
+
+  function scrollToList() {
+    document.getElementById('builders')!.scrollIntoView({ behavior: 'smooth' });
   }
 
   prevBtn.addEventListener('click', () => {
     if (currentPage > 0) {
       currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToList();
       loadPage(currentPage);
     }
   });
@@ -541,9 +501,17 @@ function formatDate(iso: string) {
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
     if (currentPage < totalPages - 1) {
       currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToList();
       loadPage(currentPage);
     }
+  });
+
+  document.querySelectorAll<HTMLInputElement>('#filters input').forEach(input => {
+    input.addEventListener('change', () => {
+      currentQuery = input.dataset.query ?? '';
+      currentPage = 0;
+      loadPage(0);
+    });
   });
 
   // Init: if SSR rendered page 0, skip the initial fetch
@@ -551,9 +519,8 @@ function formatDate(iso: string) {
     totalCount = ssrTotal;
     animateCount(countEl, ssrTotal);
     renderPagination();
-    const ssrCards = Array.from(document.querySelectorAll<HTMLElement>('#job-list article'));
-    const ssrJobDates = ssrCards.map(el => ({ created_at: el.dataset.createdAt ?? '' } as Job));
-    showNewSinceVisit(ssrJobDates);
+    const ssrDates = Array.from(listEl.querySelectorAll<HTMLElement>('.p-card')).map(el => el.dataset.createdAt ?? '');
+    showNewSinceVisit(ssrDates);
   } else {
     loadPage(0);
   }

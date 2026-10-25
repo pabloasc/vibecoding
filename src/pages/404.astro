@@ -6,55 +6,33 @@ import Footer from '../components/Footer.astro';
 
 <Layout
   title="404 — Page Not Found · vibecoding.work"
-  description="The page you're looking for doesn't exist. Browse open vibe coder positions at vibecoding.work."
+  description="The page you're looking for doesn't exist. Browse junior developers and vibecoders on vibecoding.work."
   noindex={true}
 >
   <Header />
 
-  <main class="w-full">
+  <main class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg pointer-events-none"></div>
+    <div class="orb w-[420px] h-[420px] bg-pink -top-40 left-1/2 -translate-x-1/2 !opacity-25"></div>
 
-    <div class="px-6 md:px-12 py-24 md:py-36 max-w-2xl">
-
-      <p class="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-[#CC0000] mb-5">
-        Error 404
+    <div class="relative max-w-2xl mx-auto px-4 sm:px-6 py-24 sm:py-32 text-center">
+      <p class="font-mono text-[0.8rem] text-fog">
+        <span class="text-acid">$</span> cd /this-page <span class="text-pink">→ error 404</span>
       </p>
 
-      <h1 class="font-sans font-bold text-[2.5rem] md:text-[3.8rem]
-                 tracking-tight leading-none text-[#0A0A0A] mb-6">
-        Position<br />Not Found.
+      <h1 class="font-bold tracking-[-0.04em] leading-[0.95] text-[clamp(3rem,10vw,6rem)] mt-6">
+        <span class="gradient-text">404.</span><br />Nothing shipped here.
       </h1>
 
-      <div class="w-8 h-[2px] bg-[#EBEBEB] mb-8"></div>
-
-      <p class="font-mono text-[0.75rem] leading-[1.8] text-[#666] mb-12 max-w-sm">
-        This position may have been filled, removed, or the link is incorrect.
-        Browse all open positions below.
+      <p class="text-fog text-[1.05rem] mt-6 max-w-md mx-auto">
+        This profile may have been removed, or the link has a typo. Even senior devs hit dead ends — onward.
       </p>
 
-      <div class="flex items-center gap-6">
-        <a href="/"
-           class="font-mono text-[0.65rem] tracking-[0.25em] uppercase
-                  bg-[#0A0A0A] text-white px-7 py-3.5
-                  hover:bg-[#CC0000] transition-colors duration-200">
-          Browse open positions →
-        </a>
-        <a href="/submit"
-           class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-[#CACACA]
-                  hover:text-[#0A0A0A] transition-colors duration-200">
-          Submit a job ↗
-        </a>
+      <div class="flex flex-wrap justify-center gap-3 mt-10">
+        <a href="/#builders" class="btn-primary">Browse builders →</a>
+        <a href="/submit" class="btn-ghost">Drop your profile</a>
       </div>
-
     </div>
-
-    <div class="border-t border-[#F2F2F2] mx-6 md:mx-12"></div>
-
-    <div class="px-6 md:px-12 py-10 max-w-2xl">
-      <p class="font-sans font-light text-[1rem] text-[#AAA] leading-relaxed">
-        "The best vibe coder jobs are still out there — you just have to look."
-      </p>
-    </div>
-
   </main>
 
   <Footer />

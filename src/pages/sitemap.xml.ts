@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { jobSlug } from '../lib/slug';
+import { profileSlug } from '../lib/slug';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-  let jobs: { id: string; title: string; created_at: string }[] = [];
+  let profiles: { id: string; title: string; created_at: string }[] = [];
 
   if (url && key) {
     try {
@@ -13,17 +13,17 @@ export const GET: APIRoute = async () => {
         `${url}/rest/v1/jobs?select=id,title,created_at&order=created_at.desc`,
         { headers: { apikey: key, Authorization: `Bearer ${key}` } }
       );
-      if (res.ok) jobs = await res.json();
+      if (res.ok) profiles = await res.json();
     } catch { /* fallthrough */ }
   }
 
   const today = new Date().toISOString().split('T')[0];
 
-  const jobUrls = jobs.map(job => {
-    const slug = jobSlug(job.id, job.title);
-    const date = job.created_at.split('T')[0];
+  const profileUrls = profiles.map(p => {
+    const slug = profileSlug(p.id, p.title);
+    const date = p.created_at.split('T')[0];
     return `  <url>
-    <loc>https://vibecoding.work/job/${slug}/</loc>
+    <loc>https://vibecoding.work/profile/${slug}/</loc>
     <lastmod>${date}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@ export const GET: APIRoute = async () => {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-${jobUrls}
+${profileUrls}
 </urlset>`;
 
   return new Response(xml, {

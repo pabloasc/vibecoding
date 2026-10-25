@@ -2,38 +2,41 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="bg-[#0A0A0A] mt-20">
-  <div class="max-w-6xl mx-auto px-6 md:px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+<footer class="relative mt-24 border-t border-line overflow-hidden">
+  <div class="orb w-[420px] h-[220px] bg-violet -bottom-32 left-1/2 -translate-x-1/2 !opacity-20"></div>
+
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
 
     <!-- Brand -->
     <div>
-      <a href="/" class="inline-flex items-center gap-2.5 group mb-3" aria-label="vibecoding.work home">
-        <img
-          src="/images/logo_dark.png"
-          alt=""
-          class="h-7 w-auto brightness-0 invert opacity-50 group-hover:opacity-30 transition-opacity duration-200"
-        />
-        <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;" class="text-white">
-          vibecoding<span class="text-[#CC0000]">.work</span>
+      <a href="/" class="inline-flex items-center gap-2.5 group mb-4" aria-label="vibecoding.work home">
+        <img src="/images/logo.png" alt="" class="h-7 w-auto invert opacity-80 group-hover:opacity-100 transition-opacity" />
+        <span class="font-sans font-bold text-[1rem] tracking-[-0.02em]">
+          vibecoding<span class="text-acid">.work</span>
         </span>
       </a>
-      <p class="font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#333] leading-relaxed">
-        The job board for AI-native builders.
+      <p class="text-[0.9rem] text-fog leading-relaxed max-w-xs">
+        The launchpad for junior developers and vibecoders. Show what you've shipped, find a mentor, land your first real gig.
       </p>
     </div>
 
-    <!-- Links + copyright -->
-    <div class="flex flex-col items-start sm:items-end gap-2.5">
-      <a href="/submit" class="font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#444] hover:text-[#CC0000] transition-colors duration-150">
-        Submit a position ↗
-      </a>
-      <a href="/" class="font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#444] hover:text-white transition-colors duration-150">
-        Browse jobs
-      </a>
-      <span class="font-mono text-[0.55rem] tracking-[0.1em] uppercase text-[#2a2a2a] mt-1">
-        © {year} vibecoding.work
-      </span>
+    <!-- Builders -->
+    <div class="flex flex-col gap-2.5">
+      <p class="font-mono text-[0.68rem] tracking-[0.16em] uppercase text-snow/60 mb-1">Builders</p>
+      <a href="/submit" class="text-[0.9rem] text-fog hover:text-acid transition-colors">Drop your profile</a>
+      <a href="/#how" class="text-[0.9rem] text-fog hover:text-snow transition-colors">How it works</a>
     </div>
 
+    <!-- Mentors -->
+    <div class="flex flex-col gap-2.5">
+      <p class="font-mono text-[0.68rem] tracking-[0.16em] uppercase text-snow/60 mb-1">Mentors &amp; teams</p>
+      <a href="/#builders" class="text-[0.9rem] text-fog hover:text-snow transition-colors">Browse builders</a>
+      <a href="/#mentors" class="text-[0.9rem] text-fog hover:text-snow transition-colors">Why mentor</a>
+    </div>
+  </div>
+
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 border-t border-line/60 flex flex-col sm:flex-row gap-2 justify-between">
+    <span class="font-mono text-[0.68rem] text-[#5A5A6E]">© {year} vibecoding.work</span>
+    <span class="font-mono text-[0.68rem] text-[#5A5A6E]">Built with vibes <span class="text-acid">✦</span> and a lot of tokens</span>
   </div>
 </footer>

@@ -1,25 +1,12 @@
 import type { APIRoute } from 'astro';
-
-type Job = {
-  id: string;
-  title: string;
-  description: string;
-  link: string;
-  is_remote: boolean | null;
-  locations: string[] | null;
-  salary_min: number | null;
-  salary_max: number | null;
-  salary_currency: string | null;
-  salary_period: string | null;
-  employment_type: string | null;
-  created_at: string;
-};
+import { profileSlug } from '../lib/slug';
+import { type Profile, lookingFor, formatRate } from '../lib/profile';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-  let jobs: Job[] = [];
+  let profiles: Profile[] = [];
 
   if (url && key) {
     try {
@@ -27,48 +14,43 @@ export const GET: APIRoute = async () => {
         `${url}/rest/v1/jobs?select=*&order=created_at.desc`,
         { headers: { apikey: key, Authorization: `Bearer ${key}` } }
       );
-      if (res.ok) jobs = await res.json();
+      if (res.ok) profiles = await res.json();
     } catch { /* fallthrough */ }
   }
 
   const lines: string[] = [
     '# vibecoding.work',
     '',
-    '> The job board for vibe coders and AI-native developers.',
-    '> Browse and apply to jobs at companies that embrace AI-assisted development (Cursor, Claude Code, GitHub Copilot, Windsurf).',
+    '> The launchpad for junior developers and vibecoders.',
+    '> Builders post their profile; mentors, founders and teams find them for mentorship, internships, freelance projects and first professional roles.',
     '',
     `URL: https://vibecoding.work/`,
-    `Open positions: ${jobs.length}`,
+    `Builders: ${profiles.length}`,
     '',
     '---',
     '',
-    '## Open Positions',
+    '## Builders',
     '',
   ];
 
-  for (const job of jobs) {
-    const date = new Date(job.created_at).toLocaleDateString('en-US', {
+  for (const p of profiles) {
+    const date = new Date(p.created_at).toLocaleDateString('en-US', {
       year: 'numeric', month: 'long', day: 'numeric',
     });
-    const remote = job.is_remote === true ? 'Remote' : job.is_remote === false ? 'On-site / Hybrid' : null;
-    const locationParts = [remote, ...(job.locations ?? [])].filter(Boolean);
+    const remote = p.is_remote === true ? 'Open to remote' : p.is_remote === false ? 'Not open to remote' : null;
+    const locationParts = [remote, ...(p.locations ?? [])].filter(Boolean);
     const location = locationParts.join(', ') || 'Location not specified';
-    const salaryParts = [];
-    if (job.salary_min != null) salaryParts.push(job.salary_min.toLocaleString());
-    if (job.salary_max != null && job.salary_max !== job.salary_min) salaryParts.push(job.salary_max.toLocaleString());
-    const salary = salaryParts.length
-      ? `${job.salary_currency ?? 'USD'} ${salaryParts.join('–')} / ${(job.salary_period ?? 'YEAR').toLowerCase()}`
-      : null;
-    const type = job.employment_type?.replace('_', ' ') ?? null;
+    const rate = formatRate(p);
 
-    lines.push(`### ${job.title}`);
-    lines.push(`Posted: ${date}`);
+    lines.push(`### ${p.title}`);
+    lines.push(`Joined: ${date}`);
+    lines.push(`Looking for: ${lookingFor(p.employment_type).label}`);
     lines.push(`Location: ${location}`);
-    if (type) lines.push(`Employment: ${type}`);
-    if (salary) lines.push(`Salary: ${salary}`);
-    lines.push(`Apply: ${job.link}`);
+    if (rate) lines.push(`Rate expectation: ${rate}`);
+    lines.push(`Profile: ${p.link}`);
+    lines.push(`Page: https://vibecoding.work/profile/${profileSlug(p.id, p.title)}/`);
     lines.push('');
-    lines.push(job.description);
+    lines.push(p.description);
     lines.push('');
     lines.push('---');
     lines.push('');
