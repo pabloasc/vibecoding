@@ -5,8 +5,9 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import ProjectList from '../../components/ProjectList.astro';
+import EndorsementList from '../../components/EndorsementList.astro';
 import { profileSlug } from '../../lib/slug';
-import { type Profile, type Project, PROJECTS_SELECT, lookingFor, isMentor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
+import { type Profile, type Project, type Endorsement, PROJECTS_SELECT, ENDORSEMENTS_SELECT, connectLabel, lookingFor, isMentor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
 import { createClient } from '@supabase/supabase-js';
 
 // Extract the 8-char ID prefix appended to every slug
@@ -51,11 +52,24 @@ try {
   if (!error && data) projects = data as unknown as Project[];
 } catch { /* no projects */ }
 
+// Mentor endorsements (empty if endorsements.sql hasn't been run yet)
+let endorsements: Endorsement[] = [];
+try {
+  const db = createClient(supabaseUrl, supabaseKey);
+  const { data, error } = await db
+    .from('endorsements')
+    .select(ENDORSEMENTS_SELECT)
+    .eq('profile_id', profile.id)
+    .order('created_at', { ascending: false });
+  if (!error && data) endorsements = (data as unknown as Endorsement[]).filter(e => e.mentor);
+} catch { /* no endorsements */ }
+
 const canonicalUrl = `https://vibecoding.work/profile/${canonicalSlug}/`;
 const name = profileName(profile);
 const headline = profileHeadline(profile);
 const want = lookingFor(profile.employment_type);
 const mentor = isMentor(profile.employment_type);
+const connect = connectLabel(profile.link, name);
 const locations = (profile.locations ?? []).filter(l => profile.is_remote !== true || l !== 'Worldwide');
 
 const schemaProfilePage = {
@@ -123,6 +137,11 @@ const schemaProfilePage = {
           {headline && <p class="text-[1.15rem] sm:text-[1.35rem] text-fog leading-snug mt-2">{headline}</p>}
           <div class="flex flex-wrap gap-2 mt-4">
             <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} {mentor ? want.label : `Looking for: ${want.label}`}</span>
+            {endorsements.length > 0 && (
+              <a href="#endorsements" class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3 hover:!bg-acid/20 transition-colors">
+                ⭐ Endorsed by {endorsements.length} mentor{endorsements.length !== 1 ? 's' : ''}
+              </a>
+            )}
             {profile.is_remote === true && <span class="chip !text-[0.75rem] !py-1.5 !px-3">🌍 Open to remote</span>}
             {locations.map(loc => <span class="chip !text-[0.75rem] !py-1.5 !px-3">📍 {loc}</span>)}
           </div>
@@ -139,11 +158,13 @@ const schemaProfilePage = {
 
           <div class="flex flex-wrap items-center gap-3 mt-10 pt-6 border-t border-line">
             <a href={profile.link} target="_blank" rel="noopener noreferrer" class="btn-primary">
-              Visit {name}'s profile ↗
+              {connect} ↗
             </a>
             <button id="share-btn" class="btn-ghost">Copy link</button>
           </div>
         </article>
+
+        <EndorsementList endorsements={endorsements} profileId={profile.id} ownerId={profile.user_id} name={name} />
 
         <ProjectList projects={projects} ownerId={profile.user_id} />
         </div>
@@ -157,7 +178,7 @@ const schemaProfilePage = {
                 <p class="relative text-[1.6rem]">🧑‍🏫</p>
                 <p class="relative font-semibold text-[1.15rem] mt-3">Looking for a mentor?</p>
                 <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
-                  {name} is here to help junior devs and vibecoders — code reviews, pairing sessions and advice on landing that first gig.
+                  {name} is here to help junior devs and vibecoders. Connect, set up a quick intro call and show them your projects.
                 </p>
               </>
             ) : (
@@ -165,13 +186,13 @@ const schemaProfilePage = {
                 <p class="relative text-[1.6rem]">🧭</p>
                 <p class="relative font-semibold text-[1.15rem] mt-3">Want to help {name} level up?</p>
                 <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
-                  A 30-minute code review, a pairing session or a small paid project can be the first line on their résumé.
+                  Connect and offer a 15-minute intro call — let them walk you through their projects. One conversation can be their first break.
                 </p>
               </>
             )}
             <a href={profile.link} target="_blank" rel="noopener noreferrer"
                class="relative inline-flex items-center gap-1.5 mt-5 text-acid font-medium text-[0.92rem] hover:underline underline-offset-4">
-              Reach out ↗
+              {connect} ↗
             </a>
           </div>
 

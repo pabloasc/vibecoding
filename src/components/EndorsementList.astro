@@ -1,0 +1,296 @@
+---
+/**
+ * Mentor endorsements on a profile page.
+ * - Everyone sees the endorsements (section hidden while there are none).
+ * - Mentors (signed in with a MENTOR profile) get a friendly form to endorse, edit or withdraw.
+ * - The profile owner sees a tip when empty and can hide endorsements.
+ */
+import { profileSlug } from '../lib/slug';
+import { type Endorsement, STRENGTHS, strengthEmoji, profileName, profileHeadline, initials } from '../lib/profile';
+
+export interface Props {
+  endorsements: Endorsement[];
+  profileId: string;
+  ownerId: string | null;
+  /** The endorsed builder's display name */
+  name: string;
+}
+
+const { endorsements, profileId, ownerId, name } = Astro.props;
+const visible = endorsements.filter(e => e.mentor);
+
+function monthYear(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+---
+
+<section id="endorsements" class:list={['card p-6 sm:p-9 scroll-mt-24', visible.length === 0 && 'hidden']}
+  data-profile-id={profileId} data-owner-id={ownerId ?? ''} data-name={name}>
+
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <p class="eyebrow">// endorsements · <span id="endorsement-count">{visible.length}</span></p>
+    <span class="font-mono text-[0.68rem] text-fog hidden sm:inline">from mentors after an intro call</span>
+  </div>
+
+  <!-- Owner tip while empty -->
+  <div id="endorse-owner-tip" class="hidden rounded-2xl border border-dashed border-line p-5 text-[0.92rem] text-fog leading-relaxed">
+    <p class="text-snow font-medium mb-1">🌱 No endorsements yet</p>
+    After an intro call, send your mentor this page's link — they can endorse you right here.
+    It's the first reference on your résumé.
+  </div>
+
+  <ul id="endorsement-list" class="space-y-3">
+    {visible.map(e => {
+      const mentorName = profileName(e.mentor!);
+      const mentorHeadline = profileHeadline(e.mentor!);
+      return (
+        <li class="endorsement rounded-2xl border border-line bg-raised/40 p-4 sm:p-5"
+            data-id={e.id} data-mentor-user-id={e.mentor_user_id}
+            data-strengths={JSON.stringify(e.strengths)} data-message={e.message ?? ''}>
+          <div class="flex items-start gap-3">
+            <a href={`/profile/${profileSlug(e.mentor!)}/`} class="avatar-ring w-10 h-10 !rounded-xl shrink-0" aria-hidden="true" tabindex="-1">
+              <span class="avatar-inner !rounded-[calc(0.75rem-2px)] text-[0.72rem]">
+                {e.mentor!.image_url
+                  ? <img src={e.mentor!.image_url} alt="" loading="lazy" class="w-full h-full object-cover" />
+                  : initials(mentorName)}
+              </span>
+            </a>
+            <div class="flex-1 min-w-0">
+              <p class="leading-snug">
+                <a href={`/profile/${profileSlug(e.mentor!)}/`} class="font-semibold hover:text-acid transition-colors">{mentorName}</a>
+                <span class="chip !text-[0.6rem] !py-0.5 !px-1.5 ml-1.5 align-middle">🧑‍🏫 Mentor</span>
+              </p>
+              {mentorHeadline && <p class="text-[0.8rem] text-fog truncate">{mentorHeadline}</p>}
+            </div>
+            <span class="font-mono text-[0.65rem] text-[#5A5A6E] shrink-0 mt-1">{monthYear(e.created_at)}</span>
+          </div>
+
+          {e.strengths.length > 0 && (
+            <div class="flex flex-wrap gap-1.5 mt-3">
+              {e.strengths.map(s => <span class="chip chip-acid">{strengthEmoji(s)} {s}</span>)}
+            </div>
+          )}
+          {e.message && (
+            <p class="text-[0.95rem] text-snow/85 leading-relaxed mt-3 whitespace-pre-wrap break-words">“{e.message}”</p>
+          )}
+
+          <div class="endorsement-actions hidden gap-4 mt-3 font-mono text-[0.68rem]">
+            <button type="button" class="endorsement-edit hidden text-acid hover:underline">Edit</button>
+            <button type="button" class="endorsement-remove text-fog hover:text-pink transition-colors">Remove</button>
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+
+  <!-- Endorse form — shown to mentors viewing someone else's profile -->
+  <form id="endorse-form" class="hidden mt-6 rounded-2xl border border-acid/30 bg-acid/5 p-5 sm:p-6" novalidate>
+    <p class="font-semibold text-[1.05rem]">🤝 <span id="endorse-heading">Endorse {name}</span></p>
+    <p class="text-fog text-[0.9rem] mt-1 leading-relaxed">
+      Had an intro call with {name}? A few kind words go a long way — it's often the first reference on a junior's résumé.
+    </p>
+
+    <p class="field-label mt-5 mb-2.5">What stood out? <span class="normal-case tracking-normal text-[#5A5A6E]">(pick up to 3)</span></p>
+    <div id="endorse-strengths" class="flex flex-wrap gap-2">
+      {STRENGTHS.map(s => (
+        <label class="pill-option">
+          <input type="checkbox" name="strengths" value={s.label} />
+          <span>{s.emoji} {s.label}</span>
+        </label>
+      ))}
+    </div>
+
+    <label for="endorse-message" class="field-label mt-5 mb-2 block">A few words <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></label>
+    <textarea id="endorse-message" rows="3" maxlength="280" class="field leading-relaxed resize-y"
+      placeholder={`e.g. ${name} walked me through their projects — great questions, clean code and real hunger to learn.`}></textarea>
+    <p class="field-hint text-right mt-1"><span id="endorse-chars">0</span>/280</p>
+
+    <p id="endorse-error" class="hidden banner-error mt-3"></p>
+
+    <div class="flex flex-wrap items-center gap-4 mt-4">
+      <button type="submit" id="endorse-submit" class="btn-primary">Publish endorsement →</button>
+      <button type="button" id="endorse-withdraw" class="hidden text-fog hover:text-pink text-[0.88rem] transition-colors">Withdraw my endorsement</button>
+    </div>
+  </form>
+
+  <p id="endorse-thanks" class="hidden mt-6 rounded-2xl border border-acid/30 bg-acid/5 p-5 text-[0.95rem]">
+    🎉 Thanks for endorsing {name}! That means a lot to someone starting out.
+  </p>
+</section>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { ADMIN_EMAIL, isMentor } from '../lib/profile';
+  import { fetchOwnProfile } from '../lib/profileForm';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const MAX_STRENGTHS = 3;
+
+  const section = document.getElementById('endorsements');
+
+  async function initEndorsements(section: HTMLElement) {
+    const profileId = section.dataset.profileId!;
+    const ownerId   = section.dataset.ownerId || null;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const user  = session?.user ?? null;
+    const token = session?.access_token ?? null;
+    if (!user || !token) return;   // visitors just read
+
+    const me       = await fetchOwnProfile(user.id, SUPABASE_URL, SUPABASE_KEY);
+    const isOwner  = ownerId === user.id;
+    const isAdmin  = user.email === ADMIN_EMAIL;
+    const canEndorse = !isOwner && !!me && isMentor(me.employment_type);
+
+    const list     = document.getElementById('endorsement-list')!;
+    const countEl  = document.getElementById('endorsement-count')!;
+    const ownerTip = document.getElementById('endorse-owner-tip')!;
+    const items    = () => Array.from(list.querySelectorAll<HTMLElement>('.endorsement'));
+    const mine     = () => items().find(li => li.dataset.mentorUserId === user.id) ?? null;
+
+    const headers = {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+    };
+
+    function refreshVisibility() {
+      const n = items().length;
+      countEl.textContent = String(n);
+      ownerTip.classList.toggle('hidden', !(isOwner && n === 0));
+      section.classList.toggle('hidden', n === 0 && !isOwner && !canEndorse);
+    }
+
+    async function remove(li: HTMLElement) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/endorsements?id=eq.${encodeURIComponent(li.dataset.id!)}`, { method: 'DELETE', headers });
+      const rows = res.ok ? await res.json().catch(() => []) : [];
+      if (!rows.length) { alert("Couldn't remove this endorsement."); return false; }
+      li.remove();
+      refreshVisibility();
+      return true;
+    }
+
+    // Owner can hide any endorsement; mentors can edit/withdraw their own; admin can remove any
+    for (const li of items()) {
+      const isMine = li.dataset.mentorUserId === user.id;
+      if (!(isOwner || isAdmin || isMine)) continue;
+      const actions = li.querySelector<HTMLElement>('.endorsement-actions')!;
+      actions.classList.remove('hidden');
+      actions.classList.add('flex');
+      const removeBtn = li.querySelector<HTMLButtonElement>('.endorsement-remove')!;
+      if (isOwner && !isMine) removeBtn.textContent = 'Hide from my profile';
+      removeBtn.addEventListener('click', () => {
+        const prompt = isMine ? 'Withdraw your endorsement?' : 'Remove this endorsement from the profile?';
+        if (confirm(prompt)) remove(li).then(ok => { if (ok && isMine) resetForm(); });
+      });
+      if (isMine && canEndorse) {
+        const editBtn = li.querySelector<HTMLButtonElement>('.endorsement-edit')!;
+        editBtn.classList.remove('hidden');
+        editBtn.addEventListener('click', () => {
+          form.classList.remove('hidden');
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+    }
+
+    // ── Endorse form ────────────────────────────────────────────
+    const form      = document.getElementById('endorse-form') as HTMLFormElement;
+    const heading   = document.getElementById('endorse-heading')!;
+    const boxes     = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="strengths"]'));
+    const message   = document.getElementById('endorse-message') as HTMLTextAreaElement;
+    const chars     = document.getElementById('endorse-chars')!;
+    const errorEl   = document.getElementById('endorse-error')!;
+    const submitBtn = document.getElementById('endorse-submit') as HTMLButtonElement;
+    const withdraw  = document.getElementById('endorse-withdraw')!;
+    const thanks    = document.getElementById('endorse-thanks')!;
+
+    function enforceMax() {
+      const picked = boxes.filter(b => b.checked).length;
+      boxes.forEach(b => { b.disabled = !b.checked && picked >= MAX_STRENGTHS; });
+    }
+    boxes.forEach(b => b.addEventListener('change', enforceMax));
+    message.addEventListener('input', () => { chars.textContent = String(message.value.length); });
+
+    function resetForm() {
+      boxes.forEach(b => { b.checked = false; });
+      message.value = '';
+      chars.textContent = '0';
+      enforceMax();
+      heading.textContent = `Endorse ${section.dataset.name}`;
+      submitBtn.textContent = 'Publish endorsement →';
+      withdraw.classList.add('hidden');
+      form.classList.toggle('hidden', !canEndorse);
+    }
+
+    function prefill(li: HTMLElement) {
+      const strengths: string[] = JSON.parse(li.dataset.strengths || '[]');
+      boxes.forEach(b => { b.checked = strengths.includes(b.value); });
+      message.value = li.dataset.message ?? '';
+      chars.textContent = String(message.value.length);
+      enforceMax();
+      heading.textContent = 'Update your endorsement';
+      submitBtn.textContent = 'Save changes →';
+      withdraw.classList.remove('hidden');
+    }
+
+    if (canEndorse) {
+      const existing = mine();
+      if (existing) {
+        prefill(existing);
+        form.classList.add('hidden');    // shown via "Edit" on their endorsement
+      } else {
+        resetForm();
+      }
+
+      withdraw.addEventListener('click', () => {
+        const li = mine();
+        if (li && confirm('Withdraw your endorsement?')) remove(li).then(ok => { if (ok) resetForm(); });
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorEl.classList.add('hidden');
+        const strengths = boxes.filter(b => b.checked).map(b => b.value);
+        const text = message.value.trim();
+        if (strengths.length === 0 && !text) {
+          errorEl.textContent = 'Pick at least one strength or write a few words.';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        const existing = mine();
+        try {
+          const res = existing
+            ? await fetch(`${SUPABASE_URL}/rest/v1/endorsements?id=eq.${encodeURIComponent(existing.dataset.id!)}`, {
+                method: 'PATCH', headers, body: JSON.stringify({ strengths, message: text || null }),
+              })
+            : await fetch(`${SUPABASE_URL}/rest/v1/endorsements`, {
+                method: 'POST', headers, body: JSON.stringify({ profile_id: profileId, strengths, message: text || null }),
+              });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err?.message || 'Something went wrong — please try again.');
+          }
+          // Show the thank-you, then reload so the endorsement renders like everyone sees it
+          form.classList.add('hidden');
+          thanks.classList.remove('hidden');
+          setTimeout(() => {
+            window.location.hash = 'endorsements';
+            window.location.reload();
+          }, 1400);
+        } catch (err: unknown) {
+          errorEl.textContent = err instanceof Error ? err.message : 'Something went wrong — please try again.';
+          errorEl.classList.remove('hidden');
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    refreshVisibility();
+  }
+
+  if (section) initEndorsements(section);
+</script>

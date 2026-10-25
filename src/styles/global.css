@@ -317,6 +317,10 @@
     border-color: var(--color-acid);
     font-weight: 600;
   }
+  .pill-option input:disabled + span {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
   .pill-option input:focus-visible + span {
     outline: 2px solid var(--color-acid);
     outline-offset: 2px;

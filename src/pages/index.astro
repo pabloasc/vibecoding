@@ -6,7 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProfileCard from '../components/ProfileCard.astro';
 import { profileSlug } from '../lib/slug';
-import { type Profile, profileName } from '../lib/profile';
+import { type Profile, profileName, fetchProfileList } from '../lib/profile';
 
 const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -17,17 +17,7 @@ let ssrTotal = 0;
 
 if (SUPABASE_URL && SUPABASE_KEY) {
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc`,
-      {
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          Range: `0-${PAGE_SIZE - 1}`,
-          Prefer: 'count=exact',
-        },
-      }
-    );
+    const res = await fetchProfileList(SUPABASE_URL, SUPABASE_KEY, 0, PAGE_SIZE - 1);
     if (res.ok) {
       ssrProfiles = await res.json();
       const range = res.headers.get('Content-Range');
@@ -130,21 +120,21 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
             </div>
             <div class="p-5 sm:p-6 pb-12 sm:pb-14 font-mono text-[0.82rem] leading-[1.9]">
               <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> npx vibecoding drop-profile</p>
-              <p class="term-line text-fog">  ↳ github.com/you · 4 shipped projects</p>
+              <p class="term-line text-fog">  ↳ 3 projects · linkedin.com/in/you</p>
               <p class="term-line"><span class="text-acid">✓</span> profile live on vibecoding.work</p>
-              <p class="term-line"><span class="text-acid">✓</span> 3 mentors viewed your work</p>
-              <p class="term-line"><span class="text-acid">✓</span> code review scheduled — <span class="text-pink">Thu 4pm</span></p>
-              <p class="term-line"><span class="text-acid">✓</span> first freelance offer received 🎉</p>
+              <p class="term-line"><span class="text-acid">✓</span> "habit-loop" got <span class="text-pink">24 upvotes</span></p>
+              <p class="term-line"><span class="text-acid">✓</span> a mentor connected on LinkedIn</p>
+              <p class="term-line"><span class="text-acid">✓</span> intro call: show your projects 🎉</p>
               <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> <span class="caret inline-block w-2 h-4 bg-acid align-middle"></span></p>
             </div>
           </div>
 
           <!-- Floating badge -->
           <div class="absolute -bottom-8 -left-6 card !rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl rotate-[-3deg]">
-            <span class="text-[1.4rem]">🧭</span>
+            <span class="text-[1.4rem]">🤝</span>
             <div>
-              <p class="text-[0.82rem] font-semibold leading-tight">New mentor match</p>
-              <p class="font-mono text-[0.66rem] text-fog">Senior eng · 30-min pairing</p>
+              <p class="text-[0.82rem] font-semibold leading-tight">New connection</p>
+              <p class="font-mono text-[0.66rem] text-fog">Mentor · via LinkedIn</p>
             </div>
           </div>
         </div>
@@ -261,9 +251,9 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 
       <div class="grid md:grid-cols-3 gap-4 mt-10">
         {[
-          { n: '01', icon: '📦', title: 'Drop your profile', body: "Link your GitHub, portfolio or LinkedIn. Tell us what you've shipped, the stack you vibe with, and what you want to learn next." },
-          { n: '02', icon: '👀', title: 'Get discovered',    body: 'Mentors, founders and teams browse fresh builders every week — looking for exactly the hunger and curiosity juniors bring.' },
-          { n: '03', icon: '🤝', title: 'Land the gig',      body: 'Code reviews, pairing sessions, internships, freelance projects. Your first professional assignment starts with one intro.' },
+          { n: '01', icon: '📦', title: 'Show your projects', body: "Drop your profile, add the things you've shipped and link your LinkedIn or GitHub. No CV, no cover letter." },
+          { n: '02', icon: '🔥', title: 'Get upvoted',         body: 'Other builders upvote the projects they love. The best work rises to the top — where mentors, founders and teams are looking.' },
+          { n: '03', icon: '🤝', title: 'Connect & intro',     body: 'Mentors connect with you on LinkedIn or GitHub for a quick intro call where you walk them through your projects — then endorse you, so your profile carries their word.' },
         ].map((s, i) => (
           <div class="card card-hover p-6 sm:p-7 fade-in" style={`animation-delay:${i * 80}ms`}>
             <div class="flex items-center justify-between">
@@ -291,8 +281,8 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
             </h2>
             <p class="text-fog text-[1.02rem] leading-relaxed mt-4 max-w-lg">
               Pay it forward. Every builder here is learning fast with AI tools and needs one person to say
-              <em class="text-snow not-italic font-medium">"let's ship something together."</em>
-              Browse profiles, reach out directly — no recruiters, no fees.
+              <em class="text-snow not-italic font-medium">"show me what you built."</em>
+              Browse profiles, upvote projects you like and connect on LinkedIn or GitHub — no recruiters, no fees.
             </p>
             <div class="flex flex-wrap gap-3 mt-8">
               <a href="#builders" class="btn-primary">Find a builder →</a>
@@ -302,9 +292,9 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 
           <ul class="grid grid-cols-2 gap-3">
             {[
-              { icon: '🔍', t: '30-min code review' },
-              { icon: '🧑‍💻', t: 'Pair on a feature' },
-              { icon: '💸', t: 'Offer a paid side project' },
+              { icon: '🤝', t: 'Connect on LinkedIn or GitHub' },
+              { icon: '🎥', t: '15-min intro call to see their projects' },
+              { icon: '⭐', t: 'Endorse them — their first reference' },
               { icon: '📣', t: 'Refer them to your team' },
             ].map(x => (
               <li class="rounded-2xl border border-line bg-raised/70 p-4 sm:p-5">
@@ -335,7 +325,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 <template id="tpl-card"><ProfileCard /></template>
 
 <script>
-  import type { Profile } from '../lib/profile';
+  import { type Profile, fetchProfileList } from '../lib/profile';
   import { fillCard } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -375,18 +365,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
   async function fetchPage(page: number): Promise<Profile[]> {
     const from = page * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
-    const filter = currentQuery ? `&${currentQuery}` : '';
-    const res  = await fetch(
-      `${SUPABASE_URL}/rest/v1/jobs?select=*&order=created_at.desc${filter}`,
-      {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          Range: `${from}-${to}`,
-          Prefer: 'count=exact',
-        },
-      }
-    );
+    const res  = await fetchProfileList(SUPABASE_URL, SUPABASE_ANON_KEY, from, to, currentQuery);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     totalCount = 0;
     const range = res.headers.get('Content-Range');

@@ -2,7 +2,7 @@
  * Client-side helpers for the shared <ProfileFields /> form and <ProfileCard /> markup.
  */
 import type { Profile, Project } from './profile';
-import { lookingFor, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from './profile';
+import { lookingFor, endorsementCount, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from './profile';
 import { profileSlug } from './slug';
 
 const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
@@ -286,6 +286,8 @@ export function fillCard(card: HTMLElement, p: Profile) {
   const tags = card.querySelector('.p-tags')!;
   const loc  = locationLabel(p);
   tags.textContent = '';
+  const endorsed = endorsementCount(p);
+  if (endorsed > 0) tags.appendChild(chip(`⭐ ${endorsed} endorsement${endorsed !== 1 ? 's' : ''}`, 'chip-acid'));
   if (p.is_remote === true) tags.appendChild(chip('🌍 Open to remote'));
   if (loc)  tags.appendChild(chip(`📍 ${loc}`));
 }

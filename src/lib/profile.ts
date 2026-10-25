@@ -29,7 +29,26 @@ export type Profile = {
   employment_type: string | null;
   user_id: string | null;
   created_at: string;
+  /** Present when fetched with PROFILE_LIST_SELECT */
+  endorsements?: { count: number }[];
 };
+
+/**
+ * Fetch a page of profiles (newest first) with their endorsement counts.
+ * Falls back to plain profiles if endorsements.sql hasn't been run yet.
+ * Returns the raw Response so callers can read the Content-Range total.
+ */
+export async function fetchProfileList(supabaseUrl: string, anonKey: string, from: number, to: number, filter = '') {
+  const headers = {
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
+    Range: `${from}-${to}`,
+    Prefer: 'count=exact',
+  };
+  const url = (select: string) => `${supabaseUrl}/rest/v1/jobs?select=${select}&order=created_at.desc${filter ? `&${filter}` : ''}`;
+  const res = await fetch(url('*,endorsements(count)'), { headers });
+  return res.ok ? res : fetch(url('*'), { headers });
+}
 
 /** A project showcased on a profile — see projects.sql */
 export type Project = {
@@ -53,6 +72,42 @@ export type ProjectUpvote = {
 /** PostgREST select for a profile's projects, including who upvoted each one */
 export const PROJECTS_SELECT =
   '*,project_upvotes(user_id,voter:jobs!project_upvotes_voter_profile_id_fkey(id,name,title))';
+
+/** A mentor's endorsement of a profile — see endorsements.sql */
+export type Endorsement = {
+  id: string;
+  profile_id: string;
+  mentor_user_id: string;
+  strengths: string[];
+  message: string | null;
+  created_at: string;
+  mentor: Pick<Profile, 'id' | 'name' | 'title' | 'image_url'> | null;
+};
+
+/** Strengths mentors can pick (max 3). Keep in sync with the CHECK constraint in endorsements.sql */
+export const STRENGTHS: { label: string; emoji: string }[] = [
+  { label: 'Ships fast',              emoji: '🚀' },
+  { label: 'Clean code',              emoji: '✨' },
+  { label: 'Great communicator',      emoji: '💬' },
+  { label: 'Curious learner',         emoji: '🧠' },
+  { label: 'Creative problem solver', emoji: '🧩' },
+  { label: 'AI-tools pro',            emoji: '🤖' },
+  { label: 'Team player',             emoji: '🤝' },
+  { label: 'Takes feedback well',     emoji: '🌱' },
+];
+
+export function strengthEmoji(label: string) {
+  return STRENGTHS.find(s => s.label === label)?.emoji ?? '⭐';
+}
+
+/** PostgREST select for a profile's endorsements, with the mentor's profile embedded */
+export const ENDORSEMENTS_SELECT =
+  '*,mentor:jobs!endorsements_mentor_profile_id_fkey(id,name,title,image_url)';
+
+/** Number of endorsements when the profile was fetched with `endorsements(count)` */
+export function endorsementCount(p: { endorsements?: { count: number }[] }) {
+  return p.endorsements?.[0]?.count ?? 0;
+}
 
 /** Owners can edit their own profile; the admin can edit any. Mirrors the RLS policies in schema.sql. */
 export function canEdit(user: { id: string; email?: string } | null | undefined, p: Pick<Profile, 'user_id'>) {
@@ -82,6 +137,15 @@ export const LOOKING_FOR: Record<string, LookingFor> = {
 
 export function lookingFor(type: string | null) {
   return LOOKING_FOR[type ?? 'FULL_TIME'] ?? LOOKING_FOR.FULL_TIME;
+}
+
+/** Call to action for a profile link: "Connect on LinkedIn", "Follow on GitHub" or a generic fallback */
+export function connectLabel(link: string, name: string) {
+  let host = '';
+  try { host = new URL(link).hostname.replace(/^www\./, ''); } catch { /* not a URL */ }
+  if (host.endsWith('linkedin.com')) return 'Connect on LinkedIn';
+  if (host === 'github.com')         return 'Follow on GitHub';
+  return `Visit ${name}'s profile`;
 }
 
 export function isMentor(type: string | null) {

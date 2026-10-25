@@ -6,7 +6,7 @@
  * (see the `.p-*` hooks).
  */
 import { profileSlug } from '../lib/slug';
-import { type Profile, lookingFor, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from '../lib/profile';
+import { type Profile, lookingFor, endorsementCount, locationLabel, initials, isNew, formatDate, profileName, profileHeadline } from '../lib/profile';
 
 export interface Props {
   profile?: Profile;
@@ -17,6 +17,7 @@ const { profile: p, index = 0 } = Astro.props;
 
 const want  = p ? lookingFor(p.employment_type) : null;
 const loc   = p ? locationLabel(p) : null;
+const endorsed = p ? endorsementCount(p) : 0;
 const name  = p ? profileName(p) : '';
 const headline = p ? profileHeadline(p) : '';
 const href  = p ? `/profile/${profileSlug(p)}/` : undefined;
@@ -49,6 +50,7 @@ const href  = p ? `/profile/${profileSlug(p)}/` : undefined;
   <p class="p-desc text-[0.9rem] text-fog leading-relaxed line-clamp-3 mt-4">{p?.description}</p>
 
   <div class="p-tags flex flex-wrap gap-1.5 mt-4">
+    {endorsed > 0 && <span class="chip chip-acid">⭐ {endorsed} endorsement{endorsed !== 1 ? 's' : ''}</span>}
     {p?.is_remote === true && <span class="chip">🌍 Open to remote</span>}
     {loc && <span class="chip">📍 {loc}</span>}
   </div>
