@@ -60,7 +60,7 @@ const newThisWeek = ssrProfiles.filter(p => (Date.now() - new Date(p.created_at)
 
 const FILTERS = [
   { key: 'all',        label: 'Everyone',     query: '' },
-  { key: 'mentorship', label: '🧭 Mentorship', query: 'employment_type=eq.MENTORSHIP' },
+  { key: 'mentors',    label: '🧑‍🏫 Mentors',   query: 'employment_type=eq.MENTOR' },
   { key: 'intern',     label: '🎓 Internship', query: 'employment_type=eq.INTERN' },
   { key: 'freelance',  label: '⚡ Freelance',  query: 'employment_type=in.(CONTRACTOR,TEMPORARY)' },
   { key: 'jobs',       label: '🚀 Jobs',       query: 'employment_type=in.(FULL_TIME,PART_TIME)' },
@@ -296,7 +296,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
             </p>
             <div class="flex flex-wrap gap-3 mt-8">
               <a href="#builders" class="btn-primary">Find a builder →</a>
-              <a href="mailto:hi@vibecoders.co?subject=I%20want%20to%20mentor" class="btn-ghost">Become a mentor</a>
+              <a href="/submit?as=mentor" class="btn-ghost">Become a mentor</a>
             </div>
           </div>
 

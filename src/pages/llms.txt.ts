@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { profileSlug } from '../lib/slug';
-import { type Profile, lookingFor, profileName, profileHeadline } from '../lib/profile';
+import { type Profile, lookingFor, isMentor, profileName, profileHeadline } from '../lib/profile';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -44,7 +44,7 @@ export const GET: APIRoute = async () => {
     const headline = profileHeadline(p);
     lines.push(`### ${profileName(p)}${headline ? ` — ${headline}` : ''}`);
     lines.push(`Joined: ${date}`);
-    lines.push(`Looking for: ${lookingFor(p.employment_type).label}`);
+    lines.push(isMentor(p.employment_type) ? 'Role: Mentor' : `Looking for: ${lookingFor(p.employment_type).label}`);
     lines.push(`Location: ${location}`);
     lines.push(`Profile: ${p.link}`);
     lines.push(`Page: https://vibecoding.work/profile/${profileSlug(p)}/`);

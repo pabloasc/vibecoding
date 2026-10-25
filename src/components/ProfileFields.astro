@@ -50,10 +50,10 @@ import { LOOKING_FOR } from '../lib/profile';
   <div class="space-y-3">
     <span class="field-label">Looking for</span>
     <div class="flex flex-wrap gap-2">
-      {Object.entries(LOOKING_FOR).map(([value, { label, emoji }], i) => (
+      {Object.entries(LOOKING_FOR).filter(([, o]) => !o.legacy).map(([value, { label, formLabel, emoji }], i) => (
         <label class="pill-option">
           <input type="radio" name="employment_type" value={value} checked={i === 0} />
-          <span>{emoji} {label}</span>
+          <span>{emoji} {formLabel ?? label}</span>
         </label>
       ))}
     </div>

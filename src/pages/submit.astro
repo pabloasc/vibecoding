@@ -403,6 +403,12 @@ const webPage = JSON.stringify({
     if (previewDebounce) clearTimeout(previewDebounce);
     previewDebounce = setTimeout(updatePreview, 120);
   });
+
+  // "Become a mentor" links land here with ?as=mentor — preselect that option
+  if (new URLSearchParams(window.location.search).get('as') === 'mentor') {
+    const mentorOption = document.querySelector<HTMLInputElement>('input[name="employment_type"][value="MENTOR"]');
+    if (mentorOption) mentorOption.checked = true;
+  }
   updatePreview();
 
   // ── Form submission ───────────────────────────────────────

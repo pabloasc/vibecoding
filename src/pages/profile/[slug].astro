@@ -5,7 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { profileSlug } from '../../lib/slug';
-import { type Profile, lookingFor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
+import { type Profile, lookingFor, isMentor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
 import { createClient } from '@supabase/supabase-js';
 
 // Extract the 8-char ID prefix appended to every slug
@@ -42,6 +42,7 @@ const canonicalUrl = `https://vibecoding.work/profile/${canonicalSlug}/`;
 const name = profileName(profile);
 const headline = profileHeadline(profile);
 const want = lookingFor(profile.employment_type);
+const mentor = isMentor(profile.employment_type);
 const locations = (profile.locations ?? []).filter(l => profile.is_remote !== true || l !== 'Worldwide');
 
 const schemaProfilePage = {
@@ -104,11 +105,11 @@ const schemaProfilePage = {
         </div>
 
         <div class="min-w-0">
-          <span class="eyebrow">// builder profile</span>
+          <span class="eyebrow">{mentor ? '// mentor profile' : '// builder profile'}</span>
           <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-2">{name}</h1>
           {headline && <p class="text-[1.15rem] sm:text-[1.35rem] text-fog leading-snug mt-2">{headline}</p>}
           <div class="flex flex-wrap gap-2 mt-4">
-            <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} Looking for: {want.label}</span>
+            <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} {mentor ? want.label : `Looking for: ${want.label}`}</span>
             {profile.is_remote === true && <span class="chip !text-[0.75rem] !py-1.5 !px-3">🌍 Open to remote</span>}
             {locations.map(loc => <span class="chip !text-[0.75rem] !py-1.5 !px-3">📍 {loc}</span>)}
           </div>
@@ -134,11 +135,23 @@ const schemaProfilePage = {
         <aside class="lg:sticky lg:top-24 space-y-4">
           <div class="card relative overflow-hidden p-6">
             <div class="orb w-[220px] h-[220px] bg-violet -top-24 -right-16 !opacity-30"></div>
-            <p class="relative text-[1.6rem]">🧭</p>
-            <p class="relative font-semibold text-[1.15rem] mt-3">Want to help {name} level up?</p>
-            <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
-              A 30-minute code review, a pairing session or a small paid project can be the first line on their résumé.
-            </p>
+            {mentor ? (
+              <>
+                <p class="relative text-[1.6rem]">🧑‍🏫</p>
+                <p class="relative font-semibold text-[1.15rem] mt-3">Looking for a mentor?</p>
+                <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
+                  {name} is here to help junior devs and vibecoders — code reviews, pairing sessions and advice on landing that first gig.
+                </p>
+              </>
+            ) : (
+              <>
+                <p class="relative text-[1.6rem]">🧭</p>
+                <p class="relative font-semibold text-[1.15rem] mt-3">Want to help {name} level up?</p>
+                <p class="relative text-fog text-[0.9rem] leading-relaxed mt-2">
+                  A 30-minute code review, a pairing session or a small paid project can be the first line on their résumé.
+                </p>
+              </>
+            )}
             <a href={profile.link} target="_blank" rel="noopener noreferrer"
                class="relative inline-flex items-center gap-1.5 mt-5 text-acid font-medium text-[0.92rem] hover:underline underline-offset-4">
               Reach out ↗
@@ -151,7 +164,7 @@ const schemaProfilePage = {
               <dd class="font-mono text-[0.82rem]">{formatDate(profile.created_at)}</dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-fog">Looking for</dt>
+              <dt class="text-fog">{mentor ? 'Role' : 'Looking for'}</dt>
               <dd class="font-mono text-[0.82rem]">{want.label}</dd>
             </div>
           </dl>

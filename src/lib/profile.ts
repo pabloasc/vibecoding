@@ -7,7 +7,7 @@
  *   description     → bio: what they've shipped, stack, what they want to learn
  *   image_url       → avatar / profile photo
  *   link            → profile URL (portfolio, GitHub, LinkedIn…)
- *   employment_type → what they're looking for (see LOOKING_FOR)
+ *   employment_type → what they're looking for, or MENTOR for mentors (see LOOKING_FOR)
  *   is_remote       → open to remote work
  *   locations       → where they're based
  *   salary_*        → unused (kept in the table, not shown or edited)
@@ -37,17 +37,32 @@ export function canEdit(user: { id: string; email?: string } | null | undefined,
   return user.email === ADMIN_EMAIL || (p.user_id != null && p.user_id === user.id);
 }
 
-export const LOOKING_FOR: Record<string, { label: string; emoji: string }> = {
-  MENTORSHIP: { label: 'Mentorship',      emoji: '🧭' },
+type LookingFor = {
+  label: string;
+  emoji: string;
+  /** Text on the form option when it differs from `label` */
+  formLabel?: string;
+  /** Still displayed on existing profiles, but no longer offered in the form */
+  legacy?: boolean;
+};
+
+// Order = order of the form options; the first one is preselected
+export const LOOKING_FOR: Record<string, LookingFor> = {
   INTERN:     { label: 'Internship',      emoji: '🎓' },
   CONTRACTOR: { label: 'Freelance gigs',  emoji: '⚡' },
   TEMPORARY:  { label: 'Short project',   emoji: '🛠️' },
   PART_TIME:  { label: 'Part-time role',  emoji: '🌗' },
   FULL_TIME:  { label: 'Full-time role',  emoji: '🚀' },
+  MENTOR:     { label: 'Mentor',          emoji: '🧑‍🏫', formLabel: 'Become a mentor' },
+  MENTORSHIP: { label: 'Mentorship',      emoji: '🧭', legacy: true },
 };
 
 export function lookingFor(type: string | null) {
   return LOOKING_FOR[type ?? 'FULL_TIME'] ?? LOOKING_FOR.FULL_TIME;
+}
+
+export function isMentor(type: string | null) {
+  return type === 'MENTOR';
 }
 
 /** Locations without the redundant "Worldwide" when remote, shortened to "A, B +n" */

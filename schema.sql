@@ -13,8 +13,9 @@
 --   description     → "About you"
 --   image_url       → "Avatar"
 --   link            → "Profile URL"          GitHub, portfolio, LinkedIn…
---   employment_type → "Looking for"          MENTORSHIP | INTERN | CONTRACTOR (freelance)
---                                            | TEMPORARY (short project) | PART_TIME | FULL_TIME
+--   employment_type → "Looking for"          INTERN | CONTRACTOR (freelance) | TEMPORARY (short project)
+--                                            | PART_TIME | FULL_TIME | MENTOR ("Become a mentor")
+--                                            (MENTORSHIP: legacy, no longer offered in the form)
 --   is_remote       → "Open to remote work"
 --   locations       → "Based in"
 --   salary_*        → not used by the site anymore (kept so no data is lost)
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     valid_through    DATE,                    -- job expiry date (ISO 8601)
     is_remote        BOOLEAN     DEFAULT true,
     locations        TEXT[],                  -- e.g. '{"USA","Germany","Worldwide"}' — empty/null means unspecified
-    employment_type  TEXT        DEFAULT 'FULL_TIME', -- MENTORSHIP | INTERN | CONTRACTOR | TEMPORARY | PART_TIME | FULL_TIME
+    employment_type  TEXT        DEFAULT 'FULL_TIME', -- INTERN | CONTRACTOR | TEMPORARY | PART_TIME | FULL_TIME | MENTOR
     user_id          UUID        DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
