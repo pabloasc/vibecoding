@@ -18,7 +18,6 @@ export function readProfileFields(): ProfileFieldValues {
     employment_type: document.querySelector<HTMLInputElement>('input[name="employment_type"]:checked')?.value ?? 'FULL_TIME',
     is_remote:       $('is-remote').checked,
     locations:       $('locations').value.split(',').map(s => s.trim()).filter(Boolean),
-    valid_through:   $('valid-through').value || null,
   };
 }
 
@@ -41,7 +40,6 @@ export function fillProfileFields(p: Profile) {
   if (radio) radio.checked = true;
   $('is-remote').checked = p.is_remote !== false;
   $('locations').value = (p.locations ?? []).join(', ');
-  if (p.valid_through)   $('valid-through').value = p.valid_through;
 }
 
 /** The signed-in builder's own profile, if they have one */
@@ -119,7 +117,6 @@ export function fillCard(card: HTMLElement, p: Profile) {
   card.querySelector('.p-want')!.textContent = `${want.emoji} ${want.label}`;
   card.querySelector('.p-desc')!.textContent = p.description;
   card.querySelector('.p-date')!.textContent = `Joined ${formatDate(p.created_at)}`;
-  card.querySelector<HTMLAnchorElement>('.p-link')!.href = p.link;
   const cardLink = card.querySelector<HTMLAnchorElement>('.p-card-link')!;
   cardLink.href = `/profile/${profileSlug(p)}/`;
   cardLink.setAttribute('aria-label', `View ${name}'s profile`);

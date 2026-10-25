@@ -55,10 +55,9 @@ const href  = p ? `/profile/${profileSlug(p)}/` : undefined;
 
   <div class="flex items-center justify-between mt-auto pt-5">
     <span class="p-date font-mono text-[0.68rem] text-[#5A5A6E]">{p && `Joined ${formatDate(p.created_at)}`}</span>
-    <a href={p?.link} target="_blank" rel="noopener noreferrer"
-       class="p-link relative z-10 font-mono text-[0.72rem] text-snow/80 hover:text-acid border-b border-line hover:border-acid pb-px transition-colors">
-      Profile ↗
-    </a>
+    <span class="font-mono text-[0.72rem] text-snow/80 group-hover:text-acid border-b border-line group-hover:border-acid pb-px transition-colors" aria-hidden="true">
+      View profile →
+    </span>
   </div>
 
   <!-- Full-card tap target -->

@@ -18,7 +18,7 @@
 --   is_remote       → "Open to remote work"
 --   locations       → "Based in"
 --   salary_*        → not used by the site anymore (kept so no data is lost)
---   valid_through   → "Open to offers until"
+--   valid_through   → not used by the site anymore (kept so no data is lost)
 --   user_id         → the builder who owns the profile (set automatically on insert)
 CREATE TABLE IF NOT EXISTS jobs (
     id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),

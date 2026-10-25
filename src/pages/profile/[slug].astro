@@ -43,7 +43,6 @@ const name = profileName(profile);
 const headline = profileHeadline(profile);
 const want = lookingFor(profile.employment_type);
 const locations = (profile.locations ?? []).filter(l => profile.is_remote !== true || l !== 'Worldwide');
-const openUntil = profile.valid_through ? formatDate(profile.valid_through) : null;
 
 const schemaProfilePage = {
   '@context': 'https://schema.org',
@@ -151,12 +150,6 @@ const schemaProfilePage = {
               <dt class="text-fog">Joined</dt>
               <dd class="font-mono text-[0.82rem]">{formatDate(profile.created_at)}</dd>
             </div>
-            {openUntil && (
-              <div class="flex justify-between gap-4">
-                <dt class="text-fog">Open to offers until</dt>
-                <dd class="font-mono text-[0.82rem]">{openUntil}</dd>
-              </div>
-            )}
             <div class="flex justify-between gap-4">
               <dt class="text-fog">Looking for</dt>
               <dd class="font-mono text-[0.82rem]">{want.label}</dd>

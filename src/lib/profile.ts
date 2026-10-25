@@ -11,7 +11,7 @@
  *   is_remote       → open to remote work
  *   locations       → where they're based
  *   salary_*        → unused (kept in the table, not shown or edited)
- *   valid_through   → open to offers until
+ *   valid_through   → unused (kept in the table, not shown or edited)
  *   user_id         → the builder who owns the profile (set by the DB on insert)
  */
 
@@ -24,7 +24,6 @@ export type Profile = {
   description: string;
   image_url: string | null;
   link: string;
-  valid_through: string | null;
   is_remote: boolean | null;
   locations: string[] | null;
   employment_type: string | null;
