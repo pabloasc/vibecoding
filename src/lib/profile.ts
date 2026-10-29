@@ -127,7 +127,7 @@ type LookingFor = {
 // Order = order of the form options; the first one is preselected
 export const LOOKING_FOR: Record<string, LookingFor> = {
   INTERN:     { label: 'Internship',      emoji: '🎓' },
-  CONTRACTOR: { label: 'Freelance gigs',  emoji: '⚡' },
+  CONTRACTOR: { label: 'Freelance work',  emoji: '⚡' },
   TEMPORARY:  { label: 'Short project',   emoji: '🛠️' },
   PART_TIME:  { label: 'Part-time role',  emoji: '🌗' },
   FULL_TIME:  { label: 'Full-time role',  emoji: '🚀' },

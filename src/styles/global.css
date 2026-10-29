@@ -326,6 +326,37 @@
     outline-offset: 2px;
   }
 
+  /* Toggle switch (checkbox) */
+  .toggle {
+    appearance: none;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 1.6rem;
+    border-radius: 999px;
+    background: var(--color-line);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    background: var(--color-snow);
+    transition: transform 0.2s ease;
+  }
+  .toggle:checked {
+    background: var(--color-acid);
+  }
+  .toggle:checked::after {
+    transform: translateX(1.15rem);
+    background: var(--color-void);
+  }
+
   /* Banners */
   .banner-error {
     border: 1px solid rgba(255, 95, 162, 0.4);

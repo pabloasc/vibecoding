@@ -5,6 +5,8 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProfileCard from '../components/ProfileCard.astro';
+import JobPostCard from '../components/JobPostCard.astro';
+import { fetchActiveJobs } from '../lib/jobPost';
 import { profileSlug } from '../lib/slug';
 import { type Profile, profileName, fetchProfileList } from '../lib/profile';
 
@@ -34,7 +36,7 @@ const schemaItemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Junior developers & vibecoders — vibecoding.work',
-  description: 'Profiles of junior developers and vibecoders looking for mentors and their first professional assignment.',
+  description: 'Junior developers and vibecoders showing their projects to land paid developer jobs, freelance work and mentors.',
   url: 'https://vibecoding.work/',
   numberOfItems: ssrTotal,
   itemListElement: ssrProfiles.map((p, i) => ({
@@ -44,6 +46,8 @@ const schemaItemList = {
     name: profileName(p),
   })),
 };
+
+const latestJobs = await fetchActiveJobs(SUPABASE_URL, SUPABASE_KEY, { limit: 4 });
 
 const MS_7D = 7 * 24 * 60 * 60 * 1000;
 const newThisWeek = ssrProfiles.filter(p => (Date.now() - new Date(p.created_at).getTime()) < MS_7D).length;
@@ -60,8 +64,8 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 ---
 
 <Layout
-  title="vibecoding.work — Where junior devs & vibecoders land their first gig"
-  description="Junior developers and vibecoders post their profile. Mentors, founders and teams find them. Get mentorship and land your first professional assignment."
+  title="Junior Dev & Vibe Coding Jobs, Freelance Work | vibecoding.work"
+  description="Land your first paid developer job or freelance work. Junior devs & vibecoders: show your projects, get endorsed by mentors and get hired. Free, always."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
@@ -88,12 +92,12 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 
           <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)] mt-6">
             <span class="lg:whitespace-nowrap">From side projects</span><br />
-            to your <span class="gradient-text">first<br />real gig.</span>
+            to your <span class="gradient-text">first<br />real job.</span>
           </h1>
 
           <p class="text-[1.08rem] sm:text-[1.15rem] text-fog leading-relaxed mt-6 max-w-[34rem]">
-            We help <strong class="text-snow font-semibold">junior developers</strong> and <strong class="text-snow font-semibold">vibecoders</strong> find mentors and land their first professional assignments.
-            Drop your profile, show what you've shipped — mentors, founders and teams come to you.
+            Land your first <strong class="text-snow font-semibold">paid dev job</strong> or <strong class="text-snow font-semibold">freelance work</strong>.
+            Show what you've shipped, get endorsed by mentors who've been there, and get found by the founders and teams who hire. Free, always.
           </p>
 
           <div class="flex flex-wrap items-center gap-3 mt-9">
@@ -116,7 +120,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
               <span class="w-3 h-3 rounded-full bg-[#FF5F57]"></span>
               <span class="w-3 h-3 rounded-full bg-[#FEBC2E]"></span>
               <span class="w-3 h-3 rounded-full bg-[#28C840]"></span>
-              <span class="ml-3 font-mono text-[0.7rem] text-fog">~/my-first-gig — zsh</span>
+              <span class="ml-3 font-mono text-[0.7rem] text-fog">~/my-first-job — zsh</span>
             </div>
             <div class="p-5 sm:p-6 pb-12 sm:pb-14 font-mono text-[0.82rem] leading-[1.9]">
               <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> npx vibecoding drop-profile</p>
@@ -240,6 +244,36 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         <span id="page-indicator" class="font-mono text-[0.75rem] text-fog px-2"></span>
         <button id="page-next" class="btn-ghost !py-2 !px-4 !text-[0.85rem] disabled:opacity-30 disabled:cursor-not-allowed">Next →</button>
       </div>
+    </section>
+
+    <!-- ═══════════ LATEST JOBS ════════════════════════════════ -->
+    <section id="jobs" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div>
+          <span class="eyebrow">// paid work</span>
+          <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2">
+            Junior developer jobs &amp; <span class="gradient-text">freelance work.</span>
+          </h2>
+          <p class="text-fog mt-2">Real, paid opportunities from teams that welcome juniors.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="/jobs/" class="btn-ghost">See all jobs</a>
+          <a href="/post-job" class="btn-primary">Post a job — free →</a>
+        </div>
+      </div>
+
+      {latestJobs.length > 0 ? (
+        <div class="grid md:grid-cols-2 gap-4">
+          {latestJobs.map((job, i) => <JobPostCard job={job} index={i} />)}
+        </div>
+      ) : (
+        <div class="card p-8 sm:p-10 text-center">
+          <p class="text-[2.2rem]">💼</p>
+          <p class="font-semibold text-[1.3rem] mt-2">Hiring a junior or need a small project built?</p>
+          <p class="text-fog mt-2 mb-6 max-w-md mx-auto">Post a job or a paid assignment for free and give someone their first real job.</p>
+          <a href="/post-job" class="btn-primary">Post the first job →</a>
+        </div>
+      )}
     </section>
 
     <!-- ═══════════ HOW IT WORKS ═══════════════════════════════ -->

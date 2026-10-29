@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { profileSlug } from '../lib/slug';
+import { JOB_TYPES, fetchActiveJobs, jobPostUrl } from '../lib/jobPost';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -18,6 +19,22 @@ export const GET: APIRoute = async () => {
   }
 
   const today = new Date().toISOString().split('T')[0];
+  const jobs = await fetchActiveJobs(url, key, { limit: 1000 });
+  const jobsLastmod = jobs[0]?.created_at.split('T')[0] ?? today;
+
+  const entry = (loc: string, lastmod: string, changefreq: string, priority: string) => `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+
+  const jobUrls = [
+    entry('https://vibecoding.work/jobs/', jobsLastmod, 'daily', '0.9'),
+    ...Object.keys(JOB_TYPES).map(t => entry(`https://vibecoding.work/jobs/?type=${t}`, jobsLastmod, 'daily', '0.7')),
+    entry('https://vibecoding.work/post-job', today, 'monthly', '0.6'),
+    ...jobs.map(j => entry(jobPostUrl(j), j.created_at.split('T')[0], 'weekly', '0.9')),
+  ].join('\n');
 
   const profileUrls = profiles.map(p => {
     const slug = profileSlug(p);
@@ -38,6 +55,7 @@ export const GET: APIRoute = async () => {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+${jobUrls}
 ${profileUrls}
 </urlset>`;
 

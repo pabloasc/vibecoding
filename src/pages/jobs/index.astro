@@ -1,0 +1,150 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import JobPostCard from '../../components/JobPostCard.astro';
+import { JOB_TYPES, fetchActiveJobs, jobPostUrl } from '../../lib/jobPost';
+
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+const typeParam = Astro.url.searchParams.get('type') ?? '';
+const activeType = JOB_TYPES[typeParam] ? typeParam : '';
+const jobs = await fetchActiveJobs(SUPABASE_URL, SUPABASE_KEY, { type: activeType });
+
+// One indexable page per job type, e.g. "Junior Freelance Work for Developers"
+const typeHeadlines: Record<string, string> = {
+  '':         'Junior developer jobs & freelance work',
+  FULL_TIME:  'Full-time junior developer jobs',
+  PART_TIME:  'Part-time junior developer jobs',
+  CONTRACTOR: 'Freelance work for junior developers',
+  TEMPORARY:  'Short paid assignments for junior developers',
+  INTERN:     'Developer internships',
+};
+const h1 = typeHeadlines[activeType];
+const pageTitle = activeType
+  ? `${h1} | vibecoding.work`
+  : 'Junior Developer Jobs, Freelance Work & Internships | vibecoding.work';
+const pageDescription = activeType
+  ? `${h1} for vibecoders and AI-native builders. Real, paid opportunities — apply with your projects, no years of experience required.`
+  : 'Entry-level developer jobs, freelance work and internships for junior devs and vibecoders. Real, paid opportunities — apply with your projects. Updated daily.';
+
+const schemaItemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: h1,
+  url: `https://vibecoding.work/jobs/${activeType ? `?type=${activeType}` : ''}`,
+  numberOfItems: jobs.length,
+  itemListElement: jobs.map((j, i) => ({ '@type': 'ListItem', position: i + 1, url: jobPostUrl(j) })),
+};
+const schemaBreadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://vibecoding.work/' },
+    { '@type': 'ListItem', position: 2, name: 'Jobs', item: 'https://vibecoding.work/jobs/' },
+  ],
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} canonical={activeType ? `/jobs/?type=${activeType}` : '/jobs/'}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaBreadcrumb)} />
+  </Fragment>
+
+  <Header />
+
+  <main class="relative">
+    <div class="absolute inset-x-0 top-0 h-[380px] grid-bg pointer-events-none"></div>
+    <div class="orb w-[420px] h-[420px] bg-acid -top-56 right-0 !opacity-15"></div>
+    <div class="orb w-[380px] h-[380px] bg-violet -top-48 -left-40 !opacity-30"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-14 sm:pt-20">
+
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="max-w-2xl fade-in">
+          <span class="eyebrow">// paid work for juniors</span>
+          <h1 class="font-bold tracking-[-0.035em] leading-[1.02] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-3">{h1}</h1>
+          <p class="text-fog text-[1.05rem] leading-relaxed mt-4">
+            Real, paid opportunities for junior developers and vibecoders. Apply with your projects —
+            no "5 years of experience" required.
+          </p>
+        </div>
+        <a href="/post-job" class="btn-primary shrink-0">Post a job — it's free →</a>
+      </div>
+
+      <!-- Type filters (plain links so each one is crawlable) -->
+      <nav class="flex flex-wrap gap-2 mt-10" aria-label="Filter by job type">
+        <a href="/jobs/" class:list={['pill-link', !activeType && 'is-active']}>All</a>
+        {Object.entries(JOB_TYPES).map(([value, t]) => (
+          <a href={`/jobs/?type=${value}`} class:list={['pill-link', activeType === value && 'is-active']}>{t.emoji} {t.label}</a>
+        ))}
+      </nav>
+
+      <p class="font-mono text-[0.75rem] text-fog mt-6">
+        {jobs.length} open {jobs.length === 1 ? 'opportunity' : 'opportunities'}
+      </p>
+
+      {jobs.length > 0 ? (
+        <div class="grid md:grid-cols-2 gap-4 mt-4">
+          {jobs.map((job, i) => <JobPostCard job={job} index={i} />)}
+        </div>
+      ) : (
+        <div class="card text-center px-6 py-16 mt-4">
+          <p class="text-[2.5rem] mb-3">🌱</p>
+          <p class="font-semibold text-[1.4rem] mb-2">No open {activeType ? JOB_TYPES[activeType].label.toLowerCase() : 'jobs'} right now.</p>
+          <p class="text-fog mb-6 max-w-md mx-auto">Hiring a junior developer or need a small project built? Post it here — it's free, and the right builder could reply today.</p>
+          <a href="/post-job" class="btn-primary">Post a job →</a>
+        </div>
+      )}
+
+      <!-- Employer pitch -->
+      <section class="card relative overflow-hidden p-7 sm:p-10 mt-16">
+        <div class="orb w-[300px] h-[300px] bg-violet -top-32 -right-16 !opacity-30"></div>
+        <div class="relative grid md:grid-cols-[1.3fr_1fr] gap-8 items-center">
+          <div>
+            <span class="eyebrow">// for companies, founders &amp; nonprofits</span>
+            <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.6rem,3.5vw,2.2rem)] leading-tight mt-2">Give someone their first break.</h2>
+            <p class="text-fog leading-relaxed mt-3">
+              Post a job or a small paid assignment. Every applicant comes with real projects, upvotes from other builders
+              and endorsements from mentors — so you can hire a junior with confidence.
+            </p>
+          </div>
+          <ul class="space-y-2.5 text-[0.95rem]">
+            <li>✅ Free to post</li>
+            <li>✅ Eligible for Google Jobs listings</li>
+            <li>✅ Applicants with real projects &amp; endorsements</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #C4C4D4;
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .pill-link:hover { border-color: #44445a; }
+  .pill-link.is-active {
+    color: var(--color-void);
+    background: var(--color-acid);
+    border-color: var(--color-acid);
+    font-weight: 600;
+  }
+</style>

@@ -22,7 +22,7 @@ const webPage = JSON.stringify({
 
 <Layout
   title="Drop your profile — vibecoding.work"
-  description="Junior developer or vibecoder? Post your profile in two minutes and get discovered by mentors, founders and teams offering first professional gigs."
+  description="Junior developer or vibecoder? Post your profile in two minutes and get discovered by mentors, founders and teams hiring for junior jobs and freelance work."
 >
   <script slot="head" type="application/ld+json" set:html={webPage} />
   <Header />
@@ -121,7 +121,7 @@ const webPage = JSON.stringify({
         <div class="orb w-[300px] h-[300px] bg-acid -top-40 left-1/2 -translate-x-1/2 !opacity-25"></div>
         <p class="relative text-[3rem]">🚀</p>
         <p class="relative font-bold text-[2rem] tracking-tight mt-2">You're live!</p>
-        <p class="relative text-fog mt-2 max-w-sm mx-auto">Your profile is on the board. Share it around — the more eyes, the faster that first gig shows up.</p>
+        <p class="relative text-fog mt-2 max-w-sm mx-auto">Your profile is on the board. Share it around — the more eyes, the faster that first job shows up.</p>
         <p id="success-warning" class="hidden relative banner-error mt-5 max-w-md mx-auto"></p>
         <div class="relative flex flex-wrap justify-center gap-3 mt-8">
           <a id="success-profile-link" href="/" class="btn-primary">See your profile →</a>
@@ -244,6 +244,10 @@ const webPage = JSON.stringify({
   supabase.auth.onAuthStateChange((_event, session) => {
     currentToken = session?.access_token ?? SUPABASE_ANON_KEY;
     if (!session) { showAuthWall(); return; }
+
+    // Came here only to sign in (e.g. from "Post a job") — send them back
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (next && next.startsWith('/') && !next.startsWith('//')) { window.location.replace(next); return; }
 
     // One profile per builder — send returning builders to edit instead (the admin can add more)
     if (session.user.email === ADMIN_EMAIL || !successEl.classList.contains('hidden')) { showForm(); return; }

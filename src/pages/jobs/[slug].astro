@@ -1,0 +1,185 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { type JobPost, jobType, jobPostSlug, jobPostUrl, jobPostingSchema, formatSalary, isExpired } from '../../lib/jobPost';
+import { formatDate } from '../../lib/profile';
+
+const { slug } = Astro.params;
+const idMatch = slug?.match(/([0-9a-f]{8})$/i);
+if (!idMatch) return Astro.redirect('/jobs/');
+const idPrefix = idMatch[1].toLowerCase();
+
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+let job: JobPost | null = null;
+try {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/job_posts?select=*&id=gte.${idPrefix}-0000-0000-0000-000000000000&id=lte.${idPrefix}-ffff-ffff-ffff-ffffffffffff&limit=1`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (res.ok) job = (await res.json())[0] ?? null;
+} catch { /* fall through */ }
+
+if (!job) return Astro.redirect('/jobs/');
+
+// 301 to the canonical slug if the title or company changed
+const canonicalSlug = jobPostSlug(job);
+if (slug !== canonicalSlug) return Astro.redirect(`/jobs/${canonicalSlug}/`, 301);
+
+const expired = isExpired(job);
+const type = jobType(job.employment_type);
+const salary = formatSalary(job);
+const locations = (job.locations ?? []).filter(Boolean);
+const applyHref = job.link;
+const applyIsEmail = applyHref.startsWith('mailto:');
+
+const schemaBreadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://vibecoding.work/' },
+    { '@type': 'ListItem', position: 2, name: 'Jobs', item: 'https://vibecoding.work/jobs/' },
+    { '@type': 'ListItem', position: 3, name: job.title, item: jobPostUrl(job) },
+  ],
+};
+
+const metaDescription = `${job.name} is hiring: ${job.title}${job.is_remote ? ' (remote)' : locations.length ? ` in ${locations.join(', ')}` : ''}${salary ? ` · ${salary}` : ''}. ${job.description}`.slice(0, 158);
+---
+
+<Layout
+  title={`${job.title} at ${job.name}${job.is_remote ? ' (Remote)' : ''} | vibecoding.work`}
+  description={metaDescription}
+  ogImage={job.image_url ?? '/og.svg'}
+  type="article"
+  noindex={expired}
+>
+  <Fragment slot="head">
+    {/* Expired posts must not carry JobPosting markup (Google guideline) */}
+    {!expired && <script type="application/ld+json" set:html={JSON.stringify(jobPostingSchema(job))} />}
+    <script type="application/ld+json" set:html={JSON.stringify(schemaBreadcrumb)} />
+  </Fragment>
+
+  <Header />
+
+  <main class="relative">
+    <div class="absolute inset-x-0 top-0 h-[360px] grid-bg pointer-events-none"></div>
+    <div class="orb w-[420px] h-[420px] bg-acid -top-56 -left-32 !opacity-15"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-8">
+
+      <div class="flex items-center justify-between gap-4 mb-10">
+        <a href="/jobs/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">← All jobs</a>
+        <div id="owner-bar" data-owner-id={job.user_id ?? ''}
+             class="hidden items-center gap-3 rounded-full border border-line bg-surface/80 pl-4 pr-1.5 py-1.5 font-mono text-[0.72rem]">
+          <span id="owner-label" class="text-fog">your post</span>
+          <button id="delete-btn" data-job-id={job.id} class="text-pink hover:underline px-1">Delete</button>
+          <a href={`/post-job?id=${job.id}`} class="btn-primary !py-1.5 !px-3.5 !text-[0.78rem]">Edit post</a>
+        </div>
+      </div>
+
+      {expired && (
+        <div class="banner-error mb-8">This position closed on {formatDate(job.valid_through!)}. <a href="/jobs/" class="underline">See open jobs →</a></div>
+      )}
+
+      <!-- Header -->
+      <section class="fade-in flex flex-col sm:flex-row gap-6 sm:items-center">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl border border-line bg-raised overflow-hidden flex items-center justify-center font-mono font-bold text-[2rem]">
+          {job.image_url
+            ? <img src={job.image_url} alt={`${job.name} logo`} class="w-full h-full object-contain p-2" />
+            : job.name.trim()[0]?.toUpperCase()}
+        </div>
+        <div class="min-w-0">
+          <span class="eyebrow">// {type.label.toLowerCase()}</span>
+          <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2rem,5vw,3.2rem)] mt-2">{job.title}</h1>
+          <p class="text-[1.15rem] text-fog mt-2">{job.name}</p>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <span class="chip !text-[0.75rem] !py-1.5 !px-3">{type.emoji} {type.label}</span>
+            {job.is_remote === true && <span class="chip !text-[0.75rem] !py-1.5 !px-3">🌍 Remote</span>}
+            {locations.map(loc => <span class="chip !text-[0.75rem] !py-1.5 !px-3">📍 {loc}</span>)}
+            {salary && <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">💰 {salary}</span>}
+          </div>
+        </div>
+      </section>
+
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6 mt-12 items-start">
+
+        <article class="card p-6 sm:p-9">
+          <p class="eyebrow mb-5">// about the role</p>
+          <div class="text-[1rem] sm:text-[1.05rem] leading-[1.8] text-snow/85 whitespace-pre-wrap break-words">{job.description}</div>
+
+          {!expired && (
+            <div class="flex flex-wrap items-center gap-3 mt-10 pt-6 border-t border-line">
+              <a href={applyHref} target={applyIsEmail ? undefined : '_blank'} rel="noopener noreferrer nofollow" class="btn-primary">
+                Apply {applyIsEmail ? 'by email' : 'now'} ↗
+              </a>
+              <span class="text-fog text-[0.88rem]">Tip: link your vibecoding.work profile in your application.</span>
+            </div>
+          )}
+        </article>
+
+        <aside class="lg:sticky lg:top-24 space-y-4">
+          <dl class="card p-6 space-y-4 text-[0.9rem]">
+            <div class="flex justify-between gap-4"><dt class="text-fog">Company</dt><dd class="text-right">{job.name}</dd></div>
+            <div class="flex justify-between gap-4"><dt class="text-fog">Type</dt><dd class="text-right">{type.label}</dd></div>
+            {salary && <div class="flex justify-between gap-4"><dt class="text-fog">Pay</dt><dd class="font-mono text-[0.85rem]">{salary}</dd></div>}
+            <div class="flex justify-between gap-4"><dt class="text-fog">Posted</dt><dd class="font-mono text-[0.82rem]">{formatDate(job.created_at)}</dd></div>
+            {job.valid_through && <div class="flex justify-between gap-4"><dt class="text-fog">Apply by</dt><dd class="font-mono text-[0.82rem]">{formatDate(job.valid_through)}</dd></div>}
+          </dl>
+
+          <a href="/submit" class="block card card-hover p-5">
+            <p class="text-[1.4rem]">📦</p>
+            <p class="font-semibold mt-2">Stand out when you apply</p>
+            <p class="text-fog text-[0.88rem] mt-1">Drop your profile with your projects and mentor endorsements, then share the link in your application.</p>
+          </a>
+
+          <a href="/post-job" class="block rounded-2xl border border-dashed border-line hover:border-acid/50 p-5 text-center transition-colors">
+            <p class="text-[0.9rem] text-fog">Hiring juniors too?</p>
+            <p class="font-semibold mt-1">Post a job — it's free <span class="text-acid">→</span></p>
+          </a>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+  import { ADMIN_EMAIL } from '../../lib/profile';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  async function checkOwner() {
+    const bar = document.getElementById('owner-bar')!;
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+    if (!user) return;
+    const isOwner = !!bar.dataset.ownerId && bar.dataset.ownerId === user.id;
+    if (!isOwner && user.email !== ADMIN_EMAIL) return;
+    if (!isOwner) document.getElementById('owner-label')!.textContent = 'admin';
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+  }
+  checkOwner();
+
+  document.getElementById('delete-btn')?.addEventListener('click', async () => {
+    if (!confirm('Delete this job post? This cannot be undone.')) return;
+    const btn = document.getElementById('delete-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Deleting…';
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/job_posts?id=eq.${encodeURIComponent(btn.dataset.jobId!)}`, {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${session?.access_token}`, Prefer: 'return=representation' },
+    });
+    const deleted = res.ok ? await res.json().catch(() => []) : [];
+    if (deleted.length) window.location.href = '/jobs/';
+    else { alert('Could not delete this post.'); btn.disabled = false; btn.textContent = 'Delete'; }
+  });
+</script>

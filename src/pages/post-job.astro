@@ -1,0 +1,337 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { JOB_TYPES } from '../lib/jobPost';
+---
+
+<Layout
+  title="Post a Junior Developer Job or Paid Assignment — Free | vibecoding.work"
+  description="Hiring a junior developer or need a small project built? Post a job or paid assignment for free. Reach vibecoders with real projects and mentor endorsements."
+>
+  <Header />
+
+  <main class="relative">
+    <div class="absolute inset-x-0 top-0 h-[380px] grid-bg pointer-events-none"></div>
+    <div class="orb w-[420px] h-[420px] bg-acid -top-56 right-0 !opacity-15"></div>
+
+    <div class="relative max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pt-14 sm:pt-20">
+
+      <div class="mb-10 fade-in">
+        <span id="page-eyebrow" class="eyebrow">// hire a junior</span>
+        <h1 id="page-title" class="font-bold tracking-[-0.035em] leading-[1] text-[clamp(2.2rem,6vw,3.4rem)] mt-3">
+          Post a job or <span class="gradient-text">paid assignment.</span>
+        </h1>
+        <p class="text-fog text-[1.05rem] leading-relaxed mt-4">
+          Free to post. Reach junior developers and vibecoders who come with real projects, upvotes and mentor endorsements.
+        </p>
+      </div>
+
+      <!-- Checking session -->
+      <div id="auth-checking" class="py-16 text-center">
+        <p class="font-mono text-[0.8rem] text-fog"><span class="caret inline-block w-2 h-3.5 bg-acid align-middle mr-2"></span>Checking session…</p>
+      </div>
+
+      <!-- Signed out -->
+      <div id="signed-out" class="hidden card p-8 sm:p-10 text-center">
+        <p class="text-[2.2rem]">🔑</p>
+        <p class="font-semibold text-[1.4rem] mt-2">Sign in to post a job</p>
+        <p class="text-fog mt-2 mb-6 max-w-sm mx-auto">Create a free account (or sign in) — you'll come right back here.</p>
+        <a href="/submit?next=/post-job" class="btn-primary">Sign in or create account →</a>
+      </div>
+
+      <!-- Not allowed (editing someone else's post) -->
+      <div id="denied" class="hidden card py-14 px-6 text-center">
+        <p class="text-[2.2rem]">🔒</p>
+        <p class="font-semibold text-[1.4rem] mt-2">This isn't your post.</p>
+        <a href="/jobs/" class="btn-ghost mt-6">← Back to jobs</a>
+      </div>
+
+      <form id="job-form" class="hidden space-y-5" novalidate>
+        <div id="error-banner" class="hidden banner-error"><p id="error-message"></p></div>
+
+        <!-- 01 · The role -->
+        <fieldset class="card p-5 sm:p-7 space-y-6">
+          <legend class="sr-only">The role</legend>
+          <p class="eyebrow">01 · The role</p>
+
+          <div class="space-y-2">
+            <label for="name" class="field-label">Company or organization <span class="text-pink">*</span></label>
+            <input type="text" id="name" required maxlength="80" placeholder="Acme Studio" class="field !text-[1.05rem] font-medium" autocomplete="organization" />
+          </div>
+
+          <div class="space-y-2">
+            <label for="title" class="field-label">Job title <span class="text-pink">*</span></label>
+            <input type="text" id="title" required maxlength="90" placeholder="Junior React Developer" class="field" />
+            <p class="field-hint">Use a title people search for, e.g. "Junior Frontend Developer" or "Freelance Web Developer".</p>
+          </div>
+
+          <div class="space-y-2">
+            <span class="field-label">Type</span>
+            <div class="flex flex-wrap gap-2">
+              {Object.entries(JOB_TYPES).map(([value, t], i) => (
+                <label class="pill-option">
+                  <input type="radio" name="employment_type" value={value} checked={i === 0} />
+                  <span>{t.emoji} {t.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="description" class="field-label">Description <span class="text-pink">*</span></label>
+            <textarea id="description" required rows="8" class="field leading-relaxed resize-y min-h-[12rem]"
+              placeholder="What will they build? Which tools do you use (Cursor, Claude Code, Lovable…)? What does a great first month look like? Who will they learn from?"></textarea>
+          </div>
+
+          <div class="space-y-2">
+            <label for="link" class="field-label">How to apply <span class="text-pink">*</span></label>
+            <input type="text" id="link" required placeholder="https://acme.com/careers/junior-dev  or  mailto:jobs@acme.com" class="field font-mono !text-[0.9rem]" />
+            <p class="field-hint">An application page, or an email address — we'll turn it into a mailto link.</p>
+          </div>
+
+          <!-- Logo -->
+          <div class="space-y-2">
+            <span class="field-label">Company logo <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></span>
+            <div class="relative flex items-center gap-4 rounded-xl border border-dashed border-line hover:border-acid/60 bg-raised/50 p-4 transition-colors cursor-pointer">
+              <input type="file" id="logo" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+              <div id="logo-thumb" class="w-14 h-14 shrink-0 rounded-xl border border-line bg-raised overflow-hidden flex items-center justify-center text-[1.2rem]">🏢</div>
+              <div class="min-w-0">
+                <p id="logo-name" class="font-medium text-[0.92rem] truncate">Drop a logo or click to browse</p>
+                <p class="field-hint">JPG, PNG or WebP · max 5 MB</p>
+              </div>
+              <button type="button" id="logo-remove" class="hidden relative z-10 ml-auto font-mono text-[0.7rem] text-pink hover:underline">Remove</button>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 02 · Where & pay -->
+        <fieldset class="card p-5 sm:p-7 space-y-6">
+          <legend class="sr-only">Location and pay</legend>
+          <p class="eyebrow">02 · Where &amp; pay</p>
+
+          <label class="flex items-center justify-between gap-4 rounded-xl border border-line bg-raised px-4 py-3.5 cursor-pointer">
+            <span>
+              <span class="block font-medium text-[0.95rem]">🌍 Remote</span>
+              <span class="field-hint">Remote posts reach many more junior developers.</span>
+            </span>
+            <input type="checkbox" id="is-remote" checked class="toggle" />
+          </label>
+
+          <div class="space-y-2">
+            <label for="locations" class="field-label">Location</label>
+            <input type="text" id="locations" placeholder="Lisbon, Portugal" class="field" />
+            <p class="field-hint">On-site: "City, Country". Remote: the countries applicants can live in (e.g. "USA, Canada"), or leave empty for worldwide.</p>
+          </div>
+
+          <div class="space-y-2">
+            <span class="field-label">Pay</span>
+            <div class="grid grid-cols-2 gap-3">
+              <input type="number" id="salary-min" placeholder="Min (e.g. 25)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Minimum pay" />
+              <input type="number" id="salary-max" placeholder="Max (e.g. 40)" min="0" class="field font-mono !text-[0.9rem]" aria-label="Maximum pay" />
+              <select id="salary-currency" class="field font-mono !text-[0.9rem]" aria-label="Currency">
+                <option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                <option value="CAD">CAD</option><option value="AUD">AUD</option>
+              </select>
+              <select id="salary-period" class="field font-mono !text-[0.9rem]" aria-label="Pay period">
+                <option value="HOUR">Per hour</option><option value="MONTH">Per month</option>
+                <option value="YEAR" selected>Per year</option>
+              </select>
+            </div>
+            <p class="field-hint">💡 Posts that show pay get more applicants and rank better on Google Jobs.</p>
+          </div>
+
+          <div class="space-y-2">
+            <label for="valid-through" class="field-label">Apply by</label>
+            <input type="date" id="valid-through" class="field font-mono !text-[0.9rem]" />
+            <p class="field-hint">After this date the post is closed and removed from the board and from Google.</p>
+          </div>
+        </fieldset>
+
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <button type="submit" id="submit-btn" class="btn-primary !px-7 !py-4 !text-[1rem]">Publish job →</button>
+          <a href="/jobs/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { ADMIN_EMAIL } from '../lib/profile';
+  import { type JobPost, jobPostSlug } from '../lib/jobPost';
+  import { uploadAvatar } from '../lib/profileForm';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+
+  const editId = new URLSearchParams(window.location.search).get('id');
+  const form = $<HTMLFormElement>('job-form');
+  let token = '';
+  let currentLogo: string | null = null;
+  let logoFile: File | null = null;
+
+  function show(id: 'job-form' | 'signed-out' | 'denied') {
+    $('auth-checking').classList.add('hidden');
+    $(id).classList.remove('hidden');
+  }
+
+  // Default closing date: 30 days from today
+  $('valid-through').value = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
+
+  // ── Logo ────────────────────────────────────────────────────
+  function setLogo(src: string | null, label: string) {
+    const thumb = $('logo-thumb');
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'w-full h-full object-contain p-1';
+      thumb.replaceChildren(img);
+    } else {
+      thumb.textContent = '🏢';
+    }
+    $('logo-name').textContent = label;
+    $('logo-remove').classList.toggle('hidden', !src);
+  }
+
+  $('logo').addEventListener('change', () => {
+    const file = $('logo').files?.[0];
+    if (!file) return;
+    logoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => setLogo(reader.result as string, file.name);
+    reader.readAsDataURL(file);
+  });
+
+  $('logo-remove').addEventListener('click', () => {
+    $('logo').value = '';
+    logoFile = null;
+    currentLogo = null;
+    setLogo(null, 'Drop a logo or click to browse');
+  });
+
+  // ── Load (edit mode) ────────────────────────────────────────
+  function fill(j: JobPost) {
+    $('name').value = j.name;
+    $('title').value = j.title;
+    $<HTMLTextAreaElement>('description').value = j.description;
+    $('link').value = j.link;
+    const radio = document.querySelector<HTMLInputElement>(`input[name="employment_type"][value="${j.employment_type ?? 'FULL_TIME'}"]`);
+    if (radio) radio.checked = true;
+    $('is-remote').checked = j.is_remote !== false;
+    $('locations').value = (j.locations ?? []).join(', ');
+    $('salary-min').value = j.salary_min != null ? String(j.salary_min) : '';
+    $('salary-max').value = j.salary_max != null ? String(j.salary_max) : '';
+    if (j.salary_currency) $<HTMLSelectElement>('salary-currency').value = j.salary_currency;
+    if (j.salary_period)   $<HTMLSelectElement>('salary-period').value = j.salary_period;
+    $('valid-through').value = j.valid_through ?? '';
+    currentLogo = j.image_url;
+    if (j.image_url) setLogo(j.image_url, 'Current logo');
+
+    $('page-eyebrow').textContent = '// edit your post';
+    $('page-title').textContent = 'Edit job post';
+    $('submit-btn').textContent = 'Save changes →';
+  }
+
+  async function init() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { show('signed-out'); return; }
+    token = session.access_token;
+
+    if (editId) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/job_posts?id=eq.${encodeURIComponent(editId)}&select=*`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      });
+      const rows: JobPost[] = res.ok ? await res.json() : [];
+      const job = rows[0];
+      if (!job || (job.user_id !== session.user.id && session.user.email !== ADMIN_EMAIL)) { show('denied'); return; }
+      fill(job);
+    }
+    show('job-form');
+  }
+
+  // ── Submit ──────────────────────────────────────────────────
+  function showError(msg: string) {
+    $('error-message').textContent = msg;
+    $('error-banner').classList.remove('hidden');
+    $('error-banner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function normalizeApplyLink(raw: string) {
+    const v = raw.trim();
+    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return `mailto:${v}`;   // plain email address
+    return v;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('error-banner').classList.add('hidden');
+
+    const name = $('name').value.trim();
+    const title = $('title').value.trim();
+    const description = $<HTMLTextAreaElement>('description').value.trim();
+    const link = normalizeApplyLink($('link').value);
+    const salaryMin = $('salary-min').value.trim();
+    const salaryMax = $('salary-max').value.trim();
+    const salary_min = salaryMin ? parseInt(salaryMin, 10) : null;
+    const salary_max = salaryMax ? parseInt(salaryMax, 10) : null;
+    const hasPay = salary_min != null || salary_max != null;
+
+    if (!name)        return showError('Add your company or organization name.');
+    if (!title)       return showError('Add a job title.');
+    if (!description) return showError('Describe the job or assignment.');
+    if (!link)        return showError('Tell applicants how to apply — a link or an email address.');
+    try { new URL(link); } catch { return showError('"How to apply" should be a full link (https://…) or an email address.'); }
+    if (salary_min != null && salary_max != null && salary_min > salary_max) return showError('Minimum pay is higher than maximum pay.');
+
+    const submitBtn = $<HTMLButtonElement>('submit-btn');
+    const label = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Publishing…';
+
+    try {
+      const image_url = logoFile ? await uploadAvatar(logoFile, SUPABASE_URL, SUPABASE_KEY, token) : currentLogo;
+      const body = {
+        name, title, description, link, image_url,
+        employment_type: document.querySelector<HTMLInputElement>('input[name="employment_type"]:checked')?.value ?? 'FULL_TIME',
+        is_remote: $('is-remote').checked,
+        locations: $('locations').value.split(',').map(s => s.trim()).filter(Boolean),
+        salary_min, salary_max,
+        salary_currency: hasPay ? $<HTMLSelectElement>('salary-currency').value : null,
+        salary_period:   hasPay ? $<HTMLSelectElement>('salary-period').value : null,
+        valid_through: $('valid-through').value || null,
+      };
+
+      const res = await fetch(
+        editId ? `${SUPABASE_URL}/rest/v1/job_posts?id=eq.${encodeURIComponent(editId)}` : `${SUPABASE_URL}/rest/v1/job_posts`,
+        {
+          method: editId ? 'PATCH' : 'POST',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation',
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || 'Could not save the job post.');
+      }
+      const [saved] = await res.json().catch(() => []);
+      if (!saved) throw new Error("You don't have permission to edit this post.");
+      window.location.href = `/jobs/${jobPostSlug(saved)}/`;
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Something went wrong.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = label;
+    }
+  });
+
+  init();
+</script>

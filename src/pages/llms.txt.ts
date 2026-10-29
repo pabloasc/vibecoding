@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { profileSlug } from '../lib/slug';
+import { fetchActiveJobs, jobPostUrl, jobType, formatSalary } from '../lib/jobPost';
 import { type Profile, lookingFor, isMentor, profileName, profileHeadline } from '../lib/profile';
 
 export const GET: APIRoute = async () => {
@@ -29,9 +30,20 @@ export const GET: APIRoute = async () => {
     '',
     '---',
     '',
-    '## Builders',
-    '',
   ];
+
+  const jobs = await fetchActiveJobs(url, key);
+  lines.push('## Open jobs & paid assignments', '', `Post a job (free): https://vibecoding.work/post-job`, '');
+  for (const j of jobs) {
+    const salary = formatSalary(j);
+    lines.push(`### ${j.title} — ${j.name}`);
+    lines.push(`Type: ${jobType(j.employment_type).label}${j.is_remote ? ' · Remote' : ''}${(j.locations ?? []).length ? ` · ${(j.locations ?? []).join(', ')}` : ''}`);
+    if (salary) lines.push(`Pay: ${salary}`);
+    if (j.valid_through) lines.push(`Apply by: ${j.valid_through}`);
+    lines.push(`Details: ${jobPostUrl(j)}`, `Apply: ${j.link}`, '', j.description, '', '---', '');
+  }
+
+  lines.push('## Builders', '');
 
   for (const p of profiles) {
     const date = new Date(p.created_at).toLocaleDateString('en-US', {

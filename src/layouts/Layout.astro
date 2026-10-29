@@ -11,18 +11,21 @@ export interface Props {
   noindex?: boolean;
   /** 'website' | 'article' */
   type?: string;
+  /** Canonical path incl. query when it matters (e.g. "/jobs/?type=INTERN"). Defaults to the current path. */
+  canonical?: string;
 }
 
 const {
-  title = 'vibecoding.work — Where junior devs & vibecoders land their first gig',
-  description = 'Junior developers and vibecoders post their profile. Mentors, founders and teams find them. Get mentorship and land your first professional assignment.',
+  title = 'Junior Dev & Vibe Coding Jobs, Freelance Work | vibecoding.work',
+  description = 'Land your first paid developer job or freelance work. Junior devs & vibecoders: show your projects, get endorsed by mentors and get hired. Free, always.',
   ogImage = '/og.svg',
   noindex = false,
   type = 'website',
+  canonical: canonicalPath,
 } = Astro.props;
 
 const siteURL    = Astro.site ?? new URL('https://vibecoding.work');
-const canonical  = new URL(Astro.url.pathname, siteURL).href;
+const canonical  = new URL(canonicalPath ?? Astro.url.pathname, siteURL).href;
 const ogImageAbs = new URL(ogImage, siteURL).href;
 
 // ── Structured data: WebSite + SearchAction ──────────────────
@@ -31,7 +34,7 @@ const schemaWebsite = {
   '@type': 'WebSite',
   name: 'vibecoding.work',
   url: siteURL.href,
-  description: 'Profiles of junior developers and vibecoders looking for mentors and their first professional gig.',
+  description: 'Junior developers and vibecoders showing their projects to land paid developer jobs, freelance work and mentors.',
   potentialAction: {
     '@type': 'SearchAction',
     target: {

@@ -62,7 +62,7 @@ import { LOOKING_FOR } from '../lib/profile';
   <label class="flex items-center justify-between gap-4 rounded-xl border border-line bg-raised px-4 py-3.5 cursor-pointer">
     <span>
       <span class="block font-medium text-[0.95rem]">🌍 Open to remote work</span>
-      <span class="field-hint">Most first gigs are remote — keeping this on helps.</span>
+      <span class="field-hint">Most first jobs are remote — keeping this on helps.</span>
     </span>
     <input type="checkbox" id="is-remote" name="is_remote" checked class="toggle" />
   </label>
@@ -109,35 +109,3 @@ import { LOOKING_FOR } from '../lib/profile';
       placeholder="What does it do? What did you build it with?" aria-label="Project description"></textarea>
   </div>
 </template>
-
-<style is:global>
-  .toggle {
-    appearance: none;
-    flex-shrink: 0;
-    width: 2.75rem;
-    height: 1.6rem;
-    border-radius: 999px;
-    background: var(--color-line);
-    position: relative;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  .toggle::after {
-    content: '';
-    position: absolute;
-    top: 0.2rem;
-    left: 0.2rem;
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 999px;
-    background: var(--color-snow);
-    transition: transform 0.2s ease;
-  }
-  .toggle:checked {
-    background: var(--color-acid);
-  }
-  .toggle:checked::after {
-    transform: translateX(1.15rem);
-    background: var(--color-void);
-  }
-</style>
