@@ -1,8 +1,9 @@
 ---
 /**
- * Mentor endorsements on a profile page.
+ * Community endorsements on a profile page.
  * - Everyone sees the endorsements (section hidden while there are none).
- * - Mentors (signed in with a MENTOR profile) get a friendly form to endorse, edit or withdraw.
+ * - Signed-in members with a profile get a friendly form to endorse, edit or withdraw.
+ *   (The `mentor` / `mentor_user_id` fields are the endorser — names kept for DB compatibility.)
  * - The profile owner sees a tip when empty and can hide endorsements.
  */
 import { profileSlug } from '../lib/slug';
@@ -29,14 +30,14 @@ function monthYear(iso: string) {
 
   <div class="flex items-center justify-between gap-4 mb-6">
     <p class="eyebrow">// endorsements · <span id="endorsement-count">{visible.length}</span></p>
-    <span class="font-mono text-[0.68rem] text-fog hidden sm:inline">from mentors after an intro call</span>
+    <span class="font-mono text-[0.68rem] text-fog hidden sm:inline">from people in the community</span>
   </div>
 
   <!-- Owner tip while empty -->
   <div id="endorse-owner-tip" class="hidden rounded-2xl border border-dashed border-line p-5 text-[0.92rem] text-fog leading-relaxed">
     <p class="text-snow font-medium mb-1">🌱 No endorsements yet</p>
-    After an intro call, send your mentor this page's link — they can endorse you right here.
-    It's the first reference on your résumé.
+    Built something with someone here, or helped each other out? Send them this page's link —
+    they can vouch for you right here. It's the first reference on your résumé.
   </div>
 
   <ul id="endorsement-list" class="space-y-3">
@@ -58,7 +59,6 @@ function monthYear(iso: string) {
             <div class="flex-1 min-w-0">
               <p class="leading-snug">
                 <a href={`/profile/${profileSlug(e.mentor!)}/`} class="font-semibold hover:text-acid transition-colors">{mentorName}</a>
-                <span class="chip !text-[0.6rem] !py-0.5 !px-1.5 ml-1.5 align-middle">🧑‍🏫 Mentor</span>
               </p>
               {mentorHeadline && <p class="text-[0.8rem] text-fog truncate">{mentorHeadline}</p>}
             </div>
@@ -83,11 +83,11 @@ function monthYear(iso: string) {
     })}
   </ul>
 
-  <!-- Endorse form — shown to mentors viewing someone else's profile -->
+  <!-- Endorse form — shown to members viewing someone else's profile -->
   <form id="endorse-form" class="hidden mt-6 rounded-2xl border border-acid/30 bg-acid/5 p-5 sm:p-6" novalidate>
     <p class="font-semibold text-[1.05rem]">🤝 <span id="endorse-heading">Endorse {name}</span></p>
     <p class="text-fog text-[0.9rem] mt-1 leading-relaxed">
-      Had an intro call with {name}? A few kind words go a long way — it's often the first reference on a junior's résumé.
+      Worked with {name} or seen their projects up close? Vouch for them — a few kind words help someone get hired.
     </p>
 
     <p class="field-label mt-5 mb-2.5">What stood out? <span class="normal-case tracking-normal text-[#5A5A6E]">(pick up to 3)</span></p>
@@ -102,7 +102,7 @@ function monthYear(iso: string) {
 
     <label for="endorse-message" class="field-label mt-5 mb-2 block">A few words <span class="normal-case tracking-normal text-[#5A5A6E]">(optional)</span></label>
     <textarea id="endorse-message" rows="3" maxlength="280" class="field leading-relaxed resize-y"
-      placeholder={`e.g. ${name} walked me through their projects — great questions, clean code and real hunger to learn.`}></textarea>
+      placeholder={`e.g. I built a side project with ${name} — great questions, clean code and always happy to help others.`}></textarea>
     <p class="field-hint text-right mt-1"><span id="endorse-chars">0</span>/280</p>
 
     <p id="endorse-error" class="hidden banner-error mt-3"></p>
@@ -114,13 +114,13 @@ function monthYear(iso: string) {
   </form>
 
   <p id="endorse-thanks" class="hidden mt-6 rounded-2xl border border-acid/30 bg-acid/5 p-5 text-[0.95rem]">
-    🎉 Thanks for endorsing {name}! That means a lot to someone starting out.
+    🎉 Thanks for vouching for {name}! That means a lot to someone starting out.
   </p>
 </section>
 
 <script>
   import { supabase } from '../lib/supabase';
-  import { ADMIN_EMAIL, isMentor } from '../lib/profile';
+  import { ADMIN_EMAIL } from '../lib/profile';
   import { fetchOwnProfile } from '../lib/profileForm';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -141,7 +141,7 @@ function monthYear(iso: string) {
     const me       = await fetchOwnProfile(user.id, SUPABASE_URL, SUPABASE_KEY);
     const isOwner  = ownerId === user.id;
     const isAdmin  = user.email === ADMIN_EMAIL;
-    const canEndorse = !isOwner && !!me && isMentor(me.employment_type);
+    const canEndorse = !isOwner && !!me;   // any member with a profile, on someone else's profile
 
     const list     = document.getElementById('endorsement-list')!;
     const countEl  = document.getElementById('endorsement-count')!;
@@ -172,7 +172,7 @@ function monthYear(iso: string) {
       return true;
     }
 
-    // Owner can hide any endorsement; mentors can edit/withdraw their own; admin can remove any
+    // Owner can hide any endorsement; endorsers can edit/withdraw their own; admin can remove any
     for (const li of items()) {
       const isMine = li.dataset.mentorUserId === user.id;
       if (!(isOwner || isAdmin || isMine)) continue;

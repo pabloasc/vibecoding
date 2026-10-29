@@ -1,12 +1,15 @@
 -- ============================================================
--- vibecoding.work — Mentor endorsements
+-- vibecoding.work — Community endorsements
 -- Run this in the Supabase SQL Editor AFTER schema.sql.
--- Safe to re-run.
+-- Safe to re-run (re-run it to switch from mentor-only to community endorsements).
 --
--- Mentors (profiles with employment_type = 'MENTOR') can endorse other
--- builders: up to 3 strengths from a fixed list, plus an optional short note.
--- One endorsement per mentor per profile; mentors can edit or remove theirs,
--- and profile owners can remove any endorsement from their own profile.
+-- Any member with a profile can endorse another member: up to 3 strengths
+-- from a fixed list, plus an optional short note. One endorsement per member
+-- per profile; endorsers can edit or remove theirs, and profile owners can
+-- remove any endorsement from their own profile.
+--
+-- Note: the mentor_user_id / mentor_profile_id columns hold the ENDORSER.
+-- They keep their original names so existing data and the site keep working.
 -- ============================================================
 
 
@@ -14,8 +17,8 @@
 CREATE TABLE IF NOT EXISTS endorsements (
     id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     profile_id         UUID        NOT NULL,              -- who is endorsed
-    mentor_user_id     UUID        NOT NULL DEFAULT auth.uid(),
-    mentor_profile_id  UUID        NOT NULL,              -- the mentor's profile (set by trigger)
+    mentor_user_id     UUID        NOT NULL DEFAULT auth.uid(),   -- the endorser's account
+    mentor_profile_id  UUID        NOT NULL,              -- the endorser's profile (set by trigger)
     strengths          TEXT[]      NOT NULL DEFAULT '{}',
     message            TEXT,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -48,7 +51,7 @@ CREATE INDEX IF NOT EXISTS endorsements_profile_id_idx ON endorsements (profile_
 
 
 -- ── 2. Trigger: who is endorsing ─────────────────────────────
--- The client only sends profile_id, strengths and message. The mentor is taken
+-- The client only sends profile_id, strengths and message. The endorser is taken
 -- from the session, so nobody can endorse in someone else's name.
 CREATE OR REPLACE FUNCTION set_endorsement_mentor()
 RETURNS trigger
@@ -66,12 +69,12 @@ BEGIN
 
     SELECT id INTO NEW.mentor_profile_id
     FROM jobs
-    WHERE user_id = auth.uid() AND employment_type = 'MENTOR'
+    WHERE user_id = auth.uid()
     ORDER BY created_at
     LIMIT 1;
 
     IF NEW.mentor_profile_id IS NULL THEN
-        RAISE EXCEPTION 'Only mentors can endorse builders. Create a mentor profile first.';
+        RAISE EXCEPTION 'Create your profile to endorse other members.';
     END IF;
 
     IF EXISTS (SELECT 1 FROM jobs WHERE id = NEW.profile_id AND user_id = auth.uid()) THEN
@@ -91,27 +94,30 @@ CREATE TRIGGER endorsements_set_mentor
 -- ── 3. Row Level Security ────────────────────────────────────
 ALTER TABLE endorsements ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Public read endorsements"            ON endorsements;
-DROP POLICY IF EXISTS "Mentors endorse"                     ON endorsements;
-DROP POLICY IF EXISTS "Mentors edit own endorsement"        ON endorsements;
-DROP POLICY IF EXISTS "Mentor, profile owner or admin delete" ON endorsements;
+DROP POLICY IF EXISTS "Public read endorsements"              ON endorsements;
+DROP POLICY IF EXISTS "Mentors endorse"                       ON endorsements;   -- old name
+DROP POLICY IF EXISTS "Mentors edit own endorsement"          ON endorsements;   -- old name
+DROP POLICY IF EXISTS "Mentor, profile owner or admin delete" ON endorsements;   -- old name
+DROP POLICY IF EXISTS "Members endorse"                       ON endorsements;
+DROP POLICY IF EXISTS "Members edit own endorsement"          ON endorsements;
+DROP POLICY IF EXISTS "Endorser, profile owner or admin delete" ON endorsements;
 
 -- Anyone can read endorsements
 CREATE POLICY "Public read endorsements" ON endorsements
     FOR SELECT USING (true);
 
--- Signed-in users endorse as themselves (the trigger checks they're a mentor)
-CREATE POLICY "Mentors endorse" ON endorsements
+-- Signed-in members endorse as themselves (the trigger checks they have a profile)
+CREATE POLICY "Members endorse" ON endorsements
     FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND mentor_user_id = auth.uid());
 
--- Mentors can edit their own endorsement
-CREATE POLICY "Mentors edit own endorsement" ON endorsements
+-- Endorsers can edit their own endorsement
+CREATE POLICY "Members edit own endorsement" ON endorsements
     FOR UPDATE
     USING      (mentor_user_id = auth.uid())
     WITH CHECK (mentor_user_id = auth.uid());
 
--- The mentor can withdraw it; the endorsed builder can remove it from their profile; the admin can remove any
-CREATE POLICY "Mentor, profile owner or admin delete" ON endorsements
+-- The endorser can withdraw it; the endorsed member can remove it from their profile; the admin can remove any
+CREATE POLICY "Endorser, profile owner or admin delete" ON endorsements
     FOR DELETE USING (
         mentor_user_id = auth.uid()
         OR EXISTS (SELECT 1 FROM jobs j WHERE j.id = profile_id AND j.user_id = auth.uid())

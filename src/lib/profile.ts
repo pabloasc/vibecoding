@@ -7,7 +7,7 @@
  *   description     → bio: what they've shipped, stack, what they want to learn
  *   image_url       → avatar / profile photo
  *   link            → profile URL (portfolio, GitHub, LinkedIn…)
- *   employment_type → what they're looking for, or MENTOR for mentors (see LOOKING_FOR)
+ *   employment_type → what they're looking for (see LOOKING_FOR)
  *   is_remote       → open to remote work
  *   locations       → where they're based
  *   salary_*        → unused (kept in the table, not shown or edited)
@@ -73,7 +73,7 @@ export type ProjectUpvote = {
 export const PROJECTS_SELECT =
   '*,project_upvotes(user_id,voter:jobs!project_upvotes_voter_profile_id_fkey(id,name,title))';
 
-/** A mentor's endorsement of a profile — see endorsements.sql */
+/** A community member's endorsement of a profile — see endorsements.sql. (`mentor_*` columns = the endorser.) */
 export type Endorsement = {
   id: string;
   profile_id: string;
@@ -84,7 +84,7 @@ export type Endorsement = {
   mentor: Pick<Profile, 'id' | 'name' | 'title' | 'image_url'> | null;
 };
 
-/** Strengths mentors can pick (max 3). Keep in sync with the CHECK constraint in endorsements.sql */
+/** Strengths an endorser can pick (max 3). Keep in sync with the CHECK constraint in endorsements.sql */
 export const STRENGTHS: { label: string; emoji: string }[] = [
   { label: 'Ships fast',              emoji: '🚀' },
   { label: 'Clean code',              emoji: '✨' },
@@ -100,7 +100,7 @@ export function strengthEmoji(label: string) {
   return STRENGTHS.find(s => s.label === label)?.emoji ?? '⭐';
 }
 
-/** PostgREST select for a profile's endorsements, with the mentor's profile embedded */
+/** PostgREST select for a profile's endorsements, with the endorser's profile embedded */
 export const ENDORSEMENTS_SELECT =
   '*,mentor:jobs!endorsements_mentor_profile_id_fkey(id,name,title,image_url)';
 
@@ -131,7 +131,8 @@ export const LOOKING_FOR: Record<string, LookingFor> = {
   TEMPORARY:  { label: 'Short project',   emoji: '🛠️' },
   PART_TIME:  { label: 'Part-time role',  emoji: '🌗' },
   FULL_TIME:  { label: 'Full-time role',  emoji: '🚀' },
-  MENTOR:     { label: 'Mentor',          emoji: '🧑‍🏫', formLabel: 'Become a mentor' },
+  // No longer offered — kept so older profiles still display
+  MENTOR:     { label: 'Mentor',          emoji: '🧑‍🏫', legacy: true },
   MENTORSHIP: { label: 'Mentorship',      emoji: '🧭', legacy: true },
 };
 
@@ -148,9 +149,6 @@ export function connectLabel(link: string, name: string) {
   return `Visit ${name}'s profile`;
 }
 
-export function isMentor(type: string | null) {
-  return type === 'MENTOR';
-}
 
 /** Locations without the redundant "Worldwide" when remote, shortened to "A, B +n" */
 export function locationLabel(p: Pick<Profile, 'locations' | 'is_remote'>) {

@@ -36,7 +36,7 @@ const schemaItemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Junior developers & vibecoders — vibecoding.work',
-  description: 'Junior developers and vibecoders showing their projects to land paid developer jobs, freelance work and mentors.',
+  description: 'A community of junior developers and vibecoders helping each other find developer jobs and freelance work.',
   url: 'https://vibecoding.work/',
   numberOfItems: ssrTotal,
   itemListElement: ssrProfiles.map((p, i) => ({
@@ -53,19 +53,19 @@ const MS_7D = 7 * 24 * 60 * 60 * 1000;
 const newThisWeek = ssrProfiles.filter(p => (Date.now() - new Date(p.created_at).getTime()) < MS_7D).length;
 
 const FILTERS = [
-  { key: 'all',        label: 'Everyone',     query: '' },
-  { key: 'mentors',    label: '🧑‍🏫 Mentors',   query: 'employment_type=eq.MENTOR' },
-  { key: 'intern',     label: '🎓 Internship', query: 'employment_type=eq.INTERN' },
-  { key: 'freelance',  label: '⚡ Freelance',  query: 'employment_type=in.(CONTRACTOR,TEMPORARY)' },
-  { key: 'jobs',       label: '🚀 Jobs',       query: 'employment_type=in.(FULL_TIME,PART_TIME)' },
+  // Filters describe what *members* are looking for — actual job posts live on /jobs
+  { key: 'all',        label: 'Everyone',         query: '' },
+  { key: 'intern',     label: '🎓 Internship',     query: 'employment_type=eq.INTERN' },
+  { key: 'freelance',  label: '⚡ Freelance work', query: 'employment_type=in.(CONTRACTOR,TEMPORARY)' },
+  { key: 'job',        label: '🚀 A full-time or part-time job', query: 'employment_type=in.(FULL_TIME,PART_TIME)' },
 ];
 
 const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Windsurf', 'Copilot', 'Supabase', 'Vercel', 'Next.js', 'Python'];
 ---
 
 <Layout
-  title="Junior Dev & Vibe Coding Jobs, Freelance Work | vibecoding.work"
-  description="Land your first paid developer job or freelance work. Junior devs & vibecoders: show your projects, get endorsed by mentors and get hired. Free, always."
+  title="Junior Dev Jobs & a Community to Get Hired | vibecoding.work"
+  description="Join a community of junior developers and vibecoders helping each other get hired. Find jobs and freelance work, share your projects, grow your network."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
@@ -87,7 +87,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         <div class="fade-in">
           <span class="chip chip-acid !text-[0.72rem] !py-1.5 !px-3">
             <span class="w-1.5 h-1.5 rounded-full bg-acid vc-pulse"></span>
-            {ssrTotal > 0 ? `${ssrTotal} builders looking for their first break` : 'For junior devs & vibecoders'}
+            {ssrTotal > 0 ? `${ssrTotal} builders helping each other get hired` : 'A community for junior devs & vibecoders'}
           </span>
 
           <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)] mt-6">
@@ -96,19 +96,19 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
           </h1>
 
           <p class="text-[1.08rem] sm:text-[1.15rem] text-fog leading-relaxed mt-6 max-w-[34rem]">
-            Land your first <strong class="text-snow font-semibold">paid dev job</strong> or <strong class="text-snow font-semibold">freelance work</strong>.
-            Show what you've shipped, get endorsed by mentors who've been there, and get found by the founders and teams who hire. Free, always.
+            Join a <strong class="text-snow font-semibold">community</strong> of junior developers and vibecoders who help each other get hired.
+            Find <strong class="text-snow font-semibold">jobs and freelance work</strong>, share what you've shipped and grow a network that has your back. Free, always.
           </p>
 
           <div class="flex flex-wrap items-center gap-3 mt-9">
-            <a href="/submit" class="btn-primary">Drop your profile <span aria-hidden="true">→</span></a>
-            <a href="#builders" class="btn-ghost">Browse builders</a>
+            <a href="/submit" class="btn-primary">Join the community <span aria-hidden="true">→</span></a>
+            <a href="/jobs/" class="btn-ghost">Browse jobs</a>
           </div>
 
           <ul class="flex flex-wrap gap-x-5 gap-y-2 mt-7 font-mono text-[0.72rem] text-fog">
             <li><span class="text-acid">✓</span> Free forever</li>
             <li><span class="text-acid">✓</span> No CV needed</li>
-            <li><span class="text-acid">✓</span> Takes 2 minutes</li>
+            <li><span class="text-acid">✓</span> Real people helping each other</li>
           </ul>
         </div>
 
@@ -123,12 +123,12 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
               <span class="ml-3 font-mono text-[0.7rem] text-fog">~/my-first-job — zsh</span>
             </div>
             <div class="p-5 sm:p-6 pb-12 sm:pb-14 font-mono text-[0.82rem] leading-[1.9]">
-              <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> npx vibecoding drop-profile</p>
-              <p class="term-line text-fog">  ↳ 3 projects · linkedin.com/in/you</p>
-              <p class="term-line"><span class="text-acid">✓</span> profile live on vibecoding.work</p>
+              <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> npx vibecoding join</p>
+              <p class="term-line text-fog">  ↳ 3 projects · github.com/you</p>
+              <p class="term-line"><span class="text-acid">✓</span> you're part of the community</p>
               <p class="term-line"><span class="text-acid">✓</span> "habit-loop" got <span class="text-pink">24 upvotes</span></p>
-              <p class="term-line"><span class="text-acid">✓</span> a mentor connected on LinkedIn</p>
-              <p class="term-line"><span class="text-acid">✓</span> intro call: show your projects 🎉</p>
+              <p class="term-line"><span class="text-acid">✓</span> 5 new connections this week</p>
+              <p class="term-line"><span class="text-acid">✓</span> referred for a junior job 🎉</p>
               <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> <span class="caret inline-block w-2 h-4 bg-acid align-middle"></span></p>
             </div>
           </div>
@@ -137,8 +137,8 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
           <div class="absolute -bottom-8 -left-6 card !rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl rotate-[-3deg]">
             <span class="text-[1.4rem]">🤝</span>
             <div>
-              <p class="text-[0.82rem] font-semibold leading-tight">New connection</p>
-              <p class="font-mono text-[0.66rem] text-fog">Mentor · via LinkedIn</p>
+              <p class="text-[0.82rem] font-semibold leading-tight">Job lead shared</p>
+              <p class="font-mono text-[0.66rem] text-fog">from a community member</p>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
-          <span class="eyebrow">// fresh builders</span>
+          <span class="eyebrow">// the community</span>
           <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2">
             Talent that ships. <span class="text-fog">Ready for a first shot.</span>
           </h2>
@@ -177,14 +177,18 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
           </p>
         </div>
 
-        <!-- Filters -->
-        <div id="filters" class="flex flex-wrap gap-2" role="radiogroup" aria-label="Filter by what builders are looking for">
-          {FILTERS.map((f, i) => (
-            <label class="pill-option">
-              <input type="radio" name="looking-for" value={f.key} data-query={f.query} checked={i === 0} autocomplete="off" />
-              <span>{f.label}</span>
-            </label>
-          ))}
+        <!-- Filters: what members are looking for (job posts are on /jobs) -->
+        <div class="md:max-w-[34rem] md:text-right">
+          <p class="field-label mb-2.5">Members looking for</p>
+          <div id="filters" class="flex flex-wrap md:justify-end gap-2" role="radiogroup" aria-label="Filter members by what they're looking for">
+            {FILTERS.map((f, i) => (
+              <label class="pill-option">
+                <input type="radio" name="looking-for" value={f.key} data-query={f.query} checked={i === 0} autocomplete="off" />
+                <span>{f.label}</span>
+              </label>
+            ))}
+          </div>
+          <a href="/jobs/" class="inline-flex items-center gap-1.5 mt-3 text-[0.88rem] text-acid hover:underline underline-offset-4">💼 Looking for job posts? See open jobs →</a>
         </div>
       </div>
 
@@ -285,9 +289,9 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 
       <div class="grid md:grid-cols-3 gap-4 mt-10">
         {[
-          { n: '01', icon: '📦', title: 'Show your projects', body: "Drop your profile, add the things you've shipped and link your LinkedIn or GitHub. No CV, no cover letter." },
-          { n: '02', icon: '🔥', title: 'Get upvoted',         body: 'Other builders upvote the projects they love. The best work rises to the top — where mentors, founders and teams are looking.' },
-          { n: '03', icon: '🤝', title: 'Connect & intro',     body: 'Mentors connect with you on LinkedIn or GitHub for a quick intro call where you walk them through your projects — then endorse you, so your profile carries their word.' },
+          { n: '01', icon: '📦', title: 'Join & show your work', body: "Create your profile, add the projects you've shipped and link your LinkedIn or GitHub. No CV, no cover letter." },
+          { n: '02', icon: '🤝', title: 'Connect & lift each other', body: 'Upvote projects you love, connect on LinkedIn or GitHub and endorse the people you have built with. Your network grows with every project.' },
+          { n: '03', icon: '💼', title: 'Get hired together',   body: 'Members share job leads and referrals, and teams post junior jobs and paid assignments here. Apply with a profile that has real projects and real people vouching for you.' },
         ].map((s, i) => (
           <div class="card card-hover p-6 sm:p-7 fade-in" style={`animation-delay:${i * 80}ms`}>
             <div class="flex items-center justify-between">
@@ -301,35 +305,35 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       </div>
     </section>
 
-    <!-- ═══════════ FOR MENTORS ════════════════════════════════ -->
-    <section id="mentors" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
+    <!-- ═══════════ COMMUNITY ══════════════════════════════════ -->
+    <section id="community" class="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
       <div class="relative card !rounded-[1.75rem] overflow-hidden p-7 sm:p-12">
         <div class="orb w-[380px] h-[380px] bg-violet -top-40 -right-20 !opacity-35"></div>
         <div class="orb w-[260px] h-[260px] bg-acid -bottom-32 left-10 !opacity-15"></div>
 
         <div class="relative grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
           <div>
-            <span class="eyebrow">// for mentors &amp; teams</span>
+            <span class="eyebrow">// be part of something</span>
             <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.6rem)] leading-tight mt-2">
-              Remember who gave you your first break?
+              Nobody gets their first job alone.
             </h2>
             <p class="text-fog text-[1.02rem] leading-relaxed mt-4 max-w-lg">
-              Pay it forward. Every builder here is learning fast with AI tools and needs one person to say
-              <em class="text-snow not-italic font-medium">"show me what you built."</em>
-              Browse profiles, upvote projects you like and connect on LinkedIn or GitHub — no recruiters, no fees.
+              vibecoding.work is a community built on generosity. Help someone today, and someone will help you tomorrow —
+              <em class="text-snow not-italic font-medium">that's how first jobs actually happen.</em>
+              No recruiters, no fees, just people looking out for each other.
             </p>
             <div class="flex flex-wrap gap-3 mt-8">
-              <a href="#builders" class="btn-primary">Find a builder →</a>
-              <a href="/submit?as=mentor" class="btn-ghost">Become a mentor</a>
+              <a href="/submit" class="btn-primary">Join the community →</a>
+              <a href="/post-job" class="btn-ghost">Hiring? Post a job</a>
             </div>
           </div>
 
           <ul class="grid grid-cols-2 gap-3">
             {[
               { icon: '🤝', t: 'Connect on LinkedIn or GitHub' },
-              { icon: '🎥', t: '15-min intro call to see their projects' },
-              { icon: '⭐', t: 'Endorse them — their first reference' },
-              { icon: '📣', t: 'Refer them to your team' },
+              { icon: '🔥', t: 'Upvote the projects you love' },
+              { icon: '⭐', t: 'Endorse people you have built with' },
+              { icon: '📣', t: 'Share job leads & referrals' },
             ].map(x => (
               <li class="rounded-2xl border border-line bg-raised/70 p-4 sm:p-5">
                 <span class="text-[1.4rem]">{x.icon}</span>
@@ -346,8 +350,8 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       <h2 class="font-bold tracking-[-0.035em] text-[clamp(2.2rem,6vw,4rem)] leading-[1.02]">
         Stop lurking.<br /><span class="gradient-text">Start getting noticed.</span>
       </h2>
-      <p class="text-fog text-[1.05rem] mt-5 max-w-md mx-auto">Your next mentor might be scrolling this page right now.</p>
-      <a href="/submit" class="btn-primary mt-8 !text-[1.05rem] !px-7 !py-4">Drop your profile — it's free →</a>
+      <p class="text-fog text-[1.05rem] mt-5 max-w-md mx-auto">Your next job might come from someone in this community.</p>
+      <a href="/submit" class="btn-primary mt-8 !text-[1.05rem] !px-7 !py-4">Join the community — it's free →</a>
     </section>
 
   </main>
@@ -428,8 +432,9 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
   function animateCount(el: HTMLElement, target: number) {
     const duration = 700;
     const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1);
+    // Measure with performance.now() — rAF timestamps can be earlier than `start`
+    const tick = () => {
+      const p = Math.min((performance.now() - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
       el.textContent = countLabel(Math.round(eased * target));
       if (p < 1) requestAnimationFrame(tick);

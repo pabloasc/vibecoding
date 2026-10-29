@@ -14,8 +14,8 @@
 --   image_url       → "Avatar"
 --   link            → "Profile URL"          GitHub, portfolio, LinkedIn…
 --   employment_type → "Looking for"          INTERN | CONTRACTOR (freelance) | TEMPORARY (short project)
---                                            | PART_TIME | FULL_TIME | MENTOR ("Become a mentor")
---                                            (MENTORSHIP: legacy, no longer offered in the form)
+--                                            | PART_TIME | FULL_TIME
+--                                            (MENTOR, MENTORSHIP: legacy, no longer offered in the form)
 --   is_remote       → "Open to remote work"
 --   locations       → "Based in"
 --   salary_*        → not used by the site anymore (kept so no data is lost)

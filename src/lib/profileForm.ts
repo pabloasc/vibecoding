@@ -23,9 +23,9 @@ export function readProfileFields(): ProfileFieldValues {
 
 /** Returns an error message, or null when the required fields are filled in */
 export function validateProfileFields(v: ProfileFieldValues): string | null {
-  if (!v.name)        return 'Add your name so mentors know who they\'re talking to.';
+  if (!v.name)        return 'Add your name so people know who they\'re talking to.';
   if (!v.title)       return 'Add a headline — what you build, in a few words.';
-  if (!v.description) return 'Tell mentors a bit about yourself.';
+  if (!v.description) return 'Tell the community a bit about yourself.';
   if (!v.link)        return 'Profile URL is required — link your GitHub, portfolio or LinkedIn.';
   try { new URL(v.link); } catch { return 'Profile URL should be a full link, e.g. https://github.com/you'; }
   return null;

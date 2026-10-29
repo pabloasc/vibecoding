@@ -22,7 +22,7 @@ const webPage = JSON.stringify({
 
 <Layout
   title="Drop your profile — vibecoding.work"
-  description="Junior developer or vibecoder? Post your profile in two minutes and get discovered by mentors, founders and teams hiring for junior jobs and freelance work."
+  description="Junior developer or vibecoder? Join a community that helps each other get hired. Create your profile in two minutes, share your projects and find jobs."
 >
   <script slot="head" type="application/ld+json" set:html={webPage} />
   <Header />
@@ -40,7 +40,7 @@ const webPage = JSON.stringify({
           Drop your <span class="gradient-text">profile.</span>
         </h1>
         <p class="text-fog text-[1.08rem] leading-relaxed mt-4">
-          Two minutes. No CV. Just what you've built and what you're looking for — mentors and teams take it from there.
+          Two minutes. No CV. Share what you've built and what you're looking for — and join a community that helps each other get hired.
         </p>
       </div>
 
@@ -86,8 +86,8 @@ const webPage = JSON.stringify({
 
         <ul class="space-y-3 lg:pt-2">
           {[
-            { icon: '👀', t: 'Get seen by people who hire juniors', d: 'Mentors, founders and small teams browse new builders every week.' },
-            { icon: '🧭', t: 'Find a mentor',                       d: 'Connect on LinkedIn or GitHub and get a quick intro call to show your projects.' },
+            { icon: '👀', t: 'Get seen by people who hire juniors', d: 'Founders and small teams browse new builders every week.' },
+            { icon: '🤝', t: 'Grow your network',                   d: 'Connect with builders on the same path, share tips and job leads, and vouch for each other.' },
             { icon: '⚡', t: 'Land your first paid assignment',     d: 'Freelance projects, internships and first roles — no 5-years-required.' },
           ].map(x => (
             <li class="flex gap-4 rounded-2xl border border-line bg-surface/60 p-5">
@@ -412,11 +412,6 @@ const webPage = JSON.stringify({
     previewDebounce = setTimeout(updatePreview, 120);
   });
 
-  // "Become a mentor" links land here with ?as=mentor — preselect that option
-  if (new URLSearchParams(window.location.search).get('as') === 'mentor') {
-    const mentorOption = document.querySelector<HTMLInputElement>('input[name="employment_type"][value="MENTOR"]');
-    if (mentorOption) mentorOption.checked = true;
-  }
   updatePreview();
   initProjectEditor();
 
