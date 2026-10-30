@@ -4,7 +4,7 @@
 -- Safe to re-run.
 --
 -- Companies, founders and nonprofits post paid jobs and assignments for
--- junior developers and vibecoders. Same fields as the `jobs` (profiles)
+-- developers and vibecoders. Same fields as the `jobs` (profiles)
 -- table, read as a job post:
 --   name            → company / organization name   (Google: hiringOrganization)
 --   title           → job title

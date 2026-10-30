@@ -1,6 +1,6 @@
 -- ============================================================
 -- vibecoding.work — Supabase Schema
--- The launchpad for junior developers and vibecoders: builders post profiles,
+-- A community of developers and vibecoders: builders post profiles,
 -- mentors and teams browse them. Profiles live in the original `jobs` table.
 -- Run this in the Supabase SQL Editor to set up your database
 -- ============================================================

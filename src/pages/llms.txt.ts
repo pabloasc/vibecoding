@@ -22,7 +22,7 @@ export const GET: APIRoute = async () => {
   const lines: string[] = [
     '# vibecoding.work',
     '',
-    '> A community of junior developers and vibecoders helping each other get hired.',
+    '> A community of developers and vibecoders helping each other get hired.',
     '> Members share their projects, connect, endorse each other and find developer jobs, freelance work and internships.',
     '',
     `URL: https://vibecoding.work/`,

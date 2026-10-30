@@ -22,7 +22,7 @@ const webPage = JSON.stringify({
 
 <Layout
   title="Drop your profile — vibecoding.work"
-  description="Junior developer or vibecoder? Join a community that helps each other get hired. Create your profile in two minutes, share your projects and find jobs."
+  description="Developer or vibecoder? Join a community that helps each other get hired. Create your profile in two minutes, share your projects and find jobs."
 >
   <script slot="head" type="application/ld+json" set:html={webPage} />
   <Header />
@@ -86,7 +86,7 @@ const webPage = JSON.stringify({
 
         <ul class="space-y-3 lg:pt-2">
           {[
-            { icon: '👀', t: 'Get seen by people who hire juniors', d: 'Founders and small teams browse new builders every week.' },
+            { icon: '👀', t: 'Get seen by people who hire', d: 'Founders and small teams browse new builders every week.' },
             { icon: '🤝', t: 'Grow your network',                   d: 'Connect with builders on the same path, share tips and job leads, and vouch for each other.' },
             { icon: '⚡', t: 'Land your first paid assignment',     d: 'Freelance projects, internships and first roles — no 5-years-required.' },
           ].map(x => (

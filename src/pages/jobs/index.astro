@@ -14,22 +14,22 @@ const typeParam = Astro.url.searchParams.get('type') ?? '';
 const activeType = JOB_TYPES[typeParam] ? typeParam : '';
 const jobs = await fetchActiveJobs(SUPABASE_URL, SUPABASE_KEY, { type: activeType });
 
-// One indexable page per job type, e.g. "Junior Freelance Work for Developers"
+// One indexable page per job type, e.g. "Freelance work for developers"
 const typeHeadlines: Record<string, string> = {
-  '':         'Junior developer jobs & freelance work',
-  FULL_TIME:  'Full-time junior developer jobs',
-  PART_TIME:  'Part-time junior developer jobs',
-  CONTRACTOR: 'Freelance work for junior developers',
-  TEMPORARY:  'Short paid assignments for junior developers',
+  '':         'Developer jobs & freelance work',
+  FULL_TIME:  'Full-time developer jobs',
+  PART_TIME:  'Part-time developer jobs',
+  CONTRACTOR: 'Freelance work for developers',
+  TEMPORARY:  'Short paid assignments for developers',
   INTERN:     'Developer internships',
 };
 const h1 = typeHeadlines[activeType];
 const pageTitle = activeType
   ? `${h1} | vibecoding.work`
-  : 'Junior Developer Jobs, Freelance Work & Internships | vibecoding.work';
+  : 'Developer Jobs, Freelance Work & Internships | vibecoding.work';
 const pageDescription = activeType
   ? `${h1} for vibecoders and AI-native builders. Real, paid opportunities — apply with your projects, no years of experience required.`
-  : 'Entry-level developer jobs, freelance work and internships for junior devs and vibecoders. Real, paid opportunities — apply with your projects. Updated daily.';
+  : 'Entry-level developer jobs, freelance work and internships for developers and vibecoders. Real, paid opportunities — apply with your projects. Updated daily.';
 
 const schemaItemList = {
   '@context': 'https://schema.org',
@@ -66,10 +66,10 @@ const schemaBreadcrumb = {
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div class="max-w-2xl fade-in">
-          <span class="eyebrow">// paid work for juniors</span>
+          <span class="eyebrow">// paid work for developers</span>
           <h1 class="font-bold tracking-[-0.035em] leading-[1.02] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-3">{h1}</h1>
           <p class="text-fog text-[1.05rem] leading-relaxed mt-4">
-            Real, paid opportunities for junior developers and vibecoders. Apply with your projects —
+            Real, paid opportunities for developers and vibecoders. Apply with your projects —
             no "5 years of experience" required.
           </p>
         </div>
@@ -96,7 +96,7 @@ const schemaBreadcrumb = {
         <div class="card text-center px-6 py-16 mt-4">
           <p class="text-[2.5rem] mb-3">🌱</p>
           <p class="font-semibold text-[1.4rem] mb-2">No open {activeType ? JOB_TYPES[activeType].label.toLowerCase() : 'jobs'} right now.</p>
-          <p class="text-fog mb-6 max-w-md mx-auto">Hiring a junior developer or need a small project built? Post it here — it's free, and the right builder could reply today.</p>
+          <p class="text-fog mb-6 max-w-md mx-auto">Hiring a developer or need a small project built? Post it here — it's free, and the right builder could reply today.</p>
           <a href="/post-job" class="btn-primary">Post a job →</a>
         </div>
       )}
@@ -110,7 +110,7 @@ const schemaBreadcrumb = {
             <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.6rem,3.5vw,2.2rem)] leading-tight mt-2">Give someone their first break.</h2>
             <p class="text-fog leading-relaxed mt-3">
               Post a job or a small paid assignment. Every applicant comes with real projects, upvotes from other builders
-              and endorsements from the community — so you can hire a junior with confidence.
+              and endorsements from the community — so you can hire with confidence.
             </p>
           </div>
           <ul class="space-y-2.5 text-[0.95rem]">

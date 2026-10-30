@@ -37,7 +37,7 @@ export function jobType(type: string | null) {
   return JOB_TYPES[type ?? 'FULL_TIME'] ?? JOB_TYPES.FULL_TIME;
 }
 
-/** e.g. "junior-react-developer-acme-a6b7c8d9" → /jobs/junior-react-developer-acme-a6b7c8d9/ */
+/** e.g. "react-developer-acme-a6b7c8d9" → /jobs/react-developer-acme-a6b7c8d9/ */
 export function jobPostSlug(j: Pick<JobPost, 'id' | 'title' | 'name'>) {
   return `${slugify(`${j.title} ${j.name}`)}-${j.id.slice(0, 8)}`;
 }

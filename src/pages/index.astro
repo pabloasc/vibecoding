@@ -35,8 +35,8 @@ if (SUPABASE_URL && SUPABASE_KEY) {
 const schemaItemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'Junior developers & vibecoders — vibecoding.work',
-  description: 'A community of junior developers and vibecoders helping each other find developer jobs and freelance work.',
+  name: 'Developers & vibecoders — vibecoding.work',
+  description: 'A community of developers and vibecoders helping each other find developer jobs and freelance work.',
   url: 'https://vibecoding.work/',
   numberOfItems: ssrTotal,
   itemListElement: ssrProfiles.map((p, i) => ({
@@ -64,8 +64,8 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 ---
 
 <Layout
-  title="Junior Dev Jobs & a Community to Get Hired | vibecoding.work"
-  description="Join a community of junior developers and vibecoders helping each other get hired. Find jobs and freelance work, share your projects, grow your network."
+  title="Developer Jobs & a Community to Get Hired | vibecoding.work"
+  description="Find developer jobs and freelance work in a community that helps each other get hired. Share your projects, grow your network and apply for free."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
@@ -85,15 +85,14 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-16 sm:pt-24 pb-20 sm:pb-28 grid lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
 
         <div class="fade-in">
-
-          <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)] mt-6">
+          <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)]">
             <span class="lg:whitespace-nowrap">From side projects</span><br />
             to your <span class="gradient-text">first<br />real job.</span>
           </h1>
 
           <p class="text-[1.08rem] sm:text-[1.15rem] text-fog leading-relaxed mt-6 max-w-[34rem]">
-            Join a <strong class="text-snow font-semibold">community</strong> of junior developers and vibecoders who help each other get hired.
-            Find <strong class="text-snow font-semibold">jobs and freelance work</strong>, share what you've shipped and grow a network that has your back. Free, always.
+            Find <strong class="text-snow font-semibold">developer jobs and freelance work</strong> in a <strong class="text-snow font-semibold">community</strong> that helps each other get hired.
+            Share what you've shipped, grow a network that has your back, and apply for free.
           </p>
 
           <div class="flex flex-wrap items-center gap-3 mt-9">
@@ -101,7 +100,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
             <a href="/jobs/" class="btn-ghost">Browse jobs</a>
           </div>
 
-          <ul class="flex flex-wrap gap-x-5 gap-y-2 mt-7 font-mono text-[0.72rem] text-fog">
+          <ul data-nosnippet class="flex flex-wrap gap-x-5 gap-y-2 mt-7 font-mono text-[0.72rem] text-fog">
             <li><span class="text-acid">✓</span> Free forever</li>
             <li><span class="text-acid">✓</span> No CV needed</li>
             <li><span class="text-acid">✓</span> Real people helping each other</li>
@@ -109,7 +108,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         </div>
 
         <!-- Terminal mock -->
-        <div class="relative fade-in hidden sm:block" style="animation-delay:120ms">
+        <div data-nosnippet class="relative fade-in hidden sm:block" style="animation-delay:120ms">
           <div class="absolute -inset-4 rounded-[1.75rem] bg-gradient-to-br from-acid/20 via-violet/20 to-pink/20 blur-2xl"></div>
           <div class="relative card !rounded-2xl overflow-hidden shadow-2xl">
             <div class="flex items-center gap-2 px-4 py-3 border-b border-line bg-raised/60">
@@ -124,7 +123,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
               <p class="term-line"><span class="text-acid">✓</span> you're part of the community</p>
               <p class="term-line"><span class="text-acid">✓</span> "habit-loop" got <span class="text-pink">24 upvotes</span></p>
               <p class="term-line"><span class="text-acid">✓</span> 5 new connections this week</p>
-              <p class="term-line"><span class="text-acid">✓</span> referred for a junior job 🎉</p>
+              <p class="term-line"><span class="text-acid">✓</span> referred for a dev job 🎉</p>
               <p class="term-line"><span class="text-violet">~</span> <span class="text-acid">$</span> <span class="caret inline-block w-2 h-4 bg-acid align-middle"></span></p>
             </div>
           </div>
@@ -143,7 +142,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
     </section>
 
     <!-- ═══════════ TOOL MARQUEE ═══════════════════════════════ -->
-    <section class="border-y border-line/70 bg-surface/40 overflow-hidden" aria-label="Tools our builders ship with">
+    <section data-nosnippet class="border-y border-line/70 bg-surface/40 overflow-hidden" aria-label="Tools our builders ship with">
       <div class="marquee-track flex w-max gap-10 py-4" style="animation: marquee 40s linear infinite;">
         {[...TOOLS, ...TOOLS].map(t => (
           <span class="font-mono text-[0.8rem] text-fog whitespace-nowrap flex items-center gap-10">
@@ -252,9 +251,9 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         <div>
           <span class="eyebrow">// paid work</span>
           <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2">
-            Junior developer jobs &amp; <span class="gradient-text">freelance work.</span>
+            Developer jobs &amp; <span class="gradient-text">freelance work.</span>
           </h2>
-          <p class="text-fog mt-2">Real, paid opportunities from teams that welcome juniors.</p>
+          <p class="text-fog mt-2">Real, paid opportunities from teams that value what you've built.</p>
         </div>
         <div class="flex flex-wrap gap-3">
           <a href="/jobs/" class="btn-ghost">See all jobs</a>
@@ -269,7 +268,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       ) : (
         <div class="card p-8 sm:p-10 text-center">
           <p class="text-[2.2rem]">💼</p>
-          <p class="font-semibold text-[1.3rem] mt-2">Hiring a junior or need a small project built?</p>
+          <p class="font-semibold text-[1.3rem] mt-2">Hiring a developer or need a small project built?</p>
           <p class="text-fog mt-2 mb-6 max-w-md mx-auto">Post a job or a paid assignment for free and give someone their first real job.</p>
           <a href="/post-job" class="btn-primary">Post the first job →</a>
         </div>
@@ -287,7 +286,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         {[
           { n: '01', icon: '📦', title: 'Join & show your work', body: "Create your profile, add the projects you've shipped and link your LinkedIn or GitHub. No CV, no cover letter." },
           { n: '02', icon: '🤝', title: 'Connect & lift each other', body: 'Upvote projects you love, connect on LinkedIn or GitHub and endorse the people you have built with. Your network grows with every project.' },
-          { n: '03', icon: '💼', title: 'Get hired together',   body: 'Members share job leads and referrals, and teams post junior jobs and paid assignments here. Apply with a profile that has real projects and real people vouching for you.' },
+          { n: '03', icon: '💼', title: 'Get hired together',   body: 'Members share job leads and referrals, and teams post developer jobs and paid assignments here. Apply with a profile that has real projects and real people vouching for you.' },
         ].map((s, i) => (
           <div class="card card-hover p-6 sm:p-7 fade-in" style={`animation-delay:${i * 80}ms`}>
             <div class="flex items-center justify-between">
