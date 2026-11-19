@@ -7,7 +7,7 @@ import Footer from '../../components/Footer.astro';
 import ProjectList from '../../components/ProjectList.astro';
 import EndorsementList from '../../components/EndorsementList.astro';
 import { profileSlug } from '../../lib/slug';
-import { type Profile, type Project, type Endorsement, PROJECTS_SELECT, ENDORSEMENTS_SELECT, connectLabel, lookingFor, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
+import { type Profile, type Project, type Endorsement, PROJECTS_SELECT, ENDORSEMENTS_SELECT, connectLabel, lookingFor, lookingForText, profileName, profileHeadline, initials, formatDate } from '../../lib/profile';
 import { createClient } from '@supabase/supabase-js';
 
 // Extract the 8-char ID prefix appended to every slug
@@ -93,7 +93,7 @@ const schemaProfilePage = {
 <Layout
   title={headline ? `${name} — ${headline} · vibecoding.work` : `${name} · vibecoding.work`}
   description={profile.description.substring(0, 160)}
-  ogImage={profile.image_url ?? '/og.svg'}
+  ogImage={profile.image_url ?? '/og.png'}
   type="profile"
 >
   <Fragment slot="head">
@@ -135,7 +135,7 @@ const schemaProfilePage = {
           <h1 class="font-bold tracking-[-0.03em] leading-[1.05] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-2">{name}</h1>
           {headline && <p class="text-[1.15rem] sm:text-[1.35rem] text-fog leading-snug mt-2">{headline}</p>}
           <div class="flex flex-wrap gap-2 mt-4">
-            <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} Looking for: {want.label}</span>
+            <span class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3">{want.emoji} {lookingForText(profile.employment_type)}</span>
             {endorsements.length > 0 && (
               <a href="#endorsements" class="chip chip-acid !text-[0.75rem] !py-1.5 !px-3 hover:!bg-acid/20 transition-colors">
                 ⭐ Endorsed by {endorsements.length} member{endorsements.length !== 1 ? 's' : ''}
@@ -189,13 +189,13 @@ const schemaProfilePage = {
               <dd class="font-mono text-[0.82rem]">{formatDate(profile.created_at)}</dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-fog">Looking for</dt>
+              <dt class="text-fog">{want.role ? 'Role' : 'Looking for'}</dt>
               <dd class="font-mono text-[0.82rem]">{want.label}</dd>
             </div>
           </dl>
 
           <a href="/submit" class="block rounded-2xl border border-dashed border-line hover:border-acid/50 p-5 text-center transition-colors">
-            <p class="text-[0.9rem] text-fog">Developer or vibecoder?</p>
+            <p class="text-[0.9rem] text-fog">AI developer or vibecoder?</p>
             <p class="font-semibold mt-1">Drop your profile too <span class="text-acid">→</span></p>
           </a>
         </aside>

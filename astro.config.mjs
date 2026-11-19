@@ -15,7 +15,7 @@ async function getProfileSitemapPages() {
     });
     if (!res.ok) return [];
     const profiles = await res.json();
-    return profiles.map((p) => {
+    return profiles.map((/** @type {{ id: string, name: string | null, title: string }} */ p) => {
       const slug = `${`${p.name ?? ''} ${p.title}`.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').substring(0, 60).replace(/-+$/, '')}-${p.id.slice(0, 8)}`;
       return `https://vibecoding.work/profile/${slug}/`;
     });

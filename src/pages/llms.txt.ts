@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { profileSlug } from '../lib/slug';
 import { fetchActiveJobs, jobPostUrl, jobType, formatSalary } from '../lib/jobPost';
-import { type Profile, lookingFor, profileName, profileHeadline } from '../lib/profile';
+import { type Profile, lookingForText, profileName, profileHeadline } from '../lib/profile';
 
 export const GET: APIRoute = async () => {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -22,7 +22,7 @@ export const GET: APIRoute = async () => {
   const lines: string[] = [
     '# vibecoding.work',
     '',
-    '> A community of developers and vibecoders helping each other get hired.',
+    '> AI developer and vibe coding jobs, plus a community of AI developers and vibecoders helping each other get hired.',
     '> Members share their projects, connect, endorse each other and find developer jobs, freelance work and internships.',
     '',
     `URL: https://vibecoding.work/`,
@@ -56,7 +56,7 @@ export const GET: APIRoute = async () => {
     const headline = profileHeadline(p);
     lines.push(`### ${profileName(p)}${headline ? ` — ${headline}` : ''}`);
     lines.push(`Joined: ${date}`);
-    lines.push(`Looking for: ${lookingFor(p.employment_type).label}`);
+    lines.push(lookingForText(p.employment_type));
     lines.push(`Location: ${location}`);
     lines.push(`Profile: ${p.link}`);
     lines.push(`Page: https://vibecoding.work/profile/${profileSlug(p)}/`);

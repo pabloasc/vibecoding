@@ -35,8 +35,8 @@ if (SUPABASE_URL && SUPABASE_KEY) {
 const schemaItemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'Developers & vibecoders — vibecoding.work',
-  description: 'A community of developers and vibecoders helping each other find developer jobs and freelance work.',
+  name: 'AI developers & vibecoders — vibecoding.work',
+  description: 'AI developer and vibe coding jobs, plus a community of AI developers and vibecoders helping each other get hired.',
   url: 'https://vibecoding.work/',
   numberOfItems: ssrTotal,
   itemListElement: ssrProfiles.map((p, i) => ({
@@ -48,6 +48,35 @@ const schemaItemList = {
 };
 
 const latestJobs = await fetchActiveJobs(SUPABASE_URL, SUPABASE_KEY, { limit: 4 });
+
+// FAQ — real answers to what people search for; also published as FAQPage structured data
+const FAQ = [
+  {
+    q: 'What is vibe coding?',
+    a: "Vibe coding is building software by describing what you want to AI coding tools — like Cursor, Claude Code, Lovable, v0 or Replit — then steering, testing and shipping the result. vibecoding.work is where AI developers and vibecoders who build this way find jobs and each other.",
+  },
+  {
+    q: 'How do I find an AI developer or vibe coding job?',
+    a: "Create a free profile, add the projects you've shipped and apply to open jobs on the jobs board. Members upvote and endorse each other's work, so your profile shows real proof — not just a CV.",
+  },
+  {
+    q: 'Do I need years of experience?',
+    a: "No. Teams here hire based on what you've built. You'll find full-time AI developer jobs, freelance vibe coding work, short paid projects and internships.",
+  },
+  {
+    q: 'Is vibecoding.work free?',
+    a: 'Yes. Creating a profile, applying to jobs and posting a job are all free.',
+  },
+  {
+    q: 'How do companies hire AI developers here?',
+    a: 'Post a job, freelance project or internship for free. Every applicant comes with real projects, upvotes from other builders and endorsements from the community.',
+  },
+];
+const schemaFaq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const MS_7D = 7 * 24 * 60 * 60 * 1000;
 const newThisWeek = ssrProfiles.filter(p => (Date.now() - new Date(p.created_at).getTime()) < MS_7D).length;
@@ -64,11 +93,12 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
 ---
 
 <Layout
-  title="Developer Jobs & a Community to Get Hired | vibecoding.work"
-  description="Find developer jobs and freelance work in a community that helps each other get hired. Share your projects, grow your network and apply for free."
+  title="AI Developer & Vibe Coding Jobs + Community | vibecoding.work"
+  description="Find AI developer and vibe coding jobs, freelance work and internships. Join a free community of AI developers and vibecoders who help each other get hired."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaItemList)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaFaq)} />
   </Fragment>
 
   <Header />
@@ -85,14 +115,15 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       <div class="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-16 sm:pt-24 pb-20 sm:pb-28 grid lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
 
         <div class="fade-in">
-          <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)]">
+          <p class="eyebrow">AI developer &amp; vibe coding jobs</p>
+          <h1 class="font-sans font-bold tracking-[-0.035em] leading-[0.98] text-[clamp(2.4rem,6.5vw,4.1rem)] mt-4">
             <span class="lg:whitespace-nowrap">From side projects</span><br />
             to your <span class="gradient-text">first<br />real job.</span>
           </h1>
 
           <p class="text-[1.08rem] sm:text-[1.15rem] text-fog leading-relaxed mt-6 max-w-[34rem]">
-            Find <strong class="text-snow font-semibold">developer jobs and freelance work</strong> in a <strong class="text-snow font-semibold">community</strong> that helps each other get hired.
-            Share what you've shipped, grow a network that has your back, and apply for free.
+            Find <strong class="text-snow font-semibold">AI developer and vibe coding jobs</strong>, freelance work and internships.
+            Join a free <strong class="text-snow font-semibold">community of AI developers and vibecoders</strong> who share what they've shipped and help each other get hired.
           </p>
 
           <div class="flex flex-wrap items-center gap-3 mt-9">
@@ -251,7 +282,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         <div>
           <span class="eyebrow">// paid work</span>
           <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.8rem)] leading-tight mt-2">
-            Developer jobs &amp; <span class="gradient-text">freelance work.</span>
+            AI developer &amp; <span class="gradient-text">vibe coding jobs.</span>
           </h2>
           <p class="text-fog mt-2">Real, paid opportunities from teams that value what you've built.</p>
         </div>
@@ -268,7 +299,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
       ) : (
         <div class="card p-8 sm:p-10 text-center">
           <p class="text-[2.2rem]">💼</p>
-          <p class="font-semibold text-[1.3rem] mt-2">Hiring a developer or need a small project built?</p>
+          <p class="font-semibold text-[1.3rem] mt-2">Hiring an AI developer or need a small project built?</p>
           <p class="text-fog mt-2 mb-6 max-w-md mx-auto">Post a job or a paid assignment for free and give someone their first real job.</p>
           <a href="/post-job" class="btn-primary">Post the first job →</a>
         </div>
@@ -286,7 +317,7 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
         {[
           { n: '01', icon: '📦', title: 'Join & show your work', body: "Create your profile, add the projects you've shipped and link your LinkedIn or GitHub. No CV, no cover letter." },
           { n: '02', icon: '🤝', title: 'Connect & lift each other', body: 'Upvote projects you love, connect on LinkedIn or GitHub and endorse the people you have built with. Your network grows with every project.' },
-          { n: '03', icon: '💼', title: 'Get hired together',   body: 'Members share job leads and referrals, and teams post developer jobs and paid assignments here. Apply with a profile that has real projects and real people vouching for you.' },
+          { n: '03', icon: '💼', title: 'Get hired together',   body: 'Members share job leads and referrals, and teams post AI developer jobs and paid assignments here. Apply with a profile that has real projects and real people vouching for you.' },
         ].map((s, i) => (
           <div class="card card-hover p-6 sm:p-7 fade-in" style={`animation-delay:${i * 80}ms`}>
             <div class="flex items-center justify-between">
@@ -337,6 +368,25 @@ const TOOLS = ['Cursor', 'Claude Code', 'Lovable', 'v0', 'Bolt', 'Replit', 'Wind
             ))}
           </ul>
         </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ FAQ ════════════════════════════════════════ -->
+    <section id="faq" class="scroll-mt-20 max-w-3xl mx-auto px-4 sm:px-6 md:px-8 pt-28">
+      <span class="eyebrow">// questions</span>
+      <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.9rem,4vw,2.6rem)] leading-tight mt-2">
+        AI developer &amp; vibe coding jobs, <span class="gradient-text">explained.</span>
+      </h2>
+      <div class="mt-8 space-y-3">
+        {FAQ.map((f, i) => (
+          <details class="faq card group p-5 sm:p-6" open={i === 0}>
+            <summary class="flex items-center justify-between gap-4 cursor-pointer list-none font-semibold text-[1.05rem]">
+              {f.q}
+              <span class="faq-icon shrink-0 w-7 h-7 rounded-full border border-line flex items-center justify-center text-acid transition-transform" aria-hidden="true">+</span>
+            </summary>
+            <p class="text-fog leading-relaxed mt-3">{f.a}</p>
+          </details>
+        ))}
       </div>
     </section>
 

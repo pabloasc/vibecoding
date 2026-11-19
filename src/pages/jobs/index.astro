@@ -14,22 +14,23 @@ const typeParam = Astro.url.searchParams.get('type') ?? '';
 const activeType = JOB_TYPES[typeParam] ? typeParam : '';
 const jobs = await fetchActiveJobs(SUPABASE_URL, SUPABASE_KEY, { type: activeType });
 
-// One indexable page per job type, e.g. "Freelance work for developers"
+// One indexable page per job type, each targeting its own search terms
 const typeHeadlines: Record<string, string> = {
-  '':         'Developer jobs & freelance work',
-  FULL_TIME:  'Full-time developer jobs',
-  PART_TIME:  'Part-time developer jobs',
-  CONTRACTOR: 'Freelance work for developers',
-  TEMPORARY:  'Short paid assignments for developers',
-  INTERN:     'Developer internships',
+  '':         'AI developer & vibe coding jobs',
+  FULL_TIME:  'Full-time AI developer jobs',
+  PART_TIME:  'Part-time AI developer jobs',
+  CONTRACTOR: 'Freelance AI developer & vibe coding work',
+  TEMPORARY:  'Short paid AI & vibe coding projects',
+  INTERN:     'AI developer internships',
 };
 const h1 = typeHeadlines[activeType];
+const titleCase = (t: string) => t.replace(/\b(\w)(\w*)/g, (_, f: string, r: string) => (f + r === 'and' ? f + r : f.toUpperCase() + r));
 const pageTitle = activeType
-  ? `${h1} | vibecoding.work`
-  : 'Developer Jobs, Freelance Work & Internships | vibecoding.work';
+  ? `${titleCase(h1)} | vibecoding.work`
+  : 'Open AI Developer & Vibe Coding Jobs | vibecoding.work';
 const pageDescription = activeType
-  ? `${h1} for vibecoders and AI-native builders. Real, paid opportunities — apply with your projects, no years of experience required.`
-  : 'Entry-level developer jobs, freelance work and internships for developers and vibecoders. Real, paid opportunities — apply with your projects. Updated daily.';
+  ? `Browse ${h1.startsWith('AI') ? h1 : h1[0].toLowerCase() + h1.slice(1)} — real opportunities for AI developers and vibecoders. Apply with your projects, no years of experience required.`
+  : 'Open AI developer and vibe coding jobs: remote roles, freelance work and internships for AI developers and vibecoders. Apply with your projects.';
 
 const schemaItemList = {
   '@context': 'https://schema.org',
@@ -69,7 +70,7 @@ const schemaBreadcrumb = {
           <span class="eyebrow">// paid work for developers</span>
           <h1 class="font-bold tracking-[-0.035em] leading-[1.02] text-[clamp(2.2rem,5.5vw,3.6rem)] mt-3">{h1}</h1>
           <p class="text-fog text-[1.05rem] leading-relaxed mt-4">
-            Real, paid opportunities for developers and vibecoders. Apply with your projects —
+            Real, paid opportunities for AI developers and vibecoders. Apply with your projects —
             no "5 years of experience" required.
           </p>
         </div>
@@ -109,7 +110,7 @@ const schemaBreadcrumb = {
             <span class="eyebrow">// for companies, founders &amp; nonprofits</span>
             <h2 class="font-bold tracking-[-0.03em] text-[clamp(1.6rem,3.5vw,2.2rem)] leading-tight mt-2">Give someone their first break.</h2>
             <p class="text-fog leading-relaxed mt-3">
-              Post a job or a small paid assignment. Every applicant comes with real projects, upvotes from other builders
+              Post a job or a small paid assignment. Every applicant comes with real projects, upvotes from other AI developers
               and endorsements from the community — so you can hire with confidence.
             </p>
           </div>

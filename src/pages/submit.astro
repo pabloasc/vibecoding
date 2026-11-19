@@ -4,6 +4,8 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProfileCard from '../components/ProfileCard.astro';
 import ProfileFields from '../components/ProfileFields.astro';
+import SocialButtons from '../components/SocialButtons.astro';
+import { REQUIRED_FIELDS } from '../lib/profileForm';
 
 const webPage = JSON.stringify({
   '@context': 'https://schema.org',
@@ -21,8 +23,8 @@ const webPage = JSON.stringify({
 ---
 
 <Layout
-  title="Drop your profile — vibecoding.work"
-  description="Developer or vibecoder? Join a community that helps each other get hired. Create your profile in two minutes, share your projects and find jobs."
+  title="Create Your AI Developer Profile — Free | vibecoding.work"
+  description="AI developer or vibecoder? Create your free profile in 2 minutes — sign in with LinkedIn or Google, show your projects and get found by teams who hire."
 >
   <script slot="head" type="application/ld+json" set:html={webPage} />
   <Header />
@@ -42,6 +44,19 @@ const webPage = JSON.stringify({
         <p class="text-fog text-[1.08rem] leading-relaxed mt-4">
           Two minutes. No CV. Share what you've built and what you're looking for — and join a community that helps each other get hired.
         </p>
+
+        <!-- Progress: 1 sign in → 2 profile → 3 live -->
+        <ol id="steps" class="flex items-center gap-2 sm:gap-3 mt-7 font-mono text-[0.7rem] sm:text-[0.74rem]">
+          {['Sign in', 'Your profile', "You're live"].map((label, i) => (
+            <>
+              {i > 0 && <li aria-hidden="true" class="step-bar h-px w-6 sm:w-10"></li>}
+              <li class="step flex items-center gap-2 rounded-full border px-3 py-1.5" data-step={i + 1}>
+                <span class="step-dot w-5 h-5 rounded-full flex items-center justify-center text-[0.65rem] font-bold">{i + 1}</span>
+                {label}
+              </li>
+            </>
+          ))}
+        </ol>
       </div>
 
       <!-- Auth checking state -->
@@ -53,6 +68,14 @@ const webPage = JSON.stringify({
       <div id="auth-wall" class="hidden">
       <div class="grid lg:grid-cols-[1fr_1fr] gap-6 items-start">
         <div class="card p-6 sm:p-8">
+          <p class="font-semibold text-[1.25rem]">Join in one click 🚀</p>
+          <p class="text-fog text-[0.9rem] mt-1 mb-5">We'll bring your name and photo — you can change anything later.</p>
+          <SocialButtons />
+
+          <div class="flex items-center gap-3 my-6 font-mono text-[0.68rem] tracking-[0.14em] uppercase text-[#5A5A6E]">
+            <span class="h-px flex-1 bg-line"></span>or use email<span class="h-px flex-1 bg-line"></span>
+          </div>
+
           <div class="seg mb-6" role="tablist">
             <button id="tab-signup" class="seg-btn" role="tab" aria-selected="true">Create account</button>
             <button id="tab-signin" class="seg-btn" role="tab" aria-selected="false">Sign in</button>
@@ -86,8 +109,8 @@ const webPage = JSON.stringify({
 
         <ul class="space-y-3 lg:pt-2">
           {[
-            { icon: '👀', t: 'Get seen by people who hire', d: 'Founders and small teams browse new builders every week.' },
-            { icon: '🤝', t: 'Grow your network',                   d: 'Connect with builders on the same path, share tips and job leads, and vouch for each other.' },
+            { icon: '👀', t: 'Get seen by people who hire', d: 'Founders and small teams browse new AI developers and vibecoders every week.' },
+            { icon: '🤝', t: 'Grow your network',                   d: 'Connect with AI developers and vibecoders on the same path, share tips and job leads, and vouch for each other.' },
             { icon: '⚡', t: 'Land your first paid assignment',     d: 'Freelance projects, internships and first roles — no 5-years-required.' },
           ].map(x => (
             <li class="flex gap-4 rounded-2xl border border-line bg-surface/60 p-5">
@@ -165,20 +188,34 @@ const webPage = JSON.stringify({
 
               <div id="img-pane-url" class="hidden">
                 <input type="url" id="image-url" placeholder="https://avatars.githubusercontent.com/u/…" class="field font-mono !text-[0.9rem]" aria-label="Avatar URL" />
-                <p class="field-hint mt-2">Tip: your GitHub avatar works great.</p>
+                <p id="image-url-hint" class="field-hint mt-2">Tip: your GitHub avatar works great.</p>
               </div>
             </div>
           </ProfileFields>
 
           <div class="flex flex-wrap items-center gap-4 pt-2">
             <button type="submit" id="submit-btn" class="btn-primary !px-7 !py-4 !text-[1rem]">Publish my profile →</button>
-            <a href="/" class="text-fog hover:text-snow transition-colors text-[0.9rem]">Cancel</a>
+            <p id="publish-status" class="text-[0.9rem] text-fog" role="status"></p>
           </div>
         </form>
 
         <!-- Live preview -->
         <aside class="lg:sticky lg:top-24 space-y-4">
-          <p class="eyebrow">// live preview</p>
+          <!-- What's needed to publish — ticks as they type -->
+          <div id="publish-checklist" class="card p-5">
+            <p class="font-semibold">✅ To publish</p>
+            <p class="field-hint mt-0.5 mb-3.5">Just these 4 — everything else is optional.</p>
+            <ul class="space-y-2.5">
+              {REQUIRED_FIELDS.map(f => (
+                <li data-field={f.id} data-done="false" class="check-item flex items-center gap-2.5 text-[0.92rem]">
+                  <span class="check-box w-5 h-5 shrink-0 rounded-md border flex items-center justify-center text-[0.7rem] font-bold">✓</span>
+                  {f.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p class="eyebrow pt-2">// live preview</p>
           <div id="preview" class="pointer-events-none"><ProfileCard /></div>
           <div class="rounded-2xl border border-line bg-surface/60 p-5 text-[0.88rem] text-fog leading-relaxed">
             <p class="font-semibold text-snow mb-2">💡 Profiles that get replies…</p>
@@ -203,9 +240,12 @@ const webPage = JSON.stringify({
   import { profileSlug } from '../lib/slug';
   import { ADMIN_EMAIL, profileName, type Profile } from '../lib/profile';
   import {
-    readProfileFields, validateProfileFields, uploadAvatar, fillCard, fetchOwnProfile,
+    readProfileFields, uploadAvatar, fillCard, fetchOwnProfile,
     initProjectEditor, readProjects, validateProjects, saveProjects,
+    persistRemoteImage, applyImportedProfile, showImportStatus, importedMessage, onImportClick, initAboutTemplate,
+    profileFieldError, flagField, updatePublishChecklist,
   } from '../lib/profileForm';
+  import { SOCIAL_PROVIDERS, isSocialProvider, importedProfile, connectToImport, clearImportParam } from '../lib/socialAuth';
 
   const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -219,7 +259,22 @@ const webPage = JSON.stringify({
   const hasProfileEl   = document.getElementById('has-profile')!;
   let currentToken: string = SUPABASE_ANON_KEY;
 
+  // ── Progress steps ────────────────────────────────────────
+  // Styling per state lives in the <style> block below (data-state = todo | active | done)
+  function setStep(n: 1 | 2 | 3) {
+    document.querySelectorAll<HTMLElement>('#steps .step').forEach(li => {
+      const step = Number(li.dataset.step);
+      li.dataset.state = step < n ? 'done' : step === n ? 'active' : 'todo';
+      li.querySelector('.step-dot')!.textContent = step < n ? '✓' : String(step);
+    });
+    document.querySelectorAll<HTMLElement>('#steps .step-bar').forEach((bar, i) => {
+      bar.dataset.state = i + 2 <= n ? 'done' : 'todo';
+    });
+  }
+  setStep(1);
+
   function showAuthWall() {
+    setStep(1);
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.remove('hidden');
     formWrapEl.classList.add('hidden');
@@ -227,12 +282,16 @@ const webPage = JSON.stringify({
   }
 
   function showForm() {
+    setStep(2);
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.add('hidden');
     if (successEl.classList.contains('hidden')) formWrapEl.classList.remove('hidden');
+    // Deferred: Supabase calls inside onAuthStateChange can deadlock the auth client
+    setTimeout(prefillFromSocial, 0);
   }
 
   function showHasProfile(p: Profile) {
+    setStep(3);
     authCheckingEl.classList.add('hidden');
     authWallEl.classList.add('hidden');
     document.getElementById('has-profile-title')!.textContent = `${profileName(p)}'s profile`;
@@ -388,6 +447,58 @@ const webPage = JSON.stringify({
     updatePreview();
   });
 
+  // ── Import name + photo from LinkedIn / Google ────────────
+  let importedAvatarUrl: string | null = null;
+  let prefilled = false;
+
+  /** Use an imported photo as the avatar (unless they already picked one and this isn't an explicit import) */
+  function setAvatarFromUrl(url: string, overwrite: boolean) {
+    const hasOwn = !!imageInput.files?.length || !!imageUrlInput.value.trim();
+    if (hasOwn && !overwrite) return false;
+    if (imageInput.files?.length) removeBtn.click();
+    imageUrlInput.value = url;
+    importedAvatarUrl = url;
+    switchImageTab('url');
+    document.getElementById('image-url-hint')!.textContent = '📸 Your photo was imported — we\'ll save a copy when you publish.';
+    return true;
+  }
+
+  /** After signing up with LinkedIn/Google (or coming back from "Import"), fill in what we can */
+  async function prefillFromSocial() {
+    if (prefilled) return;
+    prefilled = true;
+    const param = new URLSearchParams(window.location.search).get('import');
+    const provider = isSocialProvider(param) ? param : undefined;
+    clearImportParam();
+    const { data: { user } } = await supabase.auth.getUser();   // fresh identities, incl. one just linked
+    const imp = user ? importedProfile(user, provider) : null;
+    if (!imp) return;
+    const filled = applyImportedProfile(imp, { overwrite: !!provider, setAvatar: setAvatarFromUrl });
+    if (filled.length) showImportStatus(importedMessage(filled, SOCIAL_PROVIDERS[imp.provider].label));
+  }
+
+  onImportClick(async (provider, btn) => {
+    if (!isSocialProvider(provider)) return;
+    const label = SOCIAL_PROVIDERS[provider].label;
+    const { data: { user } } = await supabase.auth.getUser();
+    const imp = user ? importedProfile(user, provider) : null;
+    if (imp) {
+      const filled = applyImportedProfile(imp, { overwrite: true, setAvatar: setAvatarFromUrl });
+      showImportStatus(filled.length ? importedMessage(filled, label) : `${label} didn't share a name or photo.`);
+      return;
+    }
+    // Not connected yet: connect the account, then come back here with ?import=<provider>
+    btn.disabled = true;
+    showImportStatus(`Opening ${label}…`);
+    const { error } = await connectToImport(provider);
+    if (error) {
+      btn.disabled = false;
+      showImportStatus(`Couldn't connect ${label}: ${error.message}`, 'error');
+    }
+  });
+
+  initAboutTemplate();
+
   // ── Live preview ──────────────────────────────────────────
   const previewCard = document.querySelector<HTMLElement>('#preview .p-card')!;
   let previewDebounce: ReturnType<typeof setTimeout> | null = null;
@@ -409,8 +520,9 @@ const webPage = JSON.stringify({
 
   submitFormEl.addEventListener('input', () => {
     if (previewDebounce) clearTimeout(previewDebounce);
-    previewDebounce = setTimeout(updatePreview, 120);
+    previewDebounce = setTimeout(() => { updatePreview(); updatePublishChecklist(); }, 120);
   });
+  updatePublishChecklist();
 
   updatePreview();
   initProjectEditor();
@@ -426,14 +538,24 @@ const webPage = JSON.stringify({
     errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  /** Validation problems show right next to the publish button, where they're looking */
+  function showPublishProblem(message: string) {
+    const status = document.getElementById('publish-status')!;
+    status.textContent = `⚠️ ${message}`;
+    status.classList.remove('text-fog', 'text-acid');
+    status.classList.add('text-pink');
+  }
+
   submitFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorBanner.classList.add('hidden');
 
     const values = readProfileFields();
     const projects = readProjects();
-    const invalid = validateProfileFields(values) ?? validateProjects(projects);
-    if (invalid) { showError(invalid); return; }
+    const fieldError = profileFieldError(values);
+    if (fieldError) { flagField(fieldError.field); showPublishProblem(fieldError.message); return; }
+    const projectError = validateProjects(projects);
+    if (projectError) { showPublishProblem(projectError); return; }
 
     const imageFile = imageSource === 'file' ? (imageInput.files?.[0] ?? null) : null;
 
@@ -443,6 +565,9 @@ const webPage = JSON.stringify({
     try {
       let image_url: string | null = imageSource === 'url' ? (imageUrlInput.value.trim() || null) : null;
       if (imageFile) image_url = await uploadAvatar(imageFile, SUPABASE_URL, SUPABASE_ANON_KEY, currentToken);
+      else if (image_url && image_url === importedAvatarUrl) {
+        image_url = await persistRemoteImage(image_url, SUPABASE_URL, SUPABASE_ANON_KEY, currentToken);
+      }
 
       const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/jobs`, {
         method: 'POST',
@@ -478,6 +603,7 @@ const webPage = JSON.stringify({
 
       formWrapEl.classList.add('hidden');
       successEl.classList.remove('hidden');
+      setStep(3);
       successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     } catch (err: unknown) {
@@ -488,3 +614,25 @@ const webPage = JSON.stringify({
     }
   });
 </script>
+
+<style>
+  .step { color: var(--color-fog); background: rgba(17, 17, 24, 0.7); border-color: var(--color-line); transition: all 0.25s ease; }
+  .step .step-dot { background: var(--color-raised); }
+  .step[data-state="active"] {
+    color: var(--color-void);
+    background: var(--color-acid);
+    border-color: var(--color-acid);
+    font-weight: 600;
+    box-shadow: 0 6px 24px -8px rgba(198, 255, 61, 0.6);
+  }
+  .step[data-state="active"] .step-dot { background: rgba(8, 8, 12, 0.15); }
+  .step[data-state="done"] { color: var(--color-acid); border-color: rgba(198, 255, 61, 0.4); }
+  .step[data-state="done"] .step-dot { background: rgba(198, 255, 61, 0.15); }
+  .step-bar { background: var(--color-line); transition: background 0.25s ease; }
+  .step-bar[data-state="done"] { background: var(--color-acid); }
+
+  .check-item { color: var(--color-fog); transition: color 0.2s ease; }
+  .check-item .check-box { border-color: var(--color-line); color: transparent; transition: all 0.2s ease; }
+  .check-item[data-done="true"] { color: var(--color-snow); }
+  .check-item[data-done="true"] .check-box { background: var(--color-acid); border-color: var(--color-acid); color: var(--color-void); }
+</style>

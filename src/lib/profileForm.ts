@@ -9,26 +9,79 @@ const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.get
 
 export type ProfileFieldValues = Omit<Profile, 'id' | 'created_at' | 'image_url' | 'user_id'>;
 
+/** "linkedin.com/in/you" → "https://linkedin.com/in/you" — nobody should have to type https:// */
+export function normalizeUrl(raw: string) {
+  const v = raw.trim();
+  if (!v || /^[a-z][a-z0-9+.-]*:/i.test(v)) return v;
+  return `https://${v}`;
+}
+
 export function readProfileFields(): ProfileFieldValues {
   return {
     name:            $('name').value.trim(),
     title:           $('title').value.trim(),
     description:     $<HTMLTextAreaElement>('description').value.trim(),
-    link:            $('link').value.trim(),
+    link:            normalizeUrl($('link').value),
     employment_type: document.querySelector<HTMLInputElement>('input[name="employment_type"]:checked')?.value ?? 'FULL_TIME',
     is_remote:       $('is-remote').checked,
     locations:       $('locations').value.split(',').map(s => s.trim()).filter(Boolean),
   };
 }
 
+/** The 4 fields needed to publish, in form order (ids match <ProfileFields />) */
+export const REQUIRED_FIELDS = [
+  { id: 'name',        label: 'Your name' },
+  { id: 'title',       label: 'Headline' },
+  { id: 'description', label: 'About you' },
+  { id: 'link',        label: 'Profile URL' },
+] as const;
+
+/** First problem with the required fields ({ field id, message }), or null when ready to publish */
+export function profileFieldError(v: ProfileFieldValues): { field: string; message: string } | null {
+  if (!v.name)        return { field: 'name',        message: 'Add your name so people know who they\'re talking to.' };
+  if (!v.title)       return { field: 'title',       message: 'Add a headline — what you build, in a few words.' };
+  if (!v.description) return { field: 'description', message: 'Tell the community a bit about yourself — the template button helps.' };
+  if (!v.link)        return { field: 'link',        message: 'Add your LinkedIn or GitHub link so people can connect with you.' };
+  try { new URL(v.link); } catch { return { field: 'link', message: 'That profile link doesn\'t look right — e.g. linkedin.com/in/you' }; }
+  return null;
+}
+
 /** Returns an error message, or null when the required fields are filled in */
 export function validateProfileFields(v: ProfileFieldValues): string | null {
-  if (!v.name)        return 'Add your name so people know who they\'re talking to.';
-  if (!v.title)       return 'Add a headline — what you build, in a few words.';
-  if (!v.description) return 'Tell the community a bit about yourself.';
-  if (!v.link)        return 'Profile URL is required — link your GitHub, portfolio or LinkedIn.';
-  try { new URL(v.link); } catch { return 'Profile URL should be a full link, e.g. https://github.com/you'; }
-  return null;
+  return profileFieldError(v)?.message ?? null;
+}
+
+/** Highlight a field that needs attention and bring it into view; cleared as soon as they type */
+export function flagField(id: string) {
+  const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+  if (!el) return;
+  el.setAttribute('aria-invalid', 'true');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.focus({ preventScroll: true });
+  el.addEventListener('input', () => el.removeAttribute('aria-invalid'), { once: true });
+}
+
+/**
+ * Live "To publish" checklist (#publish-checklist li[data-field]) and the status line by the
+ * publish button (#publish-status). Returns how many required fields are still empty.
+ */
+export function updatePublishChecklist() {
+  const missing: string[] = [];
+  for (const f of REQUIRED_FIELDS) {
+    const done = !!(document.getElementById(f.id) as HTMLInputElement | null)?.value.trim();
+    if (!done) missing.push(f.label);
+    const li = document.querySelector<HTMLElement>(`#publish-checklist [data-field="${f.id}"]`);
+    if (li) li.dataset.done = String(done);
+  }
+  const status = document.getElementById('publish-status');
+  if (status) {
+    status.textContent = missing.length
+      ? `${missing.length} to go: ${missing.join(', ')}`
+      : '✓ All set — you can publish now';
+    status.classList.toggle('text-acid', missing.length === 0);
+    status.classList.toggle('text-fog', missing.length > 0);
+  }
+  return missing.length;
 }
 
 export function fillProfileFields(p: Profile) {
@@ -37,7 +90,10 @@ export function fillProfileFields(p: Profile) {
   $<HTMLTextAreaElement>('description').value = p.description;
   $('link').value = p.link;
   const radio = document.querySelector<HTMLInputElement>(`input[name="employment_type"][value="${p.employment_type ?? 'FULL_TIME'}"]`);
-  if (radio) radio.checked = true;
+  if (radio) {
+    radio.checked = true;
+    radio.closest('label')?.classList.remove('hidden');   // reveal a legacy option (e.g. Mentor) this profile uses
+  }
   $('is-remote').checked = p.is_remote !== false;
   $('locations').value = (p.locations ?? []).join(', ');
 }
@@ -77,6 +133,91 @@ export async function uploadAvatar(file: File, supabaseUrl: string, anonKey: str
     throw new Error(err?.message || 'Image upload failed.');
   }
   return `${supabaseUrl}/storage/v1/object/public/job-images/${filename}`;
+}
+
+/**
+ * Copy a remote image (e.g. a LinkedIn/Google profile photo) into our storage bucket.
+ * LinkedIn photo URLs expire, so a copy keeps profiles from showing broken images later.
+ * Falls back to the original URL if the provider doesn't allow the download.
+ */
+export async function persistRemoteImage(url: string, supabaseUrl: string, anonKey: string, token: string) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return url;
+    const blob = await res.blob();
+    if (!blob.type.startsWith('image/')) return url;
+    const ext = blob.type.split('/')[1]?.split('+')[0] || 'jpg';
+    return await uploadAvatar(new File([blob], `photo.${ext}`, { type: blob.type }), supabaseUrl, anonKey, token);
+  } catch {
+    return url;
+  }
+}
+
+// ── Import from LinkedIn / Google (top of <ProfileFields />) ──
+
+type ImportedFields = { provider: string; name: string | null; avatarUrl: string | null };
+
+/**
+ * Fill name + photo from an imported LinkedIn/Google profile.
+ * `overwrite` replaces what's already typed (used when the member clicks "Import").
+ * `setAvatar` is page-specific (submit and edit manage the avatar differently).
+ * Returns what was filled, e.g. ['name', 'photo'].
+ */
+export function applyImportedProfile(
+  imp: ImportedFields,
+  opts: { overwrite: boolean; setAvatar: (url: string, overwrite: boolean) => boolean },
+) {
+  const filled: string[] = [];
+  const nameInput = $('name');
+  if (imp.name && (opts.overwrite || !nameInput.value.trim())) {
+    nameInput.value = imp.name;
+    filled.push('name');
+  }
+  if (imp.avatarUrl && opts.setAvatar(imp.avatarUrl, opts.overwrite)) filled.push('photo');
+  if (filled.length) nameInput.form?.dispatchEvent(new Event('input', { bubbles: true }));
+  return filled;
+}
+
+/** Friendly status line under the import buttons */
+export function showImportStatus(message: string, tone: 'success' | 'error' = 'success') {
+  const el = $('import-status');
+  el.textContent = message;
+  el.classList.remove('hidden', 'text-acid', 'text-pink');
+  el.classList.add(tone === 'success' ? 'text-acid' : 'text-pink');
+}
+
+/** "✨ We filled in your name and photo from LinkedIn" */
+export function importedMessage(filled: string[], providerLabel: string) {
+  const what = filled.map(f => (f === 'photo' ? 'photo' : 'name')).join(' and ');
+  return `✨ We filled in your ${what} from ${providerLabel}. Now add a headline and what you've built.`;
+}
+
+/** Wire the "Import from …" buttons; the page decides what importing means */
+export function onImportClick(handler: (provider: string, button: HTMLButtonElement) => void) {
+  document.querySelectorAll<HTMLButtonElement>('[data-import-provider]').forEach(btn => {
+    btn.addEventListener('click', () => handler(btn.dataset.importProvider!, btn));
+  });
+}
+
+/** "✨ Start from a template" for the About field — LinkedIn/Google don't share profile text */
+export function initAboutTemplate() {
+  const btn = document.getElementById('about-template');
+  const about = $<HTMLTextAreaElement>('description');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (about.value.trim() && !confirm('Replace what you wrote with the template?')) return;
+    const first = $('name').value.trim().split(/\s+/)[0];
+    about.value = [
+      `Hi, I'm ${first || '…'}! 👋 I build with [your tools, e.g. Cursor, Claude Code, React, Supabase].`,
+      '',
+      'Recently I shipped [a project you are proud of] — [what it does and who uses it].',
+      '',
+      "I'm looking for [a first job / freelance work / an internship] where I can [what you want to learn or do next].",
+    ].join('\n');
+    about.focus();
+    about.setSelectionRange(about.value.indexOf('['), about.value.indexOf(']') + 1);   // select the first blank to fill in
+    about.form?.dispatchEvent(new Event('input', { bubbles: true }));
+  });
 }
 
 // ── Projects editor (section 03 of <ProfileFields />) ─────────
@@ -165,7 +306,7 @@ export function readProjects(): ProjectDraft[] {
       id:          item.dataset.projectId ?? null,
       title:       item.querySelector<HTMLInputElement>('.project-title')!.value.trim(),
       description: item.querySelector<HTMLTextAreaElement>('.project-description')!.value.trim(),
-      link:        item.querySelector<HTMLInputElement>('.project-link')!.value.trim(),
+      link:        normalizeUrl(item.querySelector<HTMLInputElement>('.project-link')!.value),
       image_url:   projectImages.get(item) ?? null,
       file:        projectFiles.get(item) ?? null,
     }))

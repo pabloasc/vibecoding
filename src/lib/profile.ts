@@ -122,6 +122,8 @@ type LookingFor = {
   formLabel?: string;
   /** Still displayed on existing profiles, but no longer offered in the form */
   legacy?: boolean;
+  /** A role the member registered as (e.g. Mentor) — not something they're "looking for" */
+  role?: boolean;
 };
 
 // Order = order of the form options; the first one is preselected
@@ -132,12 +134,18 @@ export const LOOKING_FOR: Record<string, LookingFor> = {
   PART_TIME:  { label: 'Part-time role',  emoji: '🌗' },
   FULL_TIME:  { label: 'Full-time role',  emoji: '🚀' },
   // No longer offered — kept so older profiles still display
-  MENTOR:     { label: 'Mentor',          emoji: '🧑‍🏫', legacy: true },
+  MENTOR:     { label: 'Mentor',          emoji: '🧑‍🏫', legacy: true, role: true },
   MENTORSHIP: { label: 'Mentorship',      emoji: '🧭', legacy: true },
 };
 
 export function lookingFor(type: string | null) {
   return LOOKING_FOR[type ?? 'FULL_TIME'] ?? LOOKING_FOR.FULL_TIME;
+}
+
+/** "Looking for: Internship", or just "Mentor" for roles like Mentor */
+export function lookingForText(type: string | null) {
+  const want = lookingFor(type);
+  return want.role ? want.label : `Looking for: ${want.label}`;
 }
 
 /** Call to action for a profile link: "Connect on LinkedIn", "Follow on GitHub" or a generic fallback */

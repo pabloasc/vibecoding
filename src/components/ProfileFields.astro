@@ -5,12 +5,25 @@
  * The avatar picker lives in each page since edit also manages the current image.
  */
 import { LOOKING_FOR } from '../lib/profile';
+import SocialButtons from './SocialButtons.astro';
 ---
 
 <!-- ── 01 · The basics ───────────────────────────────────── -->
 <fieldset class="card p-5 sm:p-7 space-y-6">
   <legend class="sr-only">The basics</legend>
-  <p class="eyebrow">01 · The basics</p>
+  <div class="flex items-center justify-between gap-3">
+    <p class="eyebrow">01 · The basics</p>
+    <span class="font-mono text-[0.62rem] tracking-[0.12em] uppercase rounded-full px-2 py-0.5 bg-acid/10 text-acid border border-acid/25">4 quick fields</span>
+  </div>
+
+  <!-- Import name + photo from LinkedIn / Google (wired by the page via onImportClick) -->
+  <div class="rounded-2xl border border-line p-4 sm:p-5"
+       style="background: linear-gradient(120deg, rgba(10,102,194,0.22), rgba(157,123,255,0.12) 55%, rgba(255,95,162,0.12));">
+    <p class="font-semibold text-[1rem]">⚡ Fill this in faster</p>
+    <p class="field-hint mt-0.5 mb-3.5">Import your name and photo from LinkedIn or Google — you can edit everything.</p>
+    <SocialButtons variant="import" />
+    <p id="import-status" class="hidden text-[0.88rem] font-medium mt-3" role="status"></p>
+  </div>
 
   <div class="space-y-2">
     <label for="name" class="field-label">Your name <span class="text-pink">*</span></label>
@@ -26,7 +39,11 @@ import { LOOKING_FOR } from '../lib/profile';
   </div>
 
   <div class="space-y-2">
-    <label for="description" class="field-label">About you <span class="text-pink">*</span></label>
+    <div class="flex items-center justify-between gap-3">
+      <label for="description" class="field-label">About you <span class="text-pink">*</span></label>
+      <button type="button" id="about-template"
+        class="text-[0.8rem] font-medium text-acid hover:underline underline-offset-4 whitespace-nowrap">✨ Start from a template</button>
+    </div>
     <textarea id="description" name="description" required rows="6"
       placeholder="What have you shipped? Which tools do you vibe with (Cursor, Claude Code, Lovable…)? What do you want to learn next?"
       class="field leading-relaxed resize-y min-h-[9rem]"></textarea>
@@ -35,8 +52,8 @@ import { LOOKING_FOR } from '../lib/profile';
   <div class="space-y-2">
     <label for="link" class="field-label">Profile URL <span class="text-pink">*</span></label>
     <input type="url" id="link" name="link" required
-      placeholder="https://github.com/you" class="field font-mono !text-[0.9rem]" />
-    <p class="field-hint">LinkedIn or GitHub work best — that's where people in the community will connect with you.</p>
+      placeholder="linkedin.com/in/you" class="field font-mono !text-[0.9rem]" />
+    <p class="field-hint">Your LinkedIn or GitHub — no need to type https://. That's where people will connect with you.</p>
   </div>
 
   <slot name="avatar" />
@@ -45,13 +62,17 @@ import { LOOKING_FOR } from '../lib/profile';
 <!-- ── 02 · What you're after ────────────────────────────── -->
 <fieldset class="card p-5 sm:p-7 space-y-6">
   <legend class="sr-only">What you're looking for</legend>
-  <p class="eyebrow">02 · What you're after</p>
+  <div class="flex items-center justify-between gap-3">
+    <p class="eyebrow">02 · What you're looking for</p>
+    <span class="font-mono text-[0.62rem] tracking-[0.12em] uppercase rounded-full px-2 py-0.5 bg-raised text-fog border border-line">Optional</span>
+  </div>
 
   <div class="space-y-3">
     <span class="field-label">Looking for</span>
     <div class="flex flex-wrap gap-2">
-      {Object.entries(LOOKING_FOR).filter(([, o]) => !o.legacy).map(([value, { label, formLabel, emoji }], i) => (
-        <label class="pill-option">
+      {/* Legacy options stay hidden unless the profile being edited already uses one (see fillProfileFields) */}
+      {Object.entries(LOOKING_FOR).map(([value, { label, formLabel, emoji, legacy }], i) => (
+        <label class:list={['pill-option', legacy && 'hidden']}>
           <input type="radio" name="employment_type" value={value} checked={i === 0} />
           <span>{emoji} {formLabel ?? label}</span>
         </label>
@@ -78,8 +99,11 @@ import { LOOKING_FOR } from '../lib/profile';
 <fieldset class="card p-5 sm:p-7 space-y-5">
   <legend class="sr-only">Projects</legend>
   <div>
-    <p class="eyebrow">03 · Projects</p>
-    <p class="field-hint mt-2">Show what you've shipped — apps, sites, experiments. Add one or as many as you like; other builders can upvote them.</p>
+    <div class="flex items-center justify-between gap-3">
+      <p class="eyebrow">03 · Your projects</p>
+      <span class="font-mono text-[0.62rem] tracking-[0.12em] uppercase rounded-full px-2 py-0.5 bg-raised text-fog border border-line">Optional</span>
+    </div>
+    <p class="field-hint mt-2">Show what you've shipped — apps, sites, experiments. Skip it for now if you like; you can add projects anytime from your profile.</p>
   </div>
 
   <div id="projects-list" class="space-y-4"></div>

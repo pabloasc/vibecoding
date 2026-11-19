@@ -121,9 +121,12 @@ import ProfileFields from '../components/ProfileFields.astro';
   import { profileSlug } from '../lib/slug';
   import { initials, canEdit, profileName, type Profile } from '../lib/profile';
   import {
-    readProfileFields, validateProfileFields, fillProfileFields, uploadAvatar,
+    readProfileFields, fillProfileFields, uploadAvatar,
     initProjectEditor, readProjects, validateProjects, saveProjects, fetchProjects,
+    persistRemoteImage, applyImportedProfile, showImportStatus, importedMessage, onImportClick, initAboutTemplate,
+    profileFieldError, flagField,
   } from '../lib/profileForm';
+  import { SOCIAL_PROVIDERS, isSocialProvider, importedProfile, connectToImport, clearImportParam } from '../lib/socialAuth';
 
   const SUPABASE_URL      = import.meta.env.PUBLIC_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -196,6 +199,14 @@ import ProfileFields from '../components/ProfileFields.astro';
     const projects = await fetchProjects(rows[0].id, SUPABASE_URL, SUPABASE_ANON_KEY);
     initProjectEditor(projects);
     populateForm(rows[0]);
+
+    // Back from "Import from LinkedIn/Google" (?import=<provider>): fill in name + photo
+    const param = new URLSearchParams(window.location.search).get('import');
+    if (isSocialProvider(param)) {
+      clearImportParam();
+      const imp = importedProfile(user, param);
+      if (imp) importInto(imp);
+    }
   }
 
   // ── Current avatar display ────────────────────────────────
@@ -271,6 +282,43 @@ import ProfileFields from '../components/ProfileFields.astro';
     reader.readAsDataURL(file);
   });
 
+  // ── Import name + photo from LinkedIn / Google ────────────
+  let importedAvatarUrl: string | null = null;
+
+  function setAvatarFromUrl(url: string) {
+    imageAction = 'keep';
+    imageInput.value = '';
+    switchImageTab('url');
+    imageUrlInput.value = url;
+    importedAvatarUrl = url;
+    renderCurrentAvatar(url, 'Imported photo — saved when you save changes');
+    return true;
+  }
+
+  function importInto(imp: NonNullable<ReturnType<typeof importedProfile>>) {
+    const label = SOCIAL_PROVIDERS[imp.provider].label;
+    const filled = applyImportedProfile(imp, { overwrite: true, setAvatar: setAvatarFromUrl });
+    showImportStatus(filled.length ? importedMessage(filled, label) : `${label} didn't share a name or photo.`);
+  }
+
+  onImportClick(async (provider, btn) => {
+    if (!isSocialProvider(provider)) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    const imp = user ? importedProfile(user, provider) : null;
+    if (imp) { importInto(imp); return; }
+    // Not connected yet: connect the account, then come back here with ?import=<provider>
+    const label = SOCIAL_PROVIDERS[provider].label;
+    btn.disabled = true;
+    showImportStatus(`Opening ${label}…`);
+    const { error } = await connectToImport(provider);
+    if (error) {
+      btn.disabled = false;
+      showImportStatus(`Couldn't connect ${label}: ${error.message}`, 'error');
+    }
+  });
+
+  initAboutTemplate();
+
   // ── Form save ─────────────────────────────────────────────
   const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
 
@@ -280,8 +328,10 @@ import ProfileFields from '../components/ProfileFields.astro';
 
     const values = readProfileFields();
     const projects = readProjects();
-    const invalid = validateProfileFields(values) ?? validateProjects(projects);
-    if (invalid) { showError(invalid); return; }
+    const fieldError = profileFieldError(values);
+    if (fieldError) { showError(fieldError.message); flagField(fieldError.field); return; }
+    const projectError = validateProjects(projects);
+    if (projectError) { showError(projectError); return; }
 
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving…';
@@ -293,6 +343,9 @@ import ProfileFields from '../components/ProfileFields.astro';
         image_url = null;
       } else if (imageSource === 'url' && imageUrlInput.value.trim()) {
         image_url = imageUrlInput.value.trim();
+        if (image_url === importedAvatarUrl) {
+          image_url = await persistRemoteImage(image_url, SUPABASE_URL, SUPABASE_ANON_KEY, sessionToken);
+        }
       } else if (imageAction instanceof File) {
         image_url = await uploadAvatar(imageAction, SUPABASE_URL, SUPABASE_ANON_KEY, sessionToken);
       }

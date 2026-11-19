@@ -5,7 +5,7 @@ import Analytics from '@vercel/analytics/astro';
 export interface Props {
   title?: string;
   description?: string;
-  /** og:image path, relative to site root. Defaults to /og.svg */
+  /** og:image path, relative to site root. Defaults to /og.png (1200×630) */
   ogImage?: string;
   /** Pass true to noindex (e.g. thank-you pages) */
   noindex?: boolean;
@@ -16,9 +16,9 @@ export interface Props {
 }
 
 const {
-  title = 'Developer Jobs & a Community to Get Hired | vibecoding.work',
-  description = 'Find developer jobs and freelance work in a community that helps each other get hired. Share your projects, grow your network and apply for free.',
-  ogImage = '/og.svg',
+  title = 'AI Developer & Vibe Coding Jobs + Community | vibecoding.work',
+  description = 'Find AI developer and vibe coding jobs, freelance work and internships. Join a free community of AI developers and vibecoders who help each other get hired.',
+  ogImage = '/og.png',
   noindex = false,
   type = 'website',
   canonical: canonicalPath,
@@ -34,15 +34,7 @@ const schemaWebsite = {
   '@type': 'WebSite',
   name: 'vibecoding.work',
   url: siteURL.href,
-  description: 'A community of developers and vibecoders helping each other find developer jobs and freelance work.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: `${siteURL.href}?q={search_term_string}`,
-    },
-    'query-input': 'required name=search_term_string',
-  },
+  description: 'AI developer and vibe coding jobs, plus a community of AI developers and vibecoders helping each other get hired.',
 };
 
 // ── Structured data: Organization ───────────────────────────
@@ -52,7 +44,7 @@ const schemaOrg = {
   name: 'vibecoding.work',
   url: siteURL.href,
   logo: new URL('/images/logo.png', siteURL).href,
-  description: 'A community of developers and vibecoders helping each other get hired.',
+  description: 'A community of AI developers and vibecoders helping each other get hired.',
   sameAs: [
     'https://vibecoding.work',
   ],
@@ -81,9 +73,10 @@ const schemaOrg = {
     <meta property="og:title"       content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image"       content={ogImageAbs} />
-    <meta property="og:image:width"  content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"   content="vibecoding.work — a community of developers and vibecoders helping each other get hired" />
+    {ogImage === '/og.png' && <meta property="og:image:width"  content="1200" />}
+    {ogImage === '/og.png' && <meta property="og:image:height" content="630" />}
+    {ogImage === '/og.png' && <meta property="og:image:type"   content="image/png" />}
+    <meta property="og:image:alt"   content="vibecoding.work — AI developer and vibe coding jobs, and a community of AI developers and vibecoders" />
     <meta property="og:site_name"   content="vibecoding.work" />
     <meta property="og:locale"      content="en_US" />
 

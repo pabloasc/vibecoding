@@ -139,6 +139,38 @@
     color: var(--color-void);
   }
 
+  /* ── Social sign-in buttons (brand colors) ───────────────── */
+  .oauth-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    width: 100%;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.98rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: 999px;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .oauth-btn:hover { transform: translateY(-1px); }
+  .oauth-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+  .oauth-btn-sm { font-size: 0.88rem; padding: 0.65rem 1rem; }
+
+  .oauth-linkedin {
+    color: #fff;
+    background: #0A66C2;
+    box-shadow: 0 8px 28px -10px rgba(10, 102, 194, 0.8);
+  }
+  .oauth-linkedin:hover { box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.25), 0 12px 36px -10px rgba(10, 102, 194, 0.9); }
+
+  .oauth-google {
+    color: #1F1F1F;
+    background: #FFFFFF;
+    box-shadow: 0 8px 28px -12px rgba(255, 255, 255, 0.45);
+  }
+  .oauth-google:hover { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15), 0 12px 36px -10px rgba(255, 255, 255, 0.5); }
+
   /* ── Chips / tags ────────────────────────────────────────── */
   .chip {
     display: inline-flex;
@@ -245,6 +277,10 @@
     outline: none;
     border-color: var(--color-acid);
     box-shadow: 0 0 0 3px rgba(198, 255, 61, 0.15);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-pink);
+    box-shadow: 0 0 0 3px rgba(255, 95, 162, 0.2);
   }
   select.field {
     appearance: none;
@@ -366,6 +402,10 @@
     padding: 0.85rem 1rem;
     font-size: 0.875rem;
   }
+
+  /* FAQ accordion */
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq[open] .faq-icon { transform: rotate(45deg); }
 
   /* ── Backgrounds ─────────────────────────────────────────── */
   .grid-bg {
