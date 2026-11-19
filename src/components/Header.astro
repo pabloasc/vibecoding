@@ -63,6 +63,14 @@
   const ctaDefault   = ctaLabel.innerHTML;
   const signoutBtn   = document.getElementById('auth-signout')!;
 
+  /** Name to show for the signed-in user: real name from LinkedIn/Google, else the email's first part */
+  function displayUsername(user: { email?: string; user_metadata?: Record<string, unknown> }) {
+    const meta = user.user_metadata ?? {};
+    const name = String(meta.full_name || meta.name || '').trim();
+    const label = name || `@${(user.email ?? '').split('@')[0]}`;
+    return label.length > 20 ? `${label.slice(0, 19)}…` : label;
+  }
+
   function showCta(href: string, label?: string) {
     headerCta.href = href;
     if (label) ctaLabel.textContent = label;
@@ -86,14 +94,17 @@
       authNav.classList.remove('hidden');
       authNav.classList.add('flex');
 
-      // Signed in: never "Join the community" — "My profile" if they have one, otherwise "Finish your profile"
+      // Signed in: never "Join the community" — "My profile" if they have one, otherwise their name
+      // (linking to the profile form); the separate @username is hidden then so it isn't shown twice
       if (!userChanged) return;
       headerCta.classList.add('invisible');
-      fetchOwnProfile(session.user.id, import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY)
+      const user = session.user;
+      fetchOwnProfile(user.id, import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY)
         .then(p => {
           if (check !== ctaCheck) return;
+          authUsername.classList.toggle('sm:block', !!p);
           if (p) showCta(`/profile/${profileSlug(p)}/`, 'My profile');
-          else showCta('/submit', 'Finish your profile');
+          else showCta('/submit', displayUsername(user));
         });
     } else {
       authNav.classList.add('hidden');
