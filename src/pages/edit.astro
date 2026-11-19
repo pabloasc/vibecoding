@@ -47,8 +47,12 @@ import ProfileFields from '../components/ProfileFields.astro';
     <!-- Profile not found -->
     <div id="not-found" class="hidden card py-14 text-center">
       <p class="text-[2.2rem]">🫥</p>
-      <p class="font-semibold text-[1.5rem] mt-2 mb-6">Profile not found.</p>
-      <a href="/" class="btn-ghost">← Back to builders</a>
+      <p class="font-semibold text-[1.5rem] mt-2">No profile found for this account.</p>
+      <p class="text-fog mt-2 mb-6 max-w-sm mx-auto">If you created one before, you may have used a different sign-in (email, Google or LinkedIn). Otherwise, let's create it.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="/submit" class="btn-primary">Create my profile →</a>
+        <a href="/" class="btn-ghost">← Back to builders</a>
+      </div>
     </div>
 
     <!-- Success state -->
@@ -117,6 +121,7 @@ import ProfileFields from '../components/ProfileFields.astro';
 </Layout>
 
 <script>
+  import type { User } from '@supabase/supabase-js';
   import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
   import { initials, canEdit, profileName, type Profile } from '../lib/profile';
@@ -124,7 +129,7 @@ import ProfileFields from '../components/ProfileFields.astro';
     readProfileFields, fillProfileFields, uploadAvatar,
     initProjectEditor, readProjects, validateProjects, saveProjects, fetchProjects,
     persistRemoteImage, applyImportedProfile, showImportStatus, importedMessage, onImportClick, initAboutTemplate,
-    profileFieldError, flagField,
+    profileFieldError, flagField, fetchOwnProfile,
   } from '../lib/profileForm';
   import { SOCIAL_PROVIDERS, isSocialProvider, importedProfile, connectToImport, clearImportParam } from '../lib/socialAuth';
 
@@ -168,14 +173,17 @@ import ProfileFields from '../components/ProfileFields.astro';
   let currentName = '';
   let imageAction: 'keep' | 'remove' | File = 'keep';
 
-  const profileId = new URLSearchParams(window.location.search).get('id');
+  // /edit?id=… edits that profile; plain /edit edits the signed-in member's own profile
+  let profileId = new URLSearchParams(window.location.search).get('id');
 
   async function init() {
-    if (!profileId) { showNotFound(); return; }
-
     // Validate JWT server-side — getUser() re-checks with Supabase auth server
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) { showSignedOut(); return; }
+    signedInUser = user;
+
+    if (!profileId) profileId = (await fetchOwnProfile(user.id, SUPABASE_URL, SUPABASE_ANON_KEY))?.id ?? null;
+    if (!profileId) { showNotFound(); return; }
 
     // Store session token for authenticated API calls
     const { data: { session } } = await supabase.auth.getSession();
@@ -285,7 +293,12 @@ import ProfileFields from '../components/ProfileFields.astro';
   // ── Import name + photo from LinkedIn / Google ────────────
   let importedAvatarUrl: string | null = null;
 
+  let signedInUser: User | null = null;   // set in init(); identities are fresh after a redirect back from linking
+
+  /** Saved data wins: only use the imported photo when the profile has none (or it was just removed) */
   function setAvatarFromUrl(url: string) {
+    const hasPhoto = (!!currentImageUrl && imageAction !== 'remove') || imageAction instanceof File || !!imageUrlInput.value.trim();
+    if (hasPhoto) return false;
     imageAction = 'keep';
     imageInput.value = '';
     switchImageTab('url');
@@ -295,16 +308,18 @@ import ProfileFields from '../components/ProfileFields.astro';
     return true;
   }
 
+  /** Fill only empty fields — what's saved in the database always takes priority */
   function importInto(imp: NonNullable<ReturnType<typeof importedProfile>>) {
     const label = SOCIAL_PROVIDERS[imp.provider].label;
-    const filled = applyImportedProfile(imp, { overwrite: true, setAvatar: setAvatarFromUrl });
-    showImportStatus(filled.length ? importedMessage(filled, label) : `${label} didn't share a name or photo.`);
+    const filled = applyImportedProfile(imp, { overwrite: false, setAvatar: setAvatarFromUrl });
+    showImportStatus(filled.length
+      ? importedMessage(filled, label)
+      : `Your profile already has a name and photo, so we kept them. To use your ${label} photo, remove the current one first.`);
   }
 
   onImportClick(async (provider, btn) => {
     if (!isSocialProvider(provider)) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    const imp = user ? importedProfile(user, provider) : null;
+    const imp = signedInUser ? importedProfile(signedInUser, provider) : null;
     if (imp) { importInto(imp); return; }
     // Not connected yet: connect the account, then come back here with ?import=<provider>
     const label = SOCIAL_PROVIDERS[provider].label;

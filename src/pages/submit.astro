@@ -157,6 +157,16 @@ const webPage = JSON.stringify({
       <div class="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
         <form id="submit-form" class="space-y-5" novalidate>
 
+          <!-- Signed in, but no profile is linked to this account (shown by the script) -->
+          <div id="no-profile-note" class="hidden rounded-2xl border border-violet/30 bg-violet/10 p-4 sm:p-5 text-[0.92rem] leading-relaxed">
+            <p class="font-semibold text-snow">👋 Signed in as <span id="no-profile-email"></span></p>
+            <p class="text-fog mt-1">
+              There's no profile linked to this account yet, so let's create one.
+              Made a profile before? It's probably linked to a different sign-in (email, Google or LinkedIn) —
+              sign out and sign in the way you did then to edit it.
+            </p>
+          </div>
+
           <div id="error-banner" class="hidden banner-error">
             <p id="error-message">An error occurred.</p>
           </div>
@@ -236,6 +246,7 @@ const webPage = JSON.stringify({
 </Layout>
 
 <script>
+  import type { User } from '@supabase/supabase-js';
   import { supabase } from '../lib/supabase';
   import { profileSlug } from '../lib/slug';
   import { ADMIN_EMAIL, profileName, type Profile } from '../lib/profile';
@@ -302,6 +313,7 @@ const webPage = JSON.stringify({
 
   supabase.auth.onAuthStateChange((_event, session) => {
     currentToken = session?.access_token ?? SUPABASE_ANON_KEY;
+    signedInUser = session?.user ?? null;
     if (!session) { showAuthWall(); return; }
 
     // Came here only to sign in (e.g. from "Post a job") — send them back
@@ -311,8 +323,10 @@ const webPage = JSON.stringify({
     // One profile per builder — send returning builders to edit instead (the admin can add more)
     if (session.user.email === ADMIN_EMAIL || !successEl.classList.contains('hidden')) { showForm(); return; }
     fetchOwnProfile(session.user.id, SUPABASE_URL, SUPABASE_ANON_KEY).then(existing => {
-      if (existing) showHasProfile(existing);
-      else showForm();
+      if (existing) { showHasProfile(existing); return; }
+      document.getElementById('no-profile-email')!.textContent = session.user.email ?? 'your account';
+      document.getElementById('no-profile-note')!.classList.remove('hidden');
+      showForm();
     });
   });
 
@@ -450,6 +464,7 @@ const webPage = JSON.stringify({
   // ── Import name + photo from LinkedIn / Google ────────────
   let importedAvatarUrl: string | null = null;
   let prefilled = false;
+  let signedInUser: User | null = null;   // latest signed-in user, refreshed in prefillFromSocial()
 
   /** Use an imported photo as the avatar (unless they already picked one and this isn't an explicit import) */
   function setAvatarFromUrl(url: string, overwrite: boolean) {
@@ -471,6 +486,7 @@ const webPage = JSON.stringify({
     const provider = isSocialProvider(param) ? param : undefined;
     clearImportParam();
     const { data: { user } } = await supabase.auth.getUser();   // fresh identities, incl. one just linked
+    if (user) signedInUser = user;
     const imp = user ? importedProfile(user, provider) : null;
     if (!imp) return;
     const filled = applyImportedProfile(imp, { overwrite: !!provider, setAvatar: setAvatarFromUrl });
@@ -480,8 +496,7 @@ const webPage = JSON.stringify({
   onImportClick(async (provider, btn) => {
     if (!isSocialProvider(provider)) return;
     const label = SOCIAL_PROVIDERS[provider].label;
-    const { data: { user } } = await supabase.auth.getUser();
-    const imp = user ? importedProfile(user, provider) : null;
+    const imp = signedInUser ? importedProfile(signedInUser, provider) : null;
     if (imp) {
       const filled = applyImportedProfile(imp, { overwrite: true, setAvatar: setAvatarFromUrl });
       showImportStatus(filled.length ? importedMessage(filled, label) : `${label} didn't share a name or photo.`);
