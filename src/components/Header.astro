@@ -33,7 +33,8 @@
       <a href="/post-job" class="nav-link hidden sm:block text-[0.88rem] text-snow hover:text-acid px-3 py-2 transition-colors">
         Post a job
       </a>
-      <a id="header-cta" href="/submit" class="btn-primary !py-2 !px-4 !text-[0.85rem] ml-1">
+      <!-- Label depends on auth state (set by the script below); invisible until known so it never flashes the wrong text -->
+      <a id="header-cta" href="/submit" class="btn-primary invisible !py-2 !px-4 !text-[0.85rem] ml-1">
         <span id="header-cta-label"><span class="sm:hidden">Join</span><span class="hidden sm:inline">Join the community</span></span> <span aria-hidden="true">→</span>
       </a>
 
@@ -62,25 +63,42 @@
   const ctaDefault   = ctaLabel.innerHTML;
   const signoutBtn   = document.getElementById('auth-signout')!;
 
+  function showCta(href: string, label?: string) {
+    headerCta.href = href;
+    if (label) ctaLabel.textContent = label;
+    else ctaLabel.innerHTML = ctaDefault;
+    headerCta.classList.remove('invisible');
+  }
+
+  // Auth events can fire several times (initial session, token refresh) — only the latest check may
+  // update the button, and only a different user (or sign-in/out) needs a new check
+  let ctaCheck = 0;
+  let ctaUserId: string | null | undefined;
+
   supabase.auth.onAuthStateChange((_event, session) => {
+    const userId = session?.user?.id ?? null;
+    const userChanged = userId !== ctaUserId;
+    ctaUserId = userId;
+    const check = userChanged ? ++ctaCheck : ctaCheck;
     if (session?.user) {
       const email = session.user.email ?? '';
       authUsername.textContent = `@${email.split('@')[0]}`;
       authNav.classList.remove('hidden');
       authNav.classList.add('flex');
 
-      // Builders who already have a profile get "My profile" instead of "Drop your profile"
+      // Signed in: never "Join the community" — "My profile" if they have one, otherwise "Finish your profile"
+      if (!userChanged) return;
+      headerCta.classList.add('invisible');
       fetchOwnProfile(session.user.id, import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY)
         .then(p => {
-          if (!p) return;
-          headerCta.href = `/profile/${profileSlug(p)}/`;
-          ctaLabel.textContent = 'My profile';
+          if (check !== ctaCheck) return;
+          if (p) showCta(`/profile/${profileSlug(p)}/`, 'My profile');
+          else showCta('/submit', 'Finish your profile');
         });
     } else {
       authNav.classList.add('hidden');
       authNav.classList.remove('flex');
-      headerCta.href = '/submit';
-      ctaLabel.innerHTML = ctaDefault;
+      showCta('/submit');
     }
   });
 
